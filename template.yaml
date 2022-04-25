@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Architecture for the back-end of the Trustee platform
+Description: Cloud infrastructure for the back-end of the Trustee platform
 
 Globals:
   Function:
