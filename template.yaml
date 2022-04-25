@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Architecture for the back-end of the Trustee platform
+
+Globals:
+  Function:
+    Timeout: 2
+    Runtime: nodejs14.x
+    Architectures:
+      - x86_64
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Resources:
+  RestApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: trustee
+      StageName: !Ref Stage
+      Cors:
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  HelloWorldApi:
+    Description: !Sub "API Gateway endpoint URL for ${Stage} stage"
+    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
