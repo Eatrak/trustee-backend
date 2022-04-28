@@ -15,17 +15,42 @@ Parameters:
     Default: dev
 
 Resources:
-  RestApiGateway:
-    Type: AWS::Serverless::Api
+  # RestApiGateway:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     Name: trustee
+  #     StageName: !Ref Stage
+  #     Cors:
+  #       AllowHeaders: "'Content-Type,Authorization'"
+  #       AllowMethods: "'GET,POST,OPTIONS'"
+  #       AllowOrigin: "'*'"
+  # Authentication and Authorization
+  UserPool:
+    Type: AWS::Cognito::UserPool
     Properties:
-      Name: trustee
-      StageName: !Ref Stage
-      Cors:
-        AllowHeaders: "'Content-Type,Authorization'"
-        AllowMethods: "'GET,POST,OPTIONS'"
-        AllowOrigin: "'*'"
+      UserPoolName: trustee
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          TemporaryPasswordValidityDays: 0
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+        - AttributeDataType: String
+          Name: username
+          Required: false
+          Mutable: true
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: trustee-client
+      GenerateSecret: false
 
-Outputs:
-  HelloWorldApi:
-    Description: !Sub "API Gateway endpoint URL for ${Stage} stage"
-    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+# Outputs:
+#   HelloWorldApi:
+#     Description: !Sub "API Gateway endpoint URL for ${Stage} stage"
+#     Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
