@@ -51,6 +51,6 @@ Resources:
       GenerateSecret: false
 
 # Outputs:
-#   HelloWorldApi:
+#   RestApiGatewayURL:
 #     Description: !Sub "API Gateway endpoint URL for ${Stage} stage"
 #     Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
