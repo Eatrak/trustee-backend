@@ -13,3 +13,19 @@ Parameters:
   Stage:
     Type: String
     Default: dev
+
+Resources:
+  RestApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: trustee
+      StageName: !Ref Stage
+      Cors:
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  RestApiGatewayURL:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
