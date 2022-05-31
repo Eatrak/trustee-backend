@@ -15,16 +15,6 @@ Parameters:
     Default: dev
 
 Resources:
-  # RestApiGateway:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: trustee
-  #     StageName: !Ref Stage
-  #     Cors:
-  #       AllowHeaders: "'Content-Type,Authorization'"
-  #       AllowMethods: "'GET,POST,OPTIONS'"
-  #       AllowOrigin: "'*'"
-  # Authentication and Authorization
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -49,8 +39,3 @@ Resources:
       UserPoolId: !Ref UserPool
       ClientName: trustee-client
       GenerateSecret: false
-
-# Outputs:
-#   RestApiGatewayURL:
-#     Description: !Sub "API Gateway endpoint URL for ${Stage} stage"
-#     Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
