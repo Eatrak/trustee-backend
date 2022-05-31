@@ -13,29 +13,3 @@ Parameters:
   Stage:
     Type: String
     Default: dev
-
-Resources:
-  UserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      UserPoolName: trustee
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          TemporaryPasswordValidityDays: 0
-      UsernameAttributes:
-        - email
-      Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: false
-        - AttributeDataType: String
-          Name: username
-          Required: false
-          Mutable: true
-  UserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      UserPoolId: !Ref UserPool
-      ClientName: trustee-client
-      GenerateSecret: false
