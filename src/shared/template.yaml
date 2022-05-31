@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Shared resources of the cloud infrastructure of the Trustee platform.
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Resources:
+  # Authentication and Authorization
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "trustee-${Stage}"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          TemporaryPasswordValidityDays: 0
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Sub "trustee-client-${Stage}"
+      GenerateSecret: false
+
+Outputs:
+  UserPool:
+    Value: !Ref UserPool
+    Export:
+      Name: TrusteeUserPool
+  UserPoolClient:
+    Value: !Ref UserPoolClient
+    Export:
+      Name: TrusteeUserPoolClient
