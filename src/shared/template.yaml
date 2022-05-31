@@ -11,6 +11,7 @@ Resources:
   # Authentication and Authorization
   UserPool:
     Type: AWS::Cognito::UserPool
+    DeletionPolicy: Retain
     Properties:
       UserPoolName: !Sub "trustee-${Stage}"
       Policies:
@@ -25,6 +26,7 @@ Resources:
           Required: false
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
+    DeletionPolicy: Retain
     Properties:
       UserPoolId: !Ref UserPool
       ClientName: !Sub "trustee-client-${Stage}"
