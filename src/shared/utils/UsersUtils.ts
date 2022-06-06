@@ -1,0 +1,59 @@
+import { AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
+
+import { Utils } from "./Utils";
+
+export default class UsersUtils {
+    /**
+     * 
+     * @param id User ID.
+     * @param email User email.
+     * @returns Command to create a user in DynamoDB.
+     */
+    public static async createDBUser(id: string, email: string) {
+        return await Utils.getInstance().getDBClient().send(new PutCommand({
+            TableName: Utils.getInstance().getTableName(),
+            Item: {
+                PK: "USER<" + id + ">",
+                SK: "INFO",
+                id,
+                email
+            }
+        }));
+    }
+
+    /**
+     * 
+     * @param userPoolId Cognito user pool ID.
+     * @param email User email.
+     * @returns Result of cognito user creation.
+     */
+    public static async createCognitoUser(userPoolId: string, email: string) {
+        return await Utils.getInstance().getCognitoClient().send(new AdminCreateUserCommand({
+            UserPoolId: userPoolId,
+            Username: email,
+            UserAttributes: [
+                {
+                    Name: "email",
+                    Value: email
+                }
+            ]
+        }));
+    }
+
+    /**
+     * 
+     * @param userPoolId Cognito user pool ID.
+     * @param email User email.
+     * @param password User password.
+     * @returns Command to set the password of the user specified.
+     */
+    public static async setCognitoUserPassword(userPoolId: string, email: string, password: string) {
+        return await Utils.getInstance().getCognitoClient().send(new AdminSetUserPasswordCommand({
+            UserPoolId: userPoolId,
+            Username: email,
+            Password: password,
+            Permanent: true
+        }));
+    }
+};
