@@ -23,7 +23,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         console.log("User pool id: " + USER_POOL_ID);
 
         return Utils.getInstance().getResponse(500, {
-            message: "There is a problem with the server, try later"
+            message: "Server error, try later"
         });
     }
 
