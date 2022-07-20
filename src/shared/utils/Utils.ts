@@ -1,6 +1,7 @@
 import { APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
+import Validator from "validatorjs";
 
 export class Utils {
     private static instance: Utils = new Utils();
@@ -68,5 +69,16 @@ export class Utils {
         
         this.cognitoClient = new CognitoIdentityProviderClient({});
         return this.cognitoClient;
+    }
+
+    public environmentIsSet(environmentValidationRules: Validator.Rules) {
+        const environmentValidation = new Validator(process.env, environmentValidationRules);
+        if (environmentValidation.fails()) {
+            console.log("Environment variables errors", environmentValidation.errors);
+
+            return false;
+        }
+
+        return true;
     }
 };
