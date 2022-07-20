@@ -40,7 +40,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref RestApiGateway
-            Path: /users
+            Path: /sign-up
             Method: POST
       Policies:
         - Statement:
