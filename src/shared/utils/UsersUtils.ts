@@ -1,4 +1,4 @@
-import { AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminInitiateAuthCommand, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { Utils } from "./Utils";
@@ -54,6 +54,23 @@ export default class UsersUtils {
             Username: email,
             Password: password,
             Permanent: true
+        }));
+    }
+
+    /**
+     * 
+     * @param userPoolId Cognito user pool ID.
+     * @param clientId Cognito user pool client ID.
+     * @param email User email.
+     * @param password User password.
+     * @returns Authentication response.
+     */
+    public static async authenticateUser(userPoolId: string, clientId: string, email: string, password: string) {
+        return await Utils.getInstance().getCognitoClient().send(new AdminInitiateAuthCommand({
+            UserPoolId: userPoolId,
+            ClientId: clientId,
+            AuthParameters: { USERNAME: email, PASSWORD: password },
+            AuthFlow: "ADMIN_NO_SRP_AUTH"
         }));
     }
 };

@@ -11,7 +11,7 @@ Globals:
     Environment:
       Variables:
         USER_POOL_ID: !ImportValue TrusteeUserPool
-        USER_POOL_CLIENT: !ImportValue TrusteeUserPoolClient
+        USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
         REGION: !Ref AWS::Region
 
 Parameters:
@@ -61,6 +61,34 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - signUp.ts
+  SignInFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: signIn.handler
+      Events:
+        SignIn:
+          Type: Api
+          Properties:
+            RestApiId: !Ref RestApiGateway
+            Path: /sign-in
+            Method: POST
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminCreateUser
+                - cognito-idp:AdminSetUserPassword
+                - cognito-idp:AdminInitiateAuth
+              Resource: !ImportValue TrusteeUserPoolArn
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - signIn.ts
 
 Outputs:
   RestApiGatewayURL:
