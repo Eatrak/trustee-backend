@@ -4,7 +4,7 @@ import Validator from "validatorjs";
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
 
-import { signInValidation } from "@crudRules/users";
+import { signInValidation } from "@crudRules/auth";
 import { Utils } from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import { SignInBody } from "@bodies/auth/signIn";

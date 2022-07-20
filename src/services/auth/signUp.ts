@@ -5,7 +5,7 @@ import Validator from "validatorjs";
 import en from 'validatorjs/src/lang/en';
 import { ulid } from "ulid";
 
-import { createUserValidation } from "@crudRules/users";
+import { createUserValidation } from "@crudRules/auth";
 import { SignUpBody } from "@bodies/auth/signUp";
 import { Utils } from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
