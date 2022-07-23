@@ -5,7 +5,7 @@ import Validator from "validatorjs";
 import en from 'validatorjs/src/lang/en';
 import { ulid } from "ulid";
 
-import { createUserEnvironmentValidation, signUpValidator } from "@crudRules/auth";
+import { signUpEnvironmentValidator, signUpValidator } from "../../shared/crudValidators/auth";
 import { SignUpBody } from "@bodies/auth/signUp";
 import { Utils } from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
@@ -17,7 +17,7 @@ Validator.setMessages("en", en);
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // Check if the environment variables are set
-    const environmentError = Utils.getInstance().environmentIsSet(createUserEnvironmentValidation);
+    const environmentError = Utils.getInstance().environmentIsSet(signUpEnvironmentValidator);
     if (!environmentError) {
         return Utils.getInstance().getResponse(500, {
             message: "Server error, try later"

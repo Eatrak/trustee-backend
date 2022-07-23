@@ -13,7 +13,7 @@
       "strictPropertyInitialization": false,
       "paths": {
         "@utils/*": ["./src/shared/utils/*"],
-        "@crudRules/*": ["./src/shared/crudRules/*"],
+        "@crudValidators/*": ["./src/shared/crudValidators/*"],
         "@bodies/*": ["./src/shared/bodies/*"]
       }
     },

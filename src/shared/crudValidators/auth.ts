@@ -7,24 +7,24 @@ export const signUpValidator = {
 };
 
 /**
- * Validation for creating the user.
+ * Validator for sign-up environment variables.
  */
-export const createUserEnvironmentValidation = {
+export const signUpEnvironmentValidator = {
     USER_POOL_ID: "required|string"
 };
 
 /**
- * Validation for getting the user.
+ * Validator for user sign-in.
  */
-export const signInValidation = {
+export const signInValidator = {
     email: "required|string",
     password: "required|string"
 };
 
 /**
- * Validation for creating the user.
+ * Validator for sign-in environment variables.
  */
-export const signInUserEnvironmentValidation = {
+export const signInEnvironmentValidator = {
     USER_POOL_ID: "required|string",
     USER_POOL_CLIENT_ID: "required|string"
 };
