@@ -37,7 +37,8 @@ export default class UsersUtils {
                     Name: "email",
                     Value: email
                 }
-            ]
+            ],
+            MessageAction: "SUPPRESS"
         }));
     }
 
