@@ -5,7 +5,7 @@ import Validator from "validatorjs";
 import en from 'validatorjs/src/lang/en';
 import { ulid } from "ulid";
 
-import { createUserEnvironmentValidation, createUserValidation } from "@crudRules/auth";
+import { createUserEnvironmentValidation, signUpValidator } from "@crudRules/auth";
 import { SignUpBody } from "@bodies/auth/signUp";
 import { Utils } from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
@@ -34,7 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const body: SignUpBody = JSON.parse(event.body);
     const { userInfo } = body;
 
-    const validation = new Validator(userInfo, createUserValidation);
+    const validation = new Validator(userInfo, signUpValidator);
 
     if (validation.fails()) {
         return Utils.getInstance().getResponse(400, {

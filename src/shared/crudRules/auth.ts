@@ -1,9 +1,9 @@
 /**
- * Validation for creating the user.
+ * Validator for user sign-up.
  */
-export const createUserValidation = {
-    email: "required|string",
-    password: "required|string"
+export const signUpValidator = {
+    email: "required|email",
+    password: "required|string|min:5|max:30"
 };
 
 /**
