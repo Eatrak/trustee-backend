@@ -5,7 +5,7 @@ import Validator from "validatorjs";
 import en from 'validatorjs/src/lang/en';
 import { ulid } from "ulid";
 
-import { signUpEnvironmentValidator, signUpValidator } from "../../shared/crudValidators/auth";
+import { signUpEnvironmentValidator, signUpValidator } from "@crudValidators/auth";
 import { SignUpBody } from "@bodies/auth/signUp";
 import { Utils } from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
