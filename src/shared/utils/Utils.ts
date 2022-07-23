@@ -29,7 +29,8 @@ export class Utils {
         return {
             statusCode: statusCode,
             headers: {
-                "Content-Type": contentType
+                "Content-Type": contentType,
+                "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify(body)
         };
