@@ -65,3 +65,7 @@ resources:
       Value: !Ref UserPoolClient
       Export:
         Name: TrusteeUserPoolClient
+    MainTable:
+      Value: !Ref MainTable
+      Export:
+        Name: TrusteeMainTable
