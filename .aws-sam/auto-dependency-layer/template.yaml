@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cloud infrastructure for the back-end of the Trustee platform
+Globals:
+  Function:
+    Timeout: 2
+    Runtime: nodejs14.x
+    Architectures:
+    - x86_64
+    Environment:
+      Variables:
+        userPoolId:
+          Ref: UserPool
+        region:
+          Ref: AWS::Region
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+Resources:
+  RestApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: trustee
+      StageName:
+        Ref: Stage
+      Cors:
+        AllowHeaders: '''Content-Type,Authorization'''
+        AllowMethods: '''GET,POST,OPTIONS'''
+        AllowOrigin: '''*'''
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: trustee
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          TemporaryPasswordValidityDays: 0
+      UsernameAttributes:
+      - email
+      Schema:
+      - AttributeDataType: String
+        Name: email
+        Required: false
+      - AttributeDataType: String
+        Name: username
+        Required: false
+        Mutable: true
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId:
+        Ref: UserPool
+      ClientName: trustee-client
+      GenerateSecret: false
+  SignUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SignUpFunction
+      Handler: sign-up.handler
+      Events:
+        SignUp:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RestApiGateway
+            Path: /users
+            Method: POST
+      Layers:
+      - Fn::GetAtt:
+        - AwsSamAutoDependencyLayerNestedStack
+        - Outputs.SignUpFunctionbbef62ecDepLayer
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+        - sign-up.ts
+        Minify: true
+        Sourcemap: true
+        Target: es2020
+      SamResourceId: SignUpFunction
+  AwsSamAutoDependencyLayerNestedStack:
+    DeletionPolicy: Delete
+    Metadata:
+      CreatedBy: AWS SAM CLI sync command
+    Properties:
+      TemplateURL: D:\General\Personal\GithubWorks\trustee-backend\.aws-sam\auto-dependency-layer\nested_template.yaml
+    Type: AWS::CloudFormation::Stack
+Outputs:
+  RestApiGatewayURL:
+    Description: API Gateway endpoint URL
+    Value:
+      Fn::Sub: https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}

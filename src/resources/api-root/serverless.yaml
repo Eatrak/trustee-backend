@@ -1,0 +1,29 @@
+service: trustee-api-root
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+
+resources:
+  Resources:
+    RestApiGateway:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: trustee-${self:provider.stage}
+
+  Outputs:
+    RestApiGatewayURL:
+      Description: "Rest API Gateway URL"
+      Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}"
+    RestApiGatewayId:
+      Value: !Ref RestApiGateway
+      Export:
+        Name: TrusteeRestApiGatewayId-${self:provider.stage}
+    RestApiGatewayRootResourceId:
+      Value: !GetAtt RestApiGateway.RootResourceId
+      Export:
+        Name: TrusteeRestApiGatewayRootResourceId-${self:provider.stage}

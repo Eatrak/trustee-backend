@@ -1,0 +1,45 @@
+service: trustee-auth
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
+    restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
+  environment:
+    USER_POOL_ID: !ImportValue TrusteeUserPool
+    USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
+    REGION: !Ref AWS::Region
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: arn:aws:dynamodb:eu-central-1:471417226823:table/trustee-${self:provider.stage}
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminInitiateAuth
+      Resource: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+
+functions:
+  SignUp:
+    handler: signUp.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /sign-up
+
+  SignIn:
+    handler: signIn.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /sign-in

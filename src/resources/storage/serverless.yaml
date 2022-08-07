@@ -1,0 +1,52 @@
+service: trustee-storage
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      DeletionPolicy: Retain
+      Properties:
+        UserPoolName: trustee-${self:provider.stage}
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+            TemporaryPasswordValidityDays: 0
+        UsernameAttributes:
+          - email
+        Schema:
+          - Name: email
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: id
+            AttributeDataType: String
+            Required: false
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      DeletionPolicy: Retain
+      Properties:
+        UserPoolId: !Ref UserPool
+        ClientName: trustee-client-${self:provider.stage}
+        GenerateSecret: false
+
+  Outputs:
+    UserPool:
+      Value: !Ref UserPool
+      Export:
+        Name: TrusteeUserPool
+    UserPoolArn:
+      Value: !GetAtt UserPool.Arn
+      Export:
+        Name: TrusteeUserPoolArn-${self:provider.stage}
+    UserPoolClient:
+      Value: !Ref UserPoolClient
+      Export:
+        Name: TrusteeUserPoolClient
