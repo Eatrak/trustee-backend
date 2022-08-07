@@ -36,6 +36,21 @@ resources:
         UserPoolId: !Ref UserPool
         ClientName: trustee-client-${self:provider.stage}
         GenerateSecret: false
+    MainTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: trustee-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
 
   Outputs:
     UserPool:
