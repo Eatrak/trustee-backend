@@ -62,7 +62,9 @@ export class Utils {
      * @returns DynamoDB table name.
      */
      public getTableName(): string {
-        return "trustee";
+        if (!process.env.STAGE) throw new Error("STAGE environment variable is missing");
+
+        return `trustee-${process.env.STAGE}`;
     }
     
     public getCognitoClient() {
