@@ -15,6 +15,7 @@ provider:
     USER_POOL_ID: !ImportValue TrusteeUserPool
     USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
     REGION: !Ref AWS::Region
+    STAGE: ${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -24,7 +25,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:PutItem
-      Resource: arn:aws:dynamodb:eu-central-1:471417226823:table/trustee-${self:provider.stage}
+      Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
     - Effect: Allow
       Action:
         - cognito-idp:AdminInitiateAuth

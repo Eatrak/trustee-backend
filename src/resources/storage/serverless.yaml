@@ -36,7 +36,7 @@ resources:
         UserPoolId: !Ref UserPool
         ClientName: trustee-client-${self:provider.stage}
         GenerateSecret: false
-    MainTable:
+    MainTableDev:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: trustee-${self:provider.stage}
@@ -65,7 +65,7 @@ resources:
       Value: !Ref UserPoolClient
       Export:
         Name: TrusteeUserPoolClient
-    MainTable:
-      Value: !Ref MainTable
+    MainTableArnDev:
+      Value: !GetAtt MainTableDev.Arn
       Export:
-        Name: TrusteeMainTable
+        Name: TrusteeMainTableArn-dev
