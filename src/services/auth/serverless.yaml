@@ -31,15 +31,15 @@ provider:
 
 functions:
   SignUp:
-    handler: signUp.handler
+    handler: functions/signUp.handler
     events:
-      - httpApi:
+      - http:
           method: POST
           path: /sign-up
 
   SignIn:
-    handler: signIn.handler
+    handler: functions/signIn.handler
     events:
-      - httpApi:
+      - http:
           method: POST
           path: /sign-in
