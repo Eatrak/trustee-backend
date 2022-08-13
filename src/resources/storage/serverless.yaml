@@ -35,6 +35,9 @@ resources:
       Properties:
         UserPoolId: !Ref UserPool
         ClientName: trustee-client-${self:provider.stage}
+        ExplicitAuthFlows:
+          - ALLOW_REFRESH_TOKEN_AUTH
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
         GenerateSecret: false
     MainTableDev:
       Type: AWS::DynamoDB::Table
