@@ -41,6 +41,8 @@ resources:
         GenerateSecret: false
     MainTableDev:
       Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
       Properties:
         TableName: trustee-${self:provider.stage}
         BillingMode: PAY_PER_REQUEST
