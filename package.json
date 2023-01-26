@@ -10,7 +10,10 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.102.0",
     "@aws-sdk/client-dynamodb": "^3.100.0",
     "@aws-sdk/lib-dynamodb": "^3.100.0",
+    "@typedorm/common": "^1.15.3",
+    "@typedorm/core": "^1.15.3",
     "dayjs": "^1.11.4",
+    "reflect-metadata": "^0.1.13",
     "ulid": "^2.3.0",
     "validatorjs": "^3.22.1"
   },
