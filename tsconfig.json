@@ -11,6 +11,8 @@
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
       "strictPropertyInitialization": false,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
       "paths": {
         "@utils/*": ["./src/shared/utils/*"],
         "@crudValidators/*": ["./src/shared/crudValidators/*"],
