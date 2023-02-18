@@ -1,7 +1,8 @@
 import { AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminInitiateAuthCommand, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
-import { Utils } from "./Utils";
+import Utils from "./Utils";
+import DatabaseUtils from "./DatabaseUtils";
 
 export default class UsersUtils {
     /**
@@ -11,15 +12,15 @@ export default class UsersUtils {
      * @returns Command to create a user in DynamoDB.
      */
     public static async createDBUser(id: string, email: string) {
-        return await Utils.getInstance().getDBClient().send(new PutCommand({
-            TableName: Utils.getInstance().getTableName(),
-            Item: {
-                PK: "USER<" + id + ">",
-                SK: "INFO",
-                id,
-                email
-            }
-        }));
+        // return await DatabaseUtils.getInstance().getDBClient().send(new PutCommand({
+        //     TableName: Utils.getInstance().getTableName(),
+        //     Item: {
+        //         PK: "USER<" + id + ">",
+        //         SK: "INFO",
+        //         id,
+        //         email
+        //     }
+        // }));
     }
 
     /**
@@ -28,7 +29,7 @@ export default class UsersUtils {
      * @param email User email.
      * @returns Result of cognito user creation.
      */
-    public static async createCognitoUser(userPoolId: string, email: string) {
+    public static async createCognitoUser(userPoolId: string, userId: string, email: string) {
         return await Utils.getInstance().getCognitoClient().send(new AdminCreateUserCommand({
             UserPoolId: userPoolId,
             Username: email,
@@ -36,6 +37,10 @@ export default class UsersUtils {
                 {
                     Name: "email",
                     Value: email
+                },
+                {
+                    Name: "custom:id",
+                    Value: userId
                 }
             ],
             MessageAction: "SUPPRESS"

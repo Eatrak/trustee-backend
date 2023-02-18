@@ -1,0 +1,45 @@
+{
+  "name": "transactions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.102.0",
+    "@aws-sdk/client-dynamodb": "^3.100.0",
+    "@aws-sdk/lib-dynamodb": "^3.100.0",
+    "@typedorm/common": "^1.15.3",
+    "@typedorm/core": "^1.15.3",
+    "@typedorm/document-client": "^1.15.3",
+    "dayjs": "^1.11.4",
+    "reflect-metadata": "^0.1.13",
+    "ulid": "^2.3.0",
+    "validatorjs": "^3.22.1",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "scripts": {
+    "lint": "eslint '*.ts' --quiet --fix",
+    "compile": "tsc",
+    "test": "npm run compile && npm run unit"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.92",
+    "@types/node": "^17.0.13",
+    "@types/validatorjs": "^3.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "esbuild": "^0.15.18",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "2.8.2",
+    "serverless-webpack": "^5.11.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typescript": "^4.9.5",
+    "webpack": "^5.75.0"
+  }
+}

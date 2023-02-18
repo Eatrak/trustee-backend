@@ -2,6 +2,17 @@ service: trustee-auth
 
 frameworkVersion: '3'
 
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    packager: 'npm'
+
 provider:
   name: aws
   runtime: nodejs16.x
@@ -36,6 +47,7 @@ functions:
     handler: functions/signUp.handler
     events:
       - http:
+          cors: true
           method: POST
           path: /sign-up
 
@@ -43,8 +55,6 @@ functions:
     handler: functions/signIn.handler
     events:
       - http:
+          cors: true
           method: POST
           path: /sign-in
-
-plugins:
-  - serverless-esbuild
