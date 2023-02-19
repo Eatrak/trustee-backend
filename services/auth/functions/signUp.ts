@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from "aws-lambda";
-
 import Validator from "validatorjs";
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
