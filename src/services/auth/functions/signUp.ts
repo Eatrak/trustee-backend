@@ -47,7 +47,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     try {
         // Generate user ID
         const userId = ulid();
-
+        
         // Create the user in Cognito
         const createCognitoUserResponse = await UsersUtils.createCognitoUser(USER_POOL_ID, userId, userInfo.email);
 
