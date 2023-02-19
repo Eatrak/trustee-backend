@@ -1,7 +1,7 @@
+import "reflect-metadata";
 import { APIGatewayProxyResult } from "aws-lambda";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 import Validator from "validatorjs";
-import "reflect-metadata";
 
 export default class Utils {
     private static instance?: Utils;

@@ -1,0 +1,45 @@
+{
+  "name": "trustee-backend",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "resources/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "eslint-config-custom": "*",
+    "prettier": "latest",
+    "turbo": "latest"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "@typedorm/core": "^1.15.3",
+    "@typedorm/document-client": "^1.15.3",
+    "@types/aws-lambda": "^8.10.110",
+    "@types/node": "^18.14.0",
+    "@types/validatorjs": "^3.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "aws-lambda": "^1.0.7",
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "serverless-webpack": "^5.11.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typescript": "^4.9.5",
+    "validatorjs": "^3.22.1",
+    "webpack": "^5.75.0"
+  },
+  "packageManager": "npm@8.15.0"
+}

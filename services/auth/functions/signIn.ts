@@ -4,10 +4,10 @@ import Validator from "validatorjs";
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
 
-import { signInEnvironmentValidator, signInValidator } from "@crudValidators/auth";
-import Utils from "@utils/Utils";
-import UsersUtils from "@utils/UsersUtils";
-import { SignInBody } from "@bodies/auth/signIn";
+import { signInEnvironmentValidator, signInValidator } from "@libs/crudValidators/auth";
+import Utils from "utils/Utils";
+import UsersUtils from "utils/UsersUtils";
+import { SignInBody } from "@libs/bodies/auth/signIn";
 
 // Environment variables
 const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env;
