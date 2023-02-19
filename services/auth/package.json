@@ -2,20 +2,20 @@
   "name": "auth",
   "version": "1.0.0",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^4.17.21",
+    "@aws-sdk/client-cognito-identity-provider": "^3.102.0",
+    "@aws-sdk/client-dynamodb": "^3.100.0",
+    "@aws-sdk/lib-dynamodb": "^3.100.0",
+    "aws-lambda": "^1.0.7",
     "ulid": "^2.3.0",
-    "utils": "^1.0.0",
     "validatorjs": "^3.22.1"
-  },
-  "scripts": {
-    "lint": "eslint '*.ts' --quiet --fix",
-    "compile": "tsc",
-    "test": "npm run compile && npm run unit"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.92",

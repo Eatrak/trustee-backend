@@ -1,11 +1,10 @@
+import "reflect-metadata";
 import { APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 import Validator from "validatorjs";
 
-export class Utils {
-    private static instance: Utils = new Utils();
-    private dbClient: DynamoDBClient;
+export default class Utils {
+    private static instance?: Utils;
     private cognitoClient: CognitoIdentityProviderClient;
 
     private constructor() { }
@@ -15,6 +14,10 @@ export class Utils {
      * @returns Singleton istance of the Utils class.
      */
     public static getInstance() {
+        if (!this.instance) {
+            this.instance = new Utils();
+        }
+
         return this.instance;
     }
 
@@ -44,27 +47,6 @@ export class Utils {
         return Utils.getInstance().getResponse(500, {
             message: "Something went wrong"
         });
-    }
-    
-    /**
-     * 
-     * @returns DynamoDB connection string.
-     */
-    public getDBClient(): DynamoDBClient {
-        if (this.dbClient) return this.dbClient;
-        
-        this.dbClient = new DynamoDBClient({});
-        return this.dbClient;
-    }
-    
-    /**
-     * 
-     * @returns DynamoDB table name.
-     */
-     public getTableName(): string {
-        if (!process.env.STAGE) throw new Error("STAGE environment variable is missing");
-
-        return `trustee-${process.env.STAGE}`;
     }
     
     public getCognitoClient() {

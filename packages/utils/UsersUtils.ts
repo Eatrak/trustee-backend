@@ -1,7 +1,8 @@
-import { AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminInitiateAuthCommand, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { AdminCreateUserCommand, AdminInitiateAuthCommand, AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
-import { Utils } from "./Utils";
+import Utils from "./Utils";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 export default class UsersUtils {
     /**
@@ -11,8 +12,9 @@ export default class UsersUtils {
      * @returns Command to create a user in DynamoDB.
      */
     public static async createDBUser(id: string, email: string) {
-        return await Utils.getInstance().getDBClient().send(new PutCommand({
-            TableName: Utils.getInstance().getTableName(),
+        const document = new DynamoDBClient({});
+        await document.send(new PutCommand({
+            TableName: `trustee-${process.env.STAGE}`,
             Item: {
                 PK: "USER<" + id + ">",
                 SK: "INFO",
@@ -20,6 +22,7 @@ export default class UsersUtils {
                 email
             }
         }));
+        document.destroy();
     }
 
     /**

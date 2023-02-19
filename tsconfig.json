@@ -14,8 +14,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
-      "@crudValidators/*": ["./libs/crudValidators/*"],
-      "@bodies/*": ["./libs/bodies/*"]
+      "@libs/*": ["./libs/*"]
     }
   },
   "exclude": ["node_modules", "**/*.test.ts"]
