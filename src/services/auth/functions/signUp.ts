@@ -45,8 +45,11 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
     // User creation
     try {
+        // Generate user ID
+        const userId = ulid();
+
         // Create the user in Cognito
-        const createCognitoUserResponse = await UsersUtils.createCognitoUser(USER_POOL_ID, userInfo.email);
+        const createCognitoUserResponse = await UsersUtils.createCognitoUser(USER_POOL_ID, userId, userInfo.email);
 
         if (!createCognitoUserResponse.User) {
             return Utils.getInstance().getGeneralServerErrorResponse();
@@ -58,9 +61,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         if (!setUserPasswordResponse) {
             return Utils.getInstance().getGeneralServerErrorResponse();
         }
-
-        // Generate user ID
-        const userId = ulid();
 
         // Create user in DynamoDB
         await UsersUtils.createDBUser(userId, userInfo.email);

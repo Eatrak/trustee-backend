@@ -28,7 +28,7 @@ export default class UsersUtils {
      * @param email User email.
      * @returns Result of cognito user creation.
      */
-    public static async createCognitoUser(userPoolId: string, email: string) {
+    public static async createCognitoUser(userPoolId: string, userId: string, email: string) {
         return await Utils.getInstance().getCognitoClient().send(new AdminCreateUserCommand({
             UserPoolId: userPoolId,
             Username: email,
@@ -36,6 +36,10 @@ export default class UsersUtils {
                 {
                     Name: "email",
                     Value: email
+                },
+                {
+                    Name: "custom:id",
+                    Value: userId
                 }
             ],
             MessageAction: "SUPPRESS"
