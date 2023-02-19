@@ -5,8 +5,8 @@ import Validator from "validatorjs";
 import en from 'validatorjs/src/lang/en';
 
 import { signInEnvironmentValidator, signInValidator } from "@crudValidators/auth";
-import { Utils } from "@utils/Utils";
-import UsersUtils from "@utils/UsersUtils";
+import { Utils } from "utils/Utils";
+import UsersUtils from "utils/UsersUtils";
 import { SignInBody } from "@bodies/auth/signIn";
 
 // Environment variables
