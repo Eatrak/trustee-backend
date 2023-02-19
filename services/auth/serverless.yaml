@@ -10,8 +10,8 @@ package:
 
 custom:
   webpack:
-    webpackConfig: webpack.config.js
-    packager: npm
+    webpackConfig: ../../webpack.config.js
+    packager: 'npm'
 
 provider:
   name: aws
