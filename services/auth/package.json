@@ -11,6 +11,7 @@
     "@aws-sdk/client-dynamodb": "^3.100.0",
     "@aws-sdk/lib-dynamodb": "^3.100.0",
     "ulid": "^2.3.0",
+    "utils": "^1.0.0",
     "validatorjs": "^3.22.1"
   },
   "scripts": {
@@ -20,7 +21,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.92",
-    "@types/node": "^17.0.13",
+    "@types/node": "^18.14.0",
     "@types/validatorjs": "^3.15.0",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
