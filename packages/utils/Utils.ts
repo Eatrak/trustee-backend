@@ -1,7 +1,9 @@
 import "reflect-metadata";
-import { APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 import Validator from "validatorjs";
+
+import { AuthorizerCustomClaims } from "@libs/types/auth";
 
 export default class Utils {
     private static instance?: Utils;
@@ -47,6 +49,18 @@ export default class Utils {
         return Utils.getInstance().getResponse(500, {
             message: "Something went wrong"
         });
+    }
+
+    /**
+     * @returns Authorizer claims.
+     */
+    public getAuthorizerClaims(event: APIGatewayProxyEvent): AuthorizerCustomClaims {
+        const claims = event.requestContext.authorizer?.claims;
+        const customClaims = {
+            userId: claims["custom:id"]
+        };
+
+        return customClaims;
     }
     
     public getCognitoClient() {
