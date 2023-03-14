@@ -15,9 +15,19 @@ Validator.setMessages('en', en);
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const queryParams = event.queryStringParameters as unknown as GetTransactionsInputQueryParams;
-
-    const getTransactionsInput: GetTransactionsInput = { ...queryParams, userId };
+    const {
+        startCreationTimestamp,
+        endCreationTimestamp,
+        cursor
+    } = event.queryStringParameters as GetTransactionsInputQueryParams;
+    const getTransactionsInput: GetTransactionsInput = {
+        startCreationTimestamp,
+        endCreationTimestamp,
+        userId
+    };
+    
+    // Add cursor to the request used to get the next transactions from DynamoDB
+    if (cursor) getTransactionsInput.cursor = JSON.parse(cursor);
 
     // Validation
     const getTransactionsValidation = new Validator(getTransactionsInput, getTransactionsValidator);
@@ -30,12 +40,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
         // Get user transactions by creation range
         if (getTransactionsInput.startCreationTimestamp && getTransactionsInput.endCreationTimestamp) {
-            transactions = (await TransactionsUtils.getTransactionsByCreationRange(getTransactionsInput)) as ITransaction[];
+            const getTransactionsResponseFromDB = await TransactionsUtils.getTransactionsByCreationRange(getTransactionsInput);
+            const newCursor = getTransactionsResponseFromDB.cursor;
+            transactions = getTransactionsResponseFromDB.items;
+
+            const response: GetTransactionsResponse = { transactions, cursor: newCursor };
+    
+            return Utils.getInstance().getResponse(200, response);
         }
-
-        const response: GetTransactionsResponse = { transactions };
-
-        return Utils.getInstance().getResponse(200, response);
     } catch (err) {
         console.log(err);
     }

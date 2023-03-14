@@ -5,6 +5,8 @@ import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions'
 import { Transaction } from 'entities/transaction';
 
 export default class TransactionsUtils {
+    static MAX_TRANSACTIONS_TO_GET = 20;
+
     /**
      * Get user transactions by creation range.
      *
@@ -15,6 +17,7 @@ export default class TransactionsUtils {
         userId,
         startCreationTimestamp,
         endCreationTimestamp,
+        cursor
     }: GetTransactionsInput) {
         const entityManager = DatabaseUtils.getInstance().getEntityManager();
         const response = await entityManager.find(Transaction, { userId }, {
@@ -26,8 +29,10 @@ export default class TransactionsUtils {
                 transactionTimestamp: {
                     LE: endCreationTimestamp!
                 }
-            }
+            },
+            limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
+            cursor
         });
-        return response.items;
+        return response;
     }
 }
