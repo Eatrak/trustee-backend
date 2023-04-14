@@ -54,3 +54,16 @@ functions:
                       arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
                       claims:
                           - email
+    GetWallets:
+        handler: functions/getWallets.handler
+        events:
+            - http:
+                  method: GET
+                  path: /wallets
+                  cors: true
+                  authorizer:
+                      name: AuthAuthorizer
+                      type: COGNITO_USER_POOLS
+                      arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+                      claims:
+                          - email
