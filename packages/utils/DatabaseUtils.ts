@@ -5,6 +5,7 @@ import { createConnection, getEntityManager } from "@typedorm/core";
 
 import { mainTable } from "tables/main";
 import { Transaction } from "entities/transaction";
+import { Wallet } from "entities/wallet";
 
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
@@ -13,9 +14,12 @@ export default class DatabaseUtils {
         const documentClient = new DocumentClientV3(new DynamoDBClient({}));
 
         createConnection({
-          table: mainTable,
-          entities: [Transaction],
-          documentClient
+            table: mainTable,
+            entities: [
+                Transaction,
+                Wallet
+            ],
+            documentClient
         });
     }
 
