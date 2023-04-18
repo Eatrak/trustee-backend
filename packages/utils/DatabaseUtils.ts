@@ -16,8 +16,8 @@ export default class DatabaseUtils {
         createConnection({
             table: mainTable,
             entities: [
-                Transaction,
-                Wallet
+                Wallet,
+                Transaction
             ],
             documentClient
         });
