@@ -1,6 +1,6 @@
 import "reflect-metadata";
+import { getEntityManager } from "@typedorm/core";
 
-import DatabaseUtils from './DatabaseUtils';
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
 
@@ -19,7 +19,7 @@ export default class TransactionsUtils {
         endCreationTimestamp,
         cursor
     }: GetTransactionsInput) {
-        const entityManager = DatabaseUtils.getInstance().getEntityManager();
+        const entityManager = getEntityManager();
         const response = await entityManager.find(Transaction, { userId }, {
             queryIndex: "GSI1",
             keyCondition: {

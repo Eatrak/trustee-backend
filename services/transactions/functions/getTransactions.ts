@@ -5,6 +5,7 @@ import Validator from 'validatorjs';
 import en from 'validatorjs/src/lang/en';
 
 import Utils from 'utils/Utils';
+import DatabaseUtils from "utils/DatabaseUtils";
 import TransactionsUtils from 'utils/TransactionsUtils';
 import { ITransaction } from 'entities/transaction';
 import { GetTransactionsInputQueryParams, GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
@@ -12,6 +13,7 @@ import { getTransactionsValidator } from '@libs/crudValidators/transactions';
 import { GetTransactionsResponse } from '@libs/requestInterfaces/transactions/getTransactions';
 
 Validator.setMessages('en', en);
+DatabaseUtils.getInstance().initTypeDormConnection();
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);

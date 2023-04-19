@@ -1,27 +1,13 @@
-import "reflect-metadata";
+import { createConnection } from "@typedorm/core";
+import { DocumentClientV3 } from "@typedorm/document-client";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DocumentClientV3 } from '@typedorm/document-client';
-import { createConnection, getEntityManager } from "@typedorm/core";
 
-import { mainTable } from "tables/main";
 import { Transaction } from "entities/transaction";
 import { Wallet } from "entities/wallet";
+import { mainTable } from "tables/main";
 
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
-
-    private constructor() {
-        const documentClient = new DocumentClientV3(new DynamoDBClient({}));
-
-        createConnection({
-            table: mainTable,
-            entities: [
-                Wallet,
-                Transaction
-            ],
-            documentClient
-        });
-    }
 
     /**
      * 
@@ -36,15 +22,6 @@ export default class DatabaseUtils {
     }
 
     /**
-     * Establish a connection with the database and load
-     * the entities for initializing the library used to perform
-     * queries to the database.
-     */
-    public getEntityManager() {
-        return getEntityManager();
-    }
-
-    /**
      * 
      * @returns DynamoDB table name.
      */
@@ -52,5 +29,17 @@ export default class DatabaseUtils {
         if (!process.env.STAGE) throw new Error("STAGE environment variable is missing");
 
         return `trustee-${process.env.STAGE}`;
+    }
+
+    public initTypeDormConnection() {
+        const documentClient = new DocumentClientV3(new DynamoDBClient({}));
+        createConnection({
+            table: mainTable,
+            entities: [
+                Transaction,
+                Wallet
+            ],
+            documentClient
+        });
     }
 };

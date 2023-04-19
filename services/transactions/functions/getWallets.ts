@@ -11,8 +11,10 @@ import en from 'validatorjs/src/lang/en';
 import Utils from 'utils/Utils';
 import WalletsUtils from "utils/WalletsUtils";
 import { GetWalletsResponse } from "@libs/requestInterfaces/transactions/getWallets";
+import DatabaseUtils from "utils/DatabaseUtils";
 
 Validator.setMessages('en', en);
+DatabaseUtils.getInstance().initTypeDormConnection();
 
 export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
