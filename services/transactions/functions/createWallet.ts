@@ -10,7 +10,8 @@ import en from 'validatorjs/src/lang/en';
 
 import Utils from 'utils/Utils';
 import WalletsUtils from "utils/WalletsUtils";
-import { GetWalletsResponse } from "@libs/requestInterfaces/transactions/getWallets";
+import { CreateWalletBody } from "@libs/bodies/transactions/createWallet";
+import { CreateWalletResponse } from "@libs/requestInterfaces/transactions/createWallet";
 
 Validator.setMessages('en', en);
 
@@ -18,12 +19,13 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
+    const { walletName }: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
 
     try {
-        const wallets = (await WalletsUtils.getWallets(userId)).items;
+        const createdWallet = await WalletsUtils.createWallet(userId, walletName);
 
-        const response: GetWalletsResponse = { wallets };
-        return Utils.getInstance().getResponse(200, response);
+        const response: CreateWalletResponse = { createdWallet };
+        return Utils.getInstance().getResponse(201, response);
     } catch (err) {
         console.log(err);
     }

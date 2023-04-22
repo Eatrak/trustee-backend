@@ -1,9 +1,11 @@
 import "reflect-metadata";
-import { getEntityManager } from "@typedorm/core";
 
 import { Wallet } from "entities/wallet";
+import DatabaseUtils from "./DatabaseUtils";
 
 export default class WalletsUtils {
+    static entityManager = DatabaseUtils.getInstance().getEntityManager("wallets");
+
     /**
      * Get user wallets.
      *
@@ -11,8 +13,7 @@ export default class WalletsUtils {
      * @returns Result of the query used to get user wallets.
      */
     public static async getWallets(userId: string) {
-        const entityManager = getEntityManager();
-        const response = await entityManager.find(Wallet, { userId }, {
+        const response = await this.entityManager.find(Wallet, { userId }, {
             queryIndex: "GSI1"
         });
         return response;

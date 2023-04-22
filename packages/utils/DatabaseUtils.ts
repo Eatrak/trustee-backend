@@ -1,4 +1,4 @@
-import { createConnection } from "@typedorm/core";
+import { EntityManager, createConnection, getEntityManager } from "@typedorm/core";
 import { DocumentClientV3 } from "@typedorm/document-client";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
@@ -6,8 +6,32 @@ import { Transaction } from "entities/transaction";
 import { Wallet } from "entities/wallet";
 import { mainTable } from "tables/main";
 
+type ObjectType<T> = (new () => T) | Function;
+type EntityTarget<Entity> = ObjectType<Entity>;
+
+type ConnectionName =
+    "wallets" |
+    "transactions";
+
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
+    private entityConnectionParams: {
+        connectionName: ConnectionName,
+        entityClass: EntityTarget<any>
+    }[];
+    
+    constructor() {
+        this.entityConnectionParams = [
+            {
+                connectionName: "wallets",
+                entityClass: Wallet
+            },
+            {
+                connectionName: "transactions",
+                entityClass: Transaction
+            }
+        ];
+    }
 
     /**
      * 
@@ -16,6 +40,7 @@ export default class DatabaseUtils {
     public static getInstance() {
         if (!this.instance) {
             this.instance = new DatabaseUtils();
+            this.instance.initTypeDormConnections();
         }
 
         return this.instance;
@@ -31,15 +56,22 @@ export default class DatabaseUtils {
         return `trustee-${process.env.STAGE}`;
     }
 
-    public initTypeDormConnection() {
+    public initTypeDormConnections() {
         const documentClient = new DocumentClientV3(new DynamoDBClient({}));
-        createConnection({
-            table: mainTable,
-            entities: [
-                Transaction,
-                Wallet
-            ],
-            documentClient
+
+        this.entityConnectionParams.forEach(({ connectionName, entityClass }) => {
+            createConnection({
+                table: mainTable,
+                name: connectionName,
+                entities: [entityClass],
+                documentClient
+            });
         });
+    }
+    
+    public getEntityManager(
+        connectionName: ConnectionName
+    ): EntityManager {
+        return getEntityManager(connectionName);
     }
 };

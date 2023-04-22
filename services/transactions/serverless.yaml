@@ -30,6 +30,7 @@ provider:
         - Effect: Allow
           Action:
               - dynamodb:Query
+              - dynamodb:PutItem
           Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
         - Effect: Allow
           Action:
@@ -59,6 +60,19 @@ functions:
         events:
             - http:
                   method: GET
+                  path: /wallets
+                  cors: true
+                  authorizer:
+                      name: AuthAuthorizer
+                      type: COGNITO_USER_POOLS
+                      arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+                      claims:
+                          - email
+    CreateWallet:
+        handler: functions/createWallet.handler
+        events:
+            - http:
+                  method: POST
                   path: /wallets
                   cors: true
                   authorizer:

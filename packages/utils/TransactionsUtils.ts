@@ -1,11 +1,12 @@
 import "reflect-metadata";
-import { getEntityManager } from "@typedorm/core";
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
+import DatabaseUtils from "./DatabaseUtils";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 20;
+    static entityManager = DatabaseUtils.getInstance().getEntityManager("transactions");
 
     /**
      * Get user transactions by creation range.
@@ -19,8 +20,7 @@ export default class TransactionsUtils {
         endCreationTimestamp,
         cursor
     }: GetTransactionsInput) {
-        const entityManager = getEntityManager();
-        const response = await entityManager.find(Transaction, { userId }, {
+        const response = await this.entityManager.find(Transaction, { userId }, {
             queryIndex: "GSI1",
             keyCondition: {
                 GE: `CREATION<${startCreationTimestamp}>`
