@@ -18,4 +18,13 @@ export default class WalletsUtils {
         });
         return response;
     }
+
+    public static async createWallet(userId: string, walletName: string): Promise<Wallet> {
+        const newWallet = new Wallet();
+        newWallet.userId = userId;
+        newWallet.walletName = walletName;
+
+        const response: Wallet = await this.entityManager.create(newWallet);
+        return response;
+    }
 }
