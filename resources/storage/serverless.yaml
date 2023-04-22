@@ -39,6 +39,9 @@ resources:
           - ALLOW_REFRESH_TOKEN_AUTH
           - ALLOW_ADMIN_USER_PASSWORD_AUTH
         GenerateSecret: false
+        TokenValidityUnits:
+          IdToken: days
+        IdTokenValidity: 1
     MainTableDev:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
