@@ -3,10 +3,11 @@ import "reflect-metadata";
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
 import DatabaseUtils from "./DatabaseUtils";
+import { TransactionCategory } from "entities/transactionCategory";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 20;
-    static entityManager = DatabaseUtils.getInstance().getEntityManager("transactions");
+    static entityManager = DatabaseUtils.getInstance().getEntityManager("transactionCategories");
 
     /**
      * Get user transactions by creation range.
@@ -33,6 +34,11 @@ export default class TransactionsUtils {
             limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
             cursor
         });
+        return response;
+    }
+
+    public static async getTransactionCategories(userId: string) {
+        const response = await this.entityManager.find(TransactionCategory, { userId });
         return response;
     }
 }

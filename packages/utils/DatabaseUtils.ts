@@ -3,6 +3,7 @@ import { DocumentClientV3 } from "@typedorm/document-client";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import { Transaction } from "entities/transaction";
+import { TransactionCategory } from "entities/transactionCategory";
 import { Wallet } from "entities/wallet";
 import { Currency } from "entities/currency";
 import { mainTable } from "tables/main";
@@ -13,6 +14,7 @@ type EntityTarget<Entity> = ObjectType<Entity>;
 type ConnectionName =
     "wallets" |
     "currencies" |
+    "transactionCategories" |
     "transactions";
 
 export default class DatabaseUtils {
@@ -35,6 +37,10 @@ export default class DatabaseUtils {
             {
                 connectionName: "currencies",
                 entityClass: Currency
+            },
+            {
+                connectionName: "transactionCategories",
+                entityClass: TransactionCategory
             }
         ];
     }
