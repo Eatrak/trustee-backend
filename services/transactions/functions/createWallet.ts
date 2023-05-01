@@ -19,10 +19,14 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const { walletName }: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
+    const { walletName, currencyCode }: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
 
     try {
-        const createdWallet = await WalletsUtils.createWallet(userId, walletName);
+        const createdWallet = await WalletsUtils.createWallet(
+            userId,
+            walletName,
+            currencyCode
+        );
 
         const response: CreateWalletResponse = { createdWallet };
         return Utils.getInstance().getResponse(201, response);

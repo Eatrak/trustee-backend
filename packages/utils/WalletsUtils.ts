@@ -19,10 +19,15 @@ export default class WalletsUtils {
         return response;
     }
 
-    public static async createWallet(userId: string, walletName: string): Promise<Wallet> {
+    public static async createWallet(
+        userId: string,
+        walletName: string,
+        currencyCode: string
+    ): Promise<Wallet> {
         const newWallet = new Wallet();
         newWallet.userId = userId;
         newWallet.walletName = walletName;
+        newWallet.currencyCode = currencyCode;
 
         const response: Wallet = await this.entityManager.create(newWallet);
         return response;

@@ -32,4 +32,7 @@ export class Wallet {
 
   @Attribute()
   walletName: string;
+
+  @Attribute()
+  currencyCode: string;
 }
