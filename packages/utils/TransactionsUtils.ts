@@ -1,13 +1,17 @@
 import "reflect-metadata";
+import dayjs from 'dayjs';
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
 import DatabaseUtils from "./DatabaseUtils";
 import { TransactionCategory } from "entities/transactionCategory";
+import { CreateTransactionCategoryInput } from "@libs/bodies/transactions/createTransactionCategory";
+import { CreateTransactionInput } from "@libs/bodies/transactions/createTransaction";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 20;
-    static entityManager = DatabaseUtils.getInstance().getEntityManager("transactionCategories");
+    static transactionsManager = DatabaseUtils.getInstance().getEntityManager("transactions");
+    static transactionCategoriesManager = DatabaseUtils.getInstance().getEntityManager("transactionCategories");
 
     /**
      * Get user transactions by creation range.
@@ -21,14 +25,14 @@ export default class TransactionsUtils {
         endCreationTimestamp,
         cursor
     }: GetTransactionsInput) {
-        const response = await this.entityManager.find(Transaction, { userId }, {
+        const response = await this.transactionsManager.find(Transaction, { userId }, {
             queryIndex: "GSI1",
             keyCondition: {
                 GE: `CREATION<${startCreationTimestamp}>`
             },
             where: {
                 transactionTimestamp: {
-                    LE: endCreationTimestamp!
+                    LE: Number.parseInt(endCreationTimestamp!)
                 }
             },
             limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
@@ -38,7 +42,56 @@ export default class TransactionsUtils {
     }
 
     public static async getTransactionCategories(userId: string) {
-        const response = await this.entityManager.find(TransactionCategory, { userId });
+        const response = await this.transactionCategoriesManager.find(TransactionCategory, { userId });
         return response;
+    }
+
+    public static async createTransactionCategory(
+        input: CreateTransactionCategoryInput
+    ): Promise<TransactionCategory> {
+        const { userId, transactionCategoryName } = input;
+
+        // Create new transaction category
+        const newTransactionCategory = new TransactionCategory();
+        newTransactionCategory.userId = userId;
+        newTransactionCategory.transactionCategoryName = transactionCategoryName;
+        const response: TransactionCategory = await this.transactionCategoriesManager.create(newTransactionCategory);
+
+        return response;
+    }
+
+    public static async createTransaction(
+        input: CreateTransactionInput
+    ): Promise<Transaction | null> {
+        const {
+            userId,
+            categoryId,
+            isIncome,
+            transactionAmount,
+            transactionTimestamp,
+            transactionName,
+            walletId
+        } = input;
+
+        // Initialize new transaction
+        let newTransaction: Transaction = new Transaction();
+        newTransaction.userId = userId;
+        newTransaction.categoryId = categoryId;
+        newTransaction.isIncome = isIncome;
+        newTransaction.transactionAmount = transactionAmount;
+        newTransaction.walletId = walletId;
+        newTransaction.transactionName = transactionName;
+        newTransaction.transactionTimestamp = transactionTimestamp;
+        newTransaction.transactionCreationTimestamp = dayjs().unix();
+
+        try {
+            const createdTransaction: Transaction = await this.transactionsManager.create(newTransaction);
+
+            return createdTransaction;
+        }
+        catch (err) {
+            console.log(err);
+            return null;
+        }
     }
 }

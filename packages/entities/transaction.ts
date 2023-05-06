@@ -34,10 +34,10 @@ export class Transaction {
   walletId: string;
 
   @Attribute()
-  categoryName: string;
+  categoryId: string;
   
   @Attribute()
-  transactionTimestamp: string;
+  transactionTimestamp: number;
 
   @Attribute()
   transactionName: string;
@@ -49,17 +49,17 @@ export class Transaction {
   isIncome: boolean;
 
   @Attribute()
-  itemCreationTimestamp: string;
+  transactionCreationTimestamp: number;
 }
 
 export interface ITransaction {
     userId: string;
     walletId: string;
-    categoryName: string;
+    categoryId: string;
     transactionId: string;
     transactionName: string;
     transactionAmount: number;
-    transactionTimestamp: string;
+    transactionTimestamp: number;
     isIncome: boolean;
-    itemCreationTimestamp: string;
+    transactionCreationTimestamp: number;
 }
