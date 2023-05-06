@@ -68,6 +68,19 @@ functions:
                       arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
                       claims:
                           - email
+    CreateTransactionCategory:
+        handler: functions/createTransactionCategory.handler
+        events:
+            - http:
+                  method: POST
+                  path: /transaction-categories
+                  cors: true
+                  authorizer:
+                      name: AuthAuthorizer
+                      type: COGNITO_USER_POOLS
+                      arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+                      claims:
+                          - email
 
     GetWallets:
         handler: functions/getWallets.handler
