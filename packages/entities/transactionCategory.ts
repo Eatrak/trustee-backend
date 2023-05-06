@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import {
   Attribute,
+  AutoGenerateAttribute,
+  AUTO_GENERATE_ATTRIBUTE_STRATEGY,
   Entity
 } from '@typedorm/common';
 
@@ -12,7 +14,9 @@ import {
   }
 })
 export class TransactionCategory {
-  @Attribute()
+  @AutoGenerateAttribute({
+    strategy: AUTO_GENERATE_ATTRIBUTE_STRATEGY.UUID4,
+  })
   transactionCategoryId: string;
 
   @Attribute()
