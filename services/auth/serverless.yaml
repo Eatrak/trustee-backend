@@ -58,3 +58,11 @@ functions:
           cors: true
           method: POST
           path: /sign-in
+
+  CheckAuthentication:
+    handler: functions/checkAuthentication.handler
+    events:
+      - http:
+          cors: true
+          method: GET
+          path: /auth/check
