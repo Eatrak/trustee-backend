@@ -22,6 +22,14 @@ resources:
         UsernameAttributes:
           - email
         Schema:
+          - Name: name
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: surname
+            AttributeDataType: String
+            Required: false
+            Mutable: true
           - Name: email
             AttributeDataType: String
             Required: false

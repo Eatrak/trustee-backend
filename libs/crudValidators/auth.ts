@@ -2,6 +2,8 @@
  * Validator for user sign-up.
  */
 export const signUpValidator = {
+    name: "required|string",
+    surname: "required|string",
     email: "required|email",
     password: "required|string|min:5|max:30"
 };

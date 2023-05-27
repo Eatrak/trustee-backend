@@ -48,7 +48,13 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         const userId = ulid();
         
         // Create the user in Cognito
-        const createCognitoUserResponse = await UsersUtils.createCognitoUser(USER_POOL_ID, userId, userInfo.email);
+        const createCognitoUserResponse = await UsersUtils.createCognitoUser(
+            USER_POOL_ID,
+            userId,
+            userInfo.name,
+            userInfo.surname,
+            userInfo.email
+        );
 
         if (!createCognitoUserResponse.User) {
             return Utils.getInstance().getGeneralServerErrorResponse();
