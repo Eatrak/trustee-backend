@@ -4,6 +4,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import { Transaction } from "entities/transaction";
 import { TransactionCategory } from "entities/transactionCategory";
+import { MonthlyWalletIncome } from "entities/monthlyWalletIncome";
 import { Wallet } from "entities/wallet";
 import { Currency } from "entities/currency";
 import { mainTable } from "tables/main";
@@ -15,6 +16,7 @@ type ConnectionName =
     "wallets" |
     "currencies" |
     "transactionCategories" |
+    "monthlyWalletIncome" |
     "transactions";
 
 export default class DatabaseUtils {
@@ -37,6 +39,10 @@ export default class DatabaseUtils {
             {
                 connectionName: "currencies",
                 entityClass: Currency
+            },
+            {
+                connectionName: "monthlyWalletIncome",
+                entityClass: MonthlyWalletIncome
             },
             {
                 connectionName: "transactionCategories",
