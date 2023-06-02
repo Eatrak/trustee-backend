@@ -134,6 +134,19 @@ functions:
                       arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
                       claims:
                           - email
+    GetTotalExpenseByCurrency:
+        handler: functions/getTotalExpenseByCurrency.handler
+        events:
+            - http:
+                  method: GET
+                  path: /currencies/expense
+                  cors: true
+                  authorizer:
+                      name: AuthAuthorizer
+                      type: COGNITO_USER_POOLS
+                      arn: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+                      claims:
+                          - email
     GetCurrencies:
         handler: functions/getCurrencies.handler
         events:

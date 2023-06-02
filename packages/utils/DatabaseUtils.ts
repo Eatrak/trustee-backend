@@ -8,6 +8,7 @@ import { MonthlyWalletIncome } from "entities/monthlyWalletIncome";
 import { Wallet } from "entities/wallet";
 import { Currency } from "entities/currency";
 import { mainTable } from "tables/main";
+import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
 
 type ObjectType<T> = (new () => T) | Function;
 type EntityTarget<Entity> = ObjectType<Entity>;
@@ -17,6 +18,7 @@ type ConnectionName =
     "currencies" |
     "transactionCategories" |
     "monthlyWalletIncome" |
+    "monthlyWalletExpense" |
     "transactions";
 
 export default class DatabaseUtils {
@@ -43,6 +45,10 @@ export default class DatabaseUtils {
             {
                 connectionName: "monthlyWalletIncome",
                 entityClass: MonthlyWalletIncome
+            },
+            {
+                connectionName: "monthlyWalletExpense",
+                entityClass: MonthlyWalletExpense
             },
             {
                 connectionName: "transactionCategories",
