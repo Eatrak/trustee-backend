@@ -1,4 +1,4 @@
-service: trustee-transactions
+service: trustee-wallets
 frameworkVersion: '3'
 
 plugins:
@@ -22,8 +22,6 @@ provider:
         restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
         restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
     environment:
-        USER_POOL_ID: !ImportValue TrusteeUserPool
-        USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
         REGION: !Ref AWS::Region
         STAGE: ${self:provider.stage}
     iamRoleStatements:
@@ -42,48 +40,24 @@ provider:
                 - /index/GSI1
 
 functions:
-    GetTransactions:
-        handler: functions/getTransactions.handler
+    GetWallets:
+        handler: functions/getWallets.handler
         events:
             - http:
                   method: GET
-                  path: /transactions
+                  path: /wallets
                   cors: true
                   authorizer:
                       type: COGNITO_USER_POOLS
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
-    GetTransactionCategories:
-        handler: functions/getTransactionCategories.handler
-        events:
-            - http:
-                  method: GET
-                  path: /transaction-categories
-                  cors: true
-                  authorizer:
-                      type: COGNITO_USER_POOLS
-                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
-                      claims:
-                          - email
-    CreateTransactionCategory:
-        handler: functions/createTransactionCategory.handler
+    CreateWallet:
+        handler: functions/createWallet.handler
         events:
             - http:
                   method: POST
-                  path: /transaction-categories
-                  cors: true
-                  authorizer:
-                      type: COGNITO_USER_POOLS
-                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
-                      claims:
-                          - email
-    CreateTransaction:
-        handler: functions/createTransaction.handler
-        events:
-            - http:
-                  method: POST
-                  path: /transactions
+                  path: /wallets
                   cors: true
                   authorizer:
                       type: COGNITO_USER_POOLS

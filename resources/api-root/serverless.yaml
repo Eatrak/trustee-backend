@@ -14,8 +14,21 @@ resources:
       Type: AWS::ApiGateway::RestApi
       Properties:
         Name: trustee-${self:provider.stage}
+    Authorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: TrusteeAuthorizer
+        IdentitySource: method.request.header.Authorization
+        ProviderARNs:
+          - !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+        RestApiId: !Ref RestApiGateway
+        Type: COGNITO_USER_POOLS
 
   Outputs:
+    AuthorizerId:
+      Value: !Ref Authorizer
+      Export:
+        Name: TrusteeAuthorizerId-${self:provider.stage}
     RestApiGatewayURL:
       Description: "Rest API Gateway URL"
       Value: !Sub "https://${RestApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}"

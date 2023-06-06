@@ -1,4 +1,4 @@
-service: trustee-transactions
+service: trustee-currencies
 frameworkVersion: '3'
 
 plugins:
@@ -22,15 +22,12 @@ provider:
         restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
         restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
     environment:
-        USER_POOL_ID: !ImportValue TrusteeUserPool
-        USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
         REGION: !Ref AWS::Region
         STAGE: ${self:provider.stage}
     iamRoleStatements:
         - Effect: Allow
           Action:
               - dynamodb:Query
-              - dynamodb:PutItem
           Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
         - Effect: Allow
           Action:
@@ -42,48 +39,36 @@ provider:
                 - /index/GSI1
 
 functions:
-    GetTransactions:
-        handler: functions/getTransactions.handler
+    GetCurrencies:
+        handler: functions/getCurrencies.handler
         events:
             - http:
                   method: GET
-                  path: /transactions
+                  path: /currencies
                   cors: true
                   authorizer:
                       type: COGNITO_USER_POOLS
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
-    GetTransactionCategories:
-        handler: functions/getTransactionCategories.handler
+    GetTotalIncomeByCurrency:
+        handler: functions/getTotalIncomeByCurrency.handler
         events:
             - http:
                   method: GET
-                  path: /transaction-categories
+                  path: /currencies/income
                   cors: true
                   authorizer:
                       type: COGNITO_USER_POOLS
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
-    CreateTransactionCategory:
-        handler: functions/createTransactionCategory.handler
+    GetTotalExpenseByCurrency:
+        handler: functions/getTotalExpenseByCurrency.handler
         events:
             - http:
-                  method: POST
-                  path: /transaction-categories
-                  cors: true
-                  authorizer:
-                      type: COGNITO_USER_POOLS
-                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
-                      claims:
-                          - email
-    CreateTransaction:
-        handler: functions/createTransaction.handler
-        events:
-            - http:
-                  method: POST
-                  path: /transactions
+                  method: GET
+                  path: /currencies/expense
                   cors: true
                   authorizer:
                       type: COGNITO_USER_POOLS
