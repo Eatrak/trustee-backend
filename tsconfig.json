@@ -13,6 +13,7 @@
     "strictPropertyInitialization": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "baseUrl": "./",
     "paths": {
       "@libs/*": ["./libs/*"]
     }

@@ -1,35 +1,39 @@
 const path = require('path');
-const slsw = require('serverless-webpack');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const serverlessWebpack = require('serverless-webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
-  entry: slsw.lib.entries,
-  stats: 'summary',
-  resolve: {
-    fullySpecified: false,
-    extensions: ['.ts', ".js", ".mjs"],
-    plugins: [new TsconfigPathsPlugin({
-      baseUrl: path.resolve(__dirname, '.'),
-      configFile: path.resolve(__dirname, './tsconfig.json'),
-        extensions: ['.ts', '.js', ".mjs"]
-    })]
-  },
-  target: 'node',
+  devtool: 'inline-cheap-module-source-map',
+  entry: serverlessWebpack.lib.entries,
+  mode: 'production',
   module: {
-    noParse: /@typedorm\/[core|common|testing]/,
-    rules: [
-      {
-        test: /\.(ts?)$/,
+    rules: [{
+        test: /\.ts$/,
+        exclude: /node_modules/,
         loader: 'ts-loader',
-        exclude: [
-          [
-            path.resolve(__dirname, 'node_modules'),
-            path.resolve(__dirname, '.serverless'),
-            path.resolve(__dirname, '.webpack'),
-          ],
-        ],
-      },
+        options: {
+          // disable type checker - we will use it in fork plugin
+          transpileOnly: true
+        }
+      }
     ],
   },
+  node: false,
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        keep_classnames: true,
+        keep_fnames: true,
+      }
+    }
+    )],
+  },
+  resolve: {
+    alias: {
+      "@libs": path.resolve(__dirname, 'libs')
+    },
+    extensions: ['.mjs', '.ts', '.js']
+  },
+  target: 'node',
 };
