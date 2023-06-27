@@ -1,18 +1,16 @@
 import "reflect-metadata";
 
-import DatabaseUtils from "./DatabaseUtils";
 import { Currency } from "entities/currency";
+import DatabaseUtils from "./DatabaseUtils";
 
 export default class CurrencyUtils {
-    static entityManager = DatabaseUtils.getInstance().getEntityManager("currencies");
-
     /**
      * Get currencies.
      *
      * @returns Currencies.
      */
     public static async getCurrencies() {
-        const response = await this.entityManager.find(Currency, {});
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(Currency, {});
         return response;
     }
 }

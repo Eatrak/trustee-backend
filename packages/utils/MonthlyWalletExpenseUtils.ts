@@ -4,8 +4,6 @@ import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
 import DatabaseUtils from "./DatabaseUtils";
 
 export default class MonthlyWalletExpenseUtils {
-    static entityManager = DatabaseUtils.getInstance().getEntityManager("monthlyWalletExpense");
-
     /**
      * Get expense of each month of each wallet.
      *
@@ -16,7 +14,7 @@ export default class MonthlyWalletExpenseUtils {
     public static async getExpenseByWalletByMonth(
         userId: string
     ) {
-        const response = await this.entityManager.find(
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(
             MonthlyWalletExpense,
             { userId },
             { queryIndex: "GSI1" }

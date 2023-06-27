@@ -10,52 +10,8 @@ import { Currency } from "entities/currency";
 import { mainTable } from "tables/main";
 import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
 
-type ObjectType<T> = (new () => T) | Function;
-type EntityTarget<Entity> = ObjectType<Entity>;
-
-type ConnectionName =
-    "wallets" |
-    "currencies" |
-    "transactionCategories" |
-    "monthlyWalletIncome" |
-    "monthlyWalletExpense" |
-    "transactions";
-
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
-    private entityConnectionParams: {
-        connectionName: ConnectionName,
-        entityClass: EntityTarget<any>
-    }[];
-    
-    constructor() {
-        this.entityConnectionParams = [
-            {
-                connectionName: "wallets",
-                entityClass: Wallet
-            },
-            {
-                connectionName: "transactions",
-                entityClass: Transaction
-            },
-            {
-                connectionName: "currencies",
-                entityClass: Currency
-            },
-            {
-                connectionName: "monthlyWalletIncome",
-                entityClass: MonthlyWalletIncome
-            },
-            {
-                connectionName: "monthlyWalletExpense",
-                entityClass: MonthlyWalletExpense
-            },
-            {
-                connectionName: "transactionCategories",
-                entityClass: TransactionCategory
-            }
-        ];
-    }
 
     /**
      * 
@@ -64,7 +20,7 @@ export default class DatabaseUtils {
     public static getInstance() {
         if (!this.instance) {
             this.instance = new DatabaseUtils();
-            this.instance.initTypeDormConnections();
+            this.instance.initTypeDormConnection();
         }
 
         return this.instance;
@@ -80,22 +36,24 @@ export default class DatabaseUtils {
         return `trustee-${process.env.STAGE}`;
     }
 
-    public initTypeDormConnections() {
+    public initTypeDormConnection() {
         const documentClient = new DocumentClientV3(new DynamoDBClient({}));
 
-        this.entityConnectionParams.forEach(({ connectionName, entityClass }) => {
-            createConnection({
-                table: mainTable,
-                name: connectionName,
-                entities: [entityClass],
-                documentClient
-            });
+        createConnection({
+            table: mainTable,
+            entities: [
+                Wallet,
+                MonthlyWalletIncome,
+                MonthlyWalletExpense,
+                Currency,
+                TransactionCategory,
+                Transaction
+            ],
+            documentClient
         });
     }
-    
-    public getEntityManager(
-        connectionName: ConnectionName
-    ): EntityManager {
-        return getEntityManager(connectionName);
+
+    public getEntityManager(): EntityManager {
+        return getEntityManager();
     }
 };

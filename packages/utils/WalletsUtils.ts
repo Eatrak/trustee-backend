@@ -4,8 +4,6 @@ import { Wallet } from "entities/wallet";
 import DatabaseUtils from "./DatabaseUtils";
 
 export default class WalletsUtils {
-    static entityManager = DatabaseUtils.getInstance().getEntityManager("wallets");
-
     /**
      * Get user wallets.
      *
@@ -13,7 +11,7 @@ export default class WalletsUtils {
      * @returns Result of the query used to get user wallets.
      */
     public static async getWallets(userId: string) {
-        const response = await this.entityManager.find(Wallet, { userId }, {
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(Wallet, { userId }, {
             queryIndex: "GSI1"
         });
         return response;
@@ -29,7 +27,7 @@ export default class WalletsUtils {
         newWallet.walletName = walletName;
         newWallet.currencyCode = currencyCode;
 
-        const response: Wallet = await this.entityManager.create(newWallet);
+        const response: Wallet = await DatabaseUtils.getInstance().getEntityManager().create(newWallet);
         return response;
     }
 }

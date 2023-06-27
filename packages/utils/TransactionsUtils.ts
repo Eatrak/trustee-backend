@@ -3,15 +3,13 @@ import dayjs from 'dayjs';
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
-import DatabaseUtils from "./DatabaseUtils";
 import { TransactionCategory } from "entities/transactionCategory";
 import { CreateTransactionCategoryInput } from "@libs/bodies/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@libs/bodies/transactions/createTransaction";
+import DatabaseUtils from "./DatabaseUtils";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 20;
-    static transactionsManager = DatabaseUtils.getInstance().getEntityManager("transactions");
-    static transactionCategoriesManager = DatabaseUtils.getInstance().getEntityManager("transactionCategories");
 
     /**
      * Get user transactions by creation range.
@@ -25,7 +23,7 @@ export default class TransactionsUtils {
         endCreationTimestamp,
         cursor
     }: GetTransactionsInput) {
-        const response = await this.transactionsManager.find(Transaction, { userId }, {
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(Transaction, { userId }, {
             queryIndex: "GSI1",
             keyCondition: {
                 GE: `CREATION<${startCreationTimestamp}>`
@@ -42,7 +40,7 @@ export default class TransactionsUtils {
     }
 
     public static async getTransactionCategories(userId: string) {
-        const response = await this.transactionCategoriesManager.find(TransactionCategory, { userId });
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(TransactionCategory, { userId });
         return response;
     }
 
@@ -55,7 +53,7 @@ export default class TransactionsUtils {
         const newTransactionCategory = new TransactionCategory();
         newTransactionCategory.userId = userId;
         newTransactionCategory.transactionCategoryName = transactionCategoryName;
-        const response: TransactionCategory = await this.transactionCategoriesManager.create(newTransactionCategory);
+        const response: TransactionCategory = await DatabaseUtils.getInstance().getEntityManager().create(newTransactionCategory);
 
         return response;
     }
@@ -85,7 +83,7 @@ export default class TransactionsUtils {
         newTransaction.transactionCreationTimestamp = dayjs().unix();
 
         try {
-            const createdTransaction: Transaction = await this.transactionsManager.create(newTransaction);
+            const createdTransaction: Transaction = await DatabaseUtils.getInstance().getEntityManager().create(newTransaction);
 
             return createdTransaction;
         }
