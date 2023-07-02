@@ -9,13 +9,13 @@ import {
   name: 'MonthlyWalletIncome',
   primaryKey: {
     partitionKey: 'USER<{{userId}}>#WALLET<{{walletId}}>#MONTHLY_INCOME',
-    sortKey: 'YEAR<{{year}}>#MONTH<{{month}}>',
+    sortKey: 'CURRENCY_CODE<{{currencyCode}}>#YEAR<{{year}}>#MONTH<{{month}}>',
   },
   indexes: {
     GSI1: {
       type: INDEX_TYPE.GSI,
       partitionKey: 'USER<{{userId}}>#WALLET#MONTHLY_INCOME',
-      sortKey: 'YEAR<{{year}}>#MONTH<{{month}}>#WALLET<{{walletId}}>',
+      sortKey: 'CURRENCY_CODE<{{currencyCode}}>#YEAR<{{year}}>#MONTH<{{month}}>#WALLET<{{walletId}}>',
     },
   },
 })
