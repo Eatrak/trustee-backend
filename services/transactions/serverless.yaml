@@ -32,6 +32,7 @@ provider:
               - dynamodb:Query
               - dynamodb:PutItem
               - dynamodb:GetItem
+              - dynamodb:UpdateItem
           Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
         - Effect: Allow
           Action:

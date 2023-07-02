@@ -126,7 +126,7 @@ export default class TransactionsUtils {
                     const transactionWallet = getTransactionWalletResponse.val;
 
                     // Initialize monthly-wallet-income
-                    const newMonthlyWalletIncome = new MonthlyWalletExpense();
+                    const newMonthlyWalletIncome = new MonthlyWalletIncome();
                     newMonthlyWalletIncome.currencyCode = transactionWallet.currencyCode;
                     newMonthlyWalletIncome.userId = newTransaction.userId;
                     newMonthlyWalletIncome.walletId = transactionWallet.walletId;
@@ -144,7 +144,16 @@ export default class TransactionsUtils {
                 // If the monthly-wallet-income item exists, its amount must be updated
                 let updatedMonthlyWalletIncome = getMonthlyWalletIncomeResponse.val;
                 updatedMonthlyWalletIncome.amount += newTransaction.transactionAmount;
-                writeTransaction.addCreateItem(updatedMonthlyWalletIncome);
+                writeTransaction.addUpdateItem(
+                    MonthlyWalletIncome,
+                    {
+                        userId,
+                        walletId,
+                        year: transactionYear,
+                        month: transactionMonth
+                    },
+                    updatedMonthlyWalletIncome
+                );
             }
         }
         else {
@@ -190,7 +199,16 @@ export default class TransactionsUtils {
                 // If the monthly-wallet-expense item exists, its amount must be updated
                 let updatedMonthlyWalletExpense = getMonthlyWalletExpenseResponse.val;
                 updatedMonthlyWalletExpense.amount += newTransaction.transactionAmount;
-                writeTransaction.addCreateItem(updatedMonthlyWalletExpense);
+                writeTransaction.addUpdateItem(
+                    MonthlyWalletExpense,
+                    {
+                        userId,
+                        walletId,
+                        year: transactionYear,
+                        month: transactionMonth
+                    },
+                    updatedMonthlyWalletExpense
+                );
             }
         }
 
