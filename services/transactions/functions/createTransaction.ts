@@ -33,12 +33,16 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
-        const createdTransaction = await TransactionsUtils.createTransaction(input);
+        const createTransactionResponse = await TransactionsUtils.createTransaction(input);
 
-        if (createdTransaction) {
-            const response: CreateTransactionResponse = { createdTransaction };
-            return Utils.getInstance().getResponse(201, response);
+        if (createTransactionResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
         }
+
+        const response: CreateTransactionResponse = {
+            createdTransaction: createTransactionResponse.val
+        };
+        return Utils.getInstance().getResponse(201, response);
     } catch (err) {
         console.log(err);
     }
