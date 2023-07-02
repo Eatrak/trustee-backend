@@ -2,6 +2,7 @@ import "reflect-metadata";
 import dayjs from 'dayjs';
 import { Ok, Err, Result } from "ts-results";
 import { WriteTransaction, getTransactionManger } from "@typedorm/core";
+import { QUERY_ORDER } from "@typedorm/common";
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { Transaction } from 'entities/transaction';
@@ -42,6 +43,7 @@ export default class TransactionsUtils {
                     LE: Number.parseInt(endCreationTimestamp!)
                 }
             },
+            orderBy: QUERY_ORDER.DESC,
             limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
             cursor
         });
