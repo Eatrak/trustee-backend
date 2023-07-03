@@ -94,6 +94,7 @@ export default class TransactionsUtils {
         newTransaction.userId = userId;
         newTransaction.categoryId = categoryId;
         newTransaction.isIncome = isIncome;
+        newTransaction.currencyCode = transactionWallet.currencyCode;
         newTransaction.transactionAmount = transactionAmount;
         newTransaction.walletId = walletId;
         newTransaction.transactionName = transactionName;

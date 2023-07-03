@@ -11,14 +11,14 @@ import {
   name: 'transaction',
   primaryKey: {
     partitionKey: 'USER<{{userId}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
-    sortKey: 'CREATION<{{transactionTimestamp}}>',
+    sortKey: 'CREATION<{{transactionTimestamp}}>#CURRENCY_CODE<{{currencyCode}}>',
   },
   indexes: {
     GSI1: {
       type: INDEX_TYPE.GSI,
       partitionKey: 'USER<{{userId}}>#WALLET#TRANSACTION',
-      sortKey: 'CREATION<{{transactionTimestamp}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
-    },
+      sortKey: 'CREATION<{{transactionTimestamp}}>#CURRENCY_CODE<{{currencyCode}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
+    }
   },
 })
 export class Transaction {
@@ -50,6 +50,9 @@ export class Transaction {
 
   @Attribute()
   transactionCreationTimestamp: number;
+
+  @Attribute()
+  currencyCode: string;
 }
 
 export interface ITransaction {
