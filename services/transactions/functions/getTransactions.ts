@@ -1,12 +1,13 @@
 import "reflect-metadata";
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
+import { DocumentClientTypes } from "@typedorm/document-client";
 import Validator from 'validatorjs';
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
 
 import Utils from 'utils/Utils';
 import TransactionsUtils from 'utils/TransactionsUtils';
-import { ITransaction } from 'entities/transaction';
+import { ITransaction, Transaction } from 'entities/transaction';
 import { GetTransactionsInputQueryParams, GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
 import { getTransactionsValidator } from '@libs/crudValidators/transactions';
 import { GetTransactionsResponse } from '@libs/requestInterfaces/transactions/getTransactions';
@@ -18,12 +19,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const {
         startCreationTimestamp,
         endCreationTimestamp,
-        cursor
+        cursor,
+        currencyCode
     } = event.queryStringParameters as GetTransactionsInputQueryParams;
     const getTransactionsInput: GetTransactionsInput = {
         startCreationTimestamp,
         endCreationTimestamp,
-        userId
+        userId,
+        currencyCode
     };
     
     // Add cursor to the request used to get the next transactions from DynamoDB
@@ -40,7 +43,17 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
         // Get user transactions by creation range
         if (getTransactionsInput.startCreationTimestamp && getTransactionsInput.endCreationTimestamp) {
-            const getTransactionsResponseFromDB = await TransactionsUtils.getTransactionsByCreationRange(getTransactionsInput);
+            let getTransactionsResponseFromDB: {
+                items: Transaction[];
+                cursor?: DocumentClientTypes.Key | undefined;
+            };
+            if (getTransactionsInput.currencyCode) {
+                getTransactionsResponseFromDB = await TransactionsUtils.getTransactionsByCurrencyAndCreationRange(getTransactionsInput);
+            }
+            else {
+                getTransactionsResponseFromDB = await TransactionsUtils.getTransactionsByCreationRange(getTransactionsInput);
+            }
+
             const newCursor = getTransactionsResponseFromDB.cursor;
             transactions = getTransactionsResponseFromDB.items;
 

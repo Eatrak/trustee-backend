@@ -4,6 +4,7 @@ export interface GetTransactionsInputQueryParams {
     startCreationTimestamp?: string;
     endCreationTimestamp?: string;
     cursor?: string;
+    currencyCode?: string;
 }
 
 export interface GetTransactionsInput {
@@ -11,4 +12,5 @@ export interface GetTransactionsInput {
     endCreationTimestamp?: string;
     userId: string;
     cursor?: DocumentClientTypes.Key;
+    currencyCode?: string;
 }

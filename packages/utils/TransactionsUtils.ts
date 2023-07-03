@@ -15,6 +15,7 @@ import DatabaseUtils from "./DatabaseUtils";
 import MonthlyWalletIncomeUtils from "./MonthlyWalletIncomeUtils";
 import MonthlyWalletExpenseUtils from "./MonthlyWalletExpenseUtils";
 import WalletsUtils from "./WalletsUtils";
+import { GetTransactionsByCurrencyInput } from "@libs/bodies/transactions/getTransactionsByCurrency";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -35,6 +36,36 @@ export default class TransactionsUtils {
     }: GetTransactionsInput) {
         const response = await DatabaseUtils.getInstance().getEntityManager().find(Transaction, { userId }, {
             queryIndex: "GSI1",
+            keyCondition: {
+                GE: `CREATION<${startCreationTimestamp}>`
+            },
+            where: {
+                transactionTimestamp: {
+                    LE: Number.parseInt(endCreationTimestamp!)
+                }
+            },
+            orderBy: QUERY_ORDER.DESC,
+            limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
+            cursor
+        });
+        return response;
+    }
+
+    /**
+     * Get user transactions by currency and creation range.
+     *
+     * @param input Necessary input used to get user transactions by creation range.
+     * @returns Result of the query used to get transactions by creation range.
+     */
+    public static async getTransactionsByCurrencyAndCreationRange({
+        userId,
+        startCreationTimestamp,
+        endCreationTimestamp,
+        cursor,
+        currencyCode
+    }: GetTransactionsByCurrencyInput) {
+        const response = await DatabaseUtils.getInstance().getEntityManager().find(Transaction, { userId, currencyCode }, {
+            queryIndex: "GSI2",
             keyCondition: {
                 GE: `CREATION<${startCreationTimestamp}>`
             },

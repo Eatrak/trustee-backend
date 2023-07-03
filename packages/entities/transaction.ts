@@ -17,8 +17,13 @@ import {
     GSI1: {
       type: INDEX_TYPE.GSI,
       partitionKey: 'USER<{{userId}}>#WALLET#TRANSACTION',
-      sortKey: 'CREATION<{{transactionTimestamp}}>#CURRENCY_CODE<{{currencyCode}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
-    }
+      sortKey: 'CREATION<{{transactionTimestamp}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
+    },
+    GSI2: {
+      type: INDEX_TYPE.GSI,
+      partitionKey: 'USER<{{userId}}>#WALLET#CURRENCY_CODE<{{currencyCode}}>#TRANSACTION',
+      sortKey: 'CREATION<{{transactionTimestamp}}>#WALLET<{{walletId}}>#TRANSACTION<{{transactionId}}>',
+    },
   },
 })
 export class Transaction {

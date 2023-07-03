@@ -42,6 +42,14 @@ provider:
               - ""
               - - !ImportValue TrusteeMainTableArn-${self:provider.stage}
                 - /index/GSI1
+        - Effect: Allow
+          Action:
+              - dynamodb:Query
+          Resource:
+            Fn::Join:
+              - ""
+              - - !ImportValue TrusteeMainTableArn-${self:provider.stage}
+                - /index/GSI2
 
 functions:
     GetTransactions:
