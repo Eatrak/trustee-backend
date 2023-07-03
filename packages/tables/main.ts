@@ -12,8 +12,8 @@ export const mainTable = new Table({
       type: INDEX_TYPE.GSI,
     },
     GSI2: {
-      partitionKey: 'GSI1PK',
-      sortKey: 'GSI1SK',
+      partitionKey: 'GSI2PK',
+      sortKey: 'GSI2SK',
       type: INDEX_TYPE.GSI,
     }
   },
