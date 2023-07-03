@@ -82,6 +82,13 @@ export default class TransactionsUtils {
             walletId
         } = input;
 
+        // Get transaction wallet
+        const getTransactionWalletResponse = await WalletsUtils.getWallet(userId, walletId);
+        if (getTransactionWalletResponse.err) {
+            return Err("GENERAL");
+        }
+        const transactionWallet = getTransactionWalletResponse.val;
+
         // Initialize new transaction
         let newTransaction: Transaction = new Transaction();
         newTransaction.userId = userId;
@@ -94,9 +101,9 @@ export default class TransactionsUtils {
         newTransaction.transactionCreationTimestamp = dayjs().unix();
 
         // Get year of the transaction to create
-        const transactionYear = dayjs(newTransaction.transactionTimestamp).get("year");
+        const transactionYear = dayjs.unix(newTransaction.transactionTimestamp).get("year");
         // Get month of the transaction to create
-        const transactionMonth = dayjs(newTransaction.transactionTimestamp).get("month");
+        const transactionMonth = dayjs.unix(newTransaction.transactionTimestamp).get("month") + 1;
 
         // Initialize TypeDORM write-transaction used to both create transaction
         // and update monthly-wallet-income
@@ -109,24 +116,13 @@ export default class TransactionsUtils {
                 userId,
                 walletId,
                 transactionYear,
-                transactionMonth
+                transactionMonth,
+                transactionWallet.currencyCode
             );
 
             if (getMonthlyWalletIncomeResponse.err) {
                 // If the monthly-wallet-income item doesn't exist, it must be created
                 if (getMonthlyWalletIncomeResponse.val == "UNEXISTING_RESOURCE") {
-                    // Get transaction wallet
-                    const getTransactionWalletResponse = await WalletsUtils.getWallet(
-                        newTransaction.userId,
-                        newTransaction.walletId
-                    );
-
-                    if (getTransactionWalletResponse.err) {
-                        return new Err("GENERAL");
-                    }
-
-                    const transactionWallet = getTransactionWalletResponse.val;
-
                     // Initialize monthly-wallet-income
                     const newMonthlyWalletIncome = new MonthlyWalletIncome();
                     newMonthlyWalletIncome.currencyCode = transactionWallet.currencyCode;
@@ -152,7 +148,8 @@ export default class TransactionsUtils {
                         userId,
                         walletId,
                         year: transactionYear,
-                        month: transactionMonth
+                        month: transactionMonth,
+                        currencyCode: transactionWallet.currencyCode
                     },
                     updatedMonthlyWalletIncome
                 );
@@ -164,24 +161,13 @@ export default class TransactionsUtils {
                 userId,
                 walletId,
                 transactionYear,
-                transactionMonth
+                transactionMonth,
+                transactionWallet.currencyCode
             );
 
             if (getMonthlyWalletExpenseResponse.err) {
                 // If the monthly-wallet-expense item doesn't exist, it must be created
                 if (getMonthlyWalletExpenseResponse.val == "UNEXISTING_RESOURCE") {
-                    // Get transaction wallet
-                    const getTransactionWalletResponse = await WalletsUtils.getWallet(
-                        newTransaction.userId,
-                        newTransaction.walletId
-                    );
-
-                    if (getTransactionWalletResponse.err) {
-                        return new Err("GENERAL");
-                    }
-
-                    const transactionWallet = getTransactionWalletResponse.val;
-
                     // Initialize monthly-wallet-expense
                     const newMonthlyWalletExpense = new MonthlyWalletExpense();
                     newMonthlyWalletExpense.currencyCode = transactionWallet.currencyCode;
@@ -207,7 +193,8 @@ export default class TransactionsUtils {
                         userId,
                         walletId,
                         year: transactionYear,
-                        month: transactionMonth
+                        month: transactionMonth,
+                        currencyCode: transactionWallet.currencyCode
                     },
                     updatedMonthlyWalletExpense
                 );

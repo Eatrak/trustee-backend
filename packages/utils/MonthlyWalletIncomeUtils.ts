@@ -38,13 +38,14 @@ export default class MonthlyWalletIncomeUtils {
         userId: string,
         walletId: string,
         year: number,
-        month: number
+        month: number,
+        currencyCode: string
     ): Promise<Result<MonthlyWalletIncome, Errors>> {
         try {
             // Get monthly-wallet-income
             const monthlyWalletIncome = await DatabaseUtils.getInstance().getEntityManager().findOne(
                 MonthlyWalletIncome,
-                { userId, walletId, year, month }
+                { userId, walletId, year, month, currencyCode }
             );
 
             // Abort if the monthly-wallet-income doesn't exist
