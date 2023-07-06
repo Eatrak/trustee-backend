@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import dayjs from 'dayjs';
 import { Ok, Err, Result } from "ts-results";
-import { WriteTransaction, getTransactionManger } from "@typedorm/core";
+import { WriteTransaction, getEntityManager, getTransactionManger } from "@typedorm/core";
 import { QUERY_ORDER } from "@typedorm/common";
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
@@ -16,6 +16,8 @@ import MonthlyWalletIncomeUtils from "./MonthlyWalletIncomeUtils";
 import MonthlyWalletExpenseUtils from "./MonthlyWalletExpenseUtils";
 import WalletsUtils from "./WalletsUtils";
 import { GetTransactionsByCurrencyInput } from "@libs/bodies/transactions/getTransactionsByCurrency";
+import { DeleteTransactionInput } from "@libs/bodies/transactions/deleteTransaction";
+import { GetTransactionInput } from "@libs/bodies/transactions/getTransaction";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -241,6 +243,124 @@ export default class TransactionsUtils {
             }
 
             return Ok(newTransaction);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
+    }
+
+    public static async getTransaction(
+        input: GetTransactionInput
+    ): Promise<Result<Transaction, Errors>> {
+        try {
+            const transaction = await DatabaseUtils.getInstance().getEntityManager().findOne(Transaction, input);
+
+            if (!transaction) {
+                return Err("UNEXISTING_RESOURCE");
+            }
+
+            return Ok(transaction);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
+    }
+
+    public static async deleteTransaction(
+        input: DeleteTransactionInput
+    ): Promise<Result<boolean, Errors>> {
+        try {
+            // Initialize TypeDORM write-transaction used to both delete transaction
+            // and update total balance
+            const writeTransaction = new WriteTransaction();
+            writeTransaction.addDeleteItem(Transaction, input);
+
+            // Get transaction
+            const getTransactionResponse = await this.getTransaction(input);
+            // Abort operation if transaction to delete doesn't exist
+            if (getTransactionResponse.err) {
+                return Err(getTransactionResponse.val);
+            }
+            const transactionToDelete = getTransactionResponse.val;
+
+            // Get year of the transaction to create
+            const transactionYear = dayjs.unix(transactionToDelete.transactionTimestamp).get("year");
+            // Get month of the transaction to create
+            const transactionMonth = dayjs.unix(transactionToDelete.transactionTimestamp).get("month") + 1;
+
+            // Get transaction wallet
+            const getTransactionWalletResponse = await WalletsUtils.getWallet(
+                transactionToDelete.userId,
+                transactionToDelete.walletId
+            );
+            if (getTransactionWalletResponse.err) {
+                return Err("GENERAL");
+            }
+            const transactionWallet = getTransactionWalletResponse.val;
+
+            if (transactionToDelete.isIncome) {
+                // Get monthly-wallet-income
+                const getMonthlyWalletIncomeResponse = await MonthlyWalletIncomeUtils.getMonthlyWalletIncome(
+                    transactionToDelete.userId,
+                    transactionToDelete.walletId,
+                    transactionYear,
+                    transactionMonth,
+                    transactionWallet.currencyCode
+                );
+    
+                if (!getMonthlyWalletIncomeResponse.err) {
+                    // If the monthly-wallet-income item exists, its amount must be updated
+                    let updatedMonthlyWalletIncome = getMonthlyWalletIncomeResponse.val;
+                    updatedMonthlyWalletIncome.amount -= transactionToDelete.transactionAmount;
+                    writeTransaction.addUpdateItem(
+                        MonthlyWalletIncome,
+                        {
+                            userId: transactionToDelete.userId,
+                            walletId: transactionToDelete.walletId,
+                            year: transactionYear,
+                            month: transactionMonth,
+                            currencyCode: transactionWallet.currencyCode
+                        },
+                        updatedMonthlyWalletIncome
+                    );
+                }
+            }
+            else {
+                // Get monthly-wallet-expense
+                const getMonthlyWalletExpenseResponse = await MonthlyWalletExpenseUtils.getMonthlyWalletExpense(
+                    transactionToDelete.userId,
+                    transactionToDelete.walletId,
+                    transactionYear,
+                    transactionMonth,
+                    transactionWallet.currencyCode
+                );
+    
+                if (!getMonthlyWalletExpenseResponse.err) {
+                    // If the monthly-wallet-expense item exists, its amount must be updated
+                    let updatedMonthlyWalletExpense = getMonthlyWalletExpenseResponse.val;
+                    updatedMonthlyWalletExpense.amount -= transactionToDelete.transactionAmount;
+                    writeTransaction.addUpdateItem(
+                        MonthlyWalletExpense,
+                        {
+                            userId: transactionToDelete.userId,
+                            walletId: transactionToDelete.walletId,
+                            year: transactionYear,
+                            month: transactionMonth,
+                            currencyCode: transactionWallet.currencyCode
+                        },
+                        updatedMonthlyWalletExpense
+                    );
+                }
+            }
+
+            const result = await getTransactionManger().write(writeTransaction);
+            if (!result.success) {
+                return Err("GENERAL");
+            }
+            
+            return Ok(true);
         }
         catch (err) {
             console.log(err);

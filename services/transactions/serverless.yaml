@@ -33,6 +33,7 @@ provider:
               - dynamodb:PutItem
               - dynamodb:GetItem
               - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
           Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
         - Effect: Allow
           Action:
@@ -93,6 +94,18 @@ functions:
         events:
             - http:
                   method: POST
+                  path: /transactions
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
+    DeleteTransaction:
+        handler: functions/deleteTransaction.handler
+        events:
+            - http:
+                  method: DELETE
                   path: /transactions
                   cors: true
                   authorizer:

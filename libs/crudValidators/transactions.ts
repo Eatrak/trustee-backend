@@ -16,3 +16,11 @@ export const createTransactionInputRules = {
     isIncome: "required|boolean",
     userId: "required|string"
 };
+
+export const deleteTransactionInputRules = {
+    userId: "required|string",
+    walletId: "required|string",
+    transactionId: "required|string",
+    transactionTimestamp: "required|string",
+    currencyCode: "required|string"
+};
