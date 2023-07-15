@@ -32,7 +32,9 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
-        const deleteTransactionResponse = await TransactionsUtils.deleteTransaction(input);
+        const deleteTransactionResponse = await TransactionsUtils.deleteTransaction(
+            input.transactionId
+        );
 
         if (deleteTransactionResponse.err) {
             return Utils.getInstance().getGeneralServerErrorResponse();

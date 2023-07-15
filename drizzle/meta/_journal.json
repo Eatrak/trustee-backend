@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1689431233560,
-      "tag": "0000_optimal_red_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1689434465763,
-      "tag": "0001_equal_thunderbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1689435097397,
-      "tag": "0002_chilly_roland_deschain",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1689436876813,
-      "tag": "0003_strong_leper_queen",
+      "when": 1689445279375,
+      "tag": "0000_right_puma",
       "breakpoints": true
     }
   ]

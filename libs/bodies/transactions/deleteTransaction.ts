@@ -1,8 +1,5 @@
 export interface DeleteTransactionQueryParameters {
-    walletId: string,
-    transactionId: string,
-    transactionTimestamp: string,
-    currencyCode: string
+    transactionId: string
 }
 
 export interface DeleteTransactionInput extends DeleteTransactionQueryParameters {

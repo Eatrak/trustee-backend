@@ -1,6 +1,0 @@
-ALTER TABLE `TransactionCategory` ADD CONSTRAINT `TransactionCategory_userId_User_id_fk` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `Transaction` ADD CONSTRAINT `Transaction_userId_User_id_fk` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `Transaction` ADD CONSTRAINT `Transaction_walletId_Wallet_id_fk` FOREIGN KEY (`walletId`) REFERENCES `Wallet`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `Transaction` ADD CONSTRAINT `Transaction_categoryId_TransactionCategory_id_fk` FOREIGN KEY (`categoryId`) REFERENCES `TransactionCategory`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `Wallet` ADD CONSTRAINT `Wallet_userId_User_id_fk` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `Wallet` ADD CONSTRAINT `Wallet_currencyCode_Currency_id_fk` FOREIGN KEY (`currencyCode`) REFERENCES `Currency`(`id`) ON DELETE no action ON UPDATE no action;

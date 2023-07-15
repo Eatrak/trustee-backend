@@ -27,8 +27,6 @@
   },
   "dependencies": {
     "@planetscale/database": "^1.8.0",
-    "@typedorm/core": "^1.15.3",
-    "@typedorm/document-client": "^1.15.3",
     "@types/aws-lambda": "^8.10.110",
     "@types/node": "^18.14.0",
     "@types/validatorjs": "^3.15.0",

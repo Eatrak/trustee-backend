@@ -26,6 +26,7 @@ export const currencies = mysqlTable('Currency', {
 
 export const transactions = mysqlTable('Transaction', {
   id: varchar('id', { length: UUID_LENGTH }).primaryKey(),
+  name: varchar('name', { length: 256 }).notNull(),
   userId: varchar('userId', { length: UUID_LENGTH }).notNull().references(() => users.id),
   walletId: varchar('walletId', { length: UUID_LENGTH }).notNull().references(() => wallets.id),
   categoryId: varchar('categoryId', { length: UUID_LENGTH }).notNull().references(() => transactionCategories.id),

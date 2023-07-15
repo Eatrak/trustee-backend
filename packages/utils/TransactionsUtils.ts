@@ -3,9 +3,9 @@ import dayjs from 'dayjs';
 import { Ok, Err, Result } from "ts-results";
 import { WriteTransaction, getEntityManager, getTransactionManger } from "@typedorm/core";
 import { QUERY_ORDER } from "@typedorm/common";
+import { eq } from "drizzle-orm";
 
 import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
-import { Transaction } from 'entities/transaction';
 import { TransactionCategory } from "entities/transactionCategory";
 import { MonthlyWalletIncome } from "entities/monthlyWalletIncome";
 import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
@@ -18,6 +18,7 @@ import WalletsUtils from "./WalletsUtils";
 import { GetTransactionsByCurrencyInput } from "@libs/bodies/transactions/getTransactionsByCurrency";
 import { DeleteTransactionInput } from "@libs/bodies/transactions/deleteTransaction";
 import { GetTransactionInput } from "@libs/bodies/transactions/getTransaction";
+import { transactions, Transaction } from "schema";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -103,146 +104,45 @@ export default class TransactionsUtils {
     }
 
     public static async createTransaction(
+        transactionId: string,
         input: CreateTransactionInput
     ): Promise<Result<Transaction, "GENERAL">> {
         const {
             userId,
             categoryId,
             isIncome,
-            transactionAmount,
-            transactionTimestamp,
-            transactionName,
+            amount,
+            carriedOut,
+            name,
             walletId
         } = input;
 
-        // Get transaction wallet
-        const getTransactionWalletResponse = await WalletsUtils.getWallet(userId, walletId);
-        if (getTransactionWalletResponse.err) {
-            return Err("GENERAL");
-        }
-        const transactionWallet = getTransactionWalletResponse.val;
-
-        // Initialize new transaction
-        let newTransaction: Transaction = new Transaction();
-        newTransaction.userId = userId;
-        newTransaction.categoryId = categoryId;
-        newTransaction.isIncome = isIncome;
-        newTransaction.currencyCode = transactionWallet.currencyCode;
-        newTransaction.transactionAmount = transactionAmount;
-        newTransaction.walletId = walletId;
-        newTransaction.transactionName = transactionName;
-        newTransaction.transactionTimestamp = transactionTimestamp;
-        newTransaction.transactionCreationTimestamp = dayjs().unix();
-
-        // Get year of the transaction to create
-        const transactionYear = dayjs.unix(newTransaction.transactionTimestamp).get("year");
-        // Get month of the transaction to create
-        const transactionMonth = dayjs.unix(newTransaction.transactionTimestamp).get("month") + 1;
-
-        // Initialize TypeDORM write-transaction used to both create transaction
-        // and update monthly-wallet-income
-        const writeTransaction = new WriteTransaction();
-        writeTransaction.addCreateItem(newTransaction);
-
-        if (newTransaction.isIncome) {
-            // Get monthly-wallet-income
-            const getMonthlyWalletIncomeResponse = await MonthlyWalletIncomeUtils.getMonthlyWalletIncome(
-                userId,
-                walletId,
-                transactionYear,
-                transactionMonth,
-                transactionWallet.currencyCode
-            );
-
-            if (getMonthlyWalletIncomeResponse.err) {
-                // If the monthly-wallet-income item doesn't exist, it must be created
-                if (getMonthlyWalletIncomeResponse.val == "UNEXISTING_RESOURCE") {
-                    // Initialize monthly-wallet-income
-                    const newMonthlyWalletIncome = new MonthlyWalletIncome();
-                    newMonthlyWalletIncome.currencyCode = transactionWallet.currencyCode;
-                    newMonthlyWalletIncome.userId = newTransaction.userId;
-                    newMonthlyWalletIncome.walletId = transactionWallet.walletId;
-                    newMonthlyWalletIncome.year = transactionYear;
-                    newMonthlyWalletIncome.month = transactionMonth;
-                    newMonthlyWalletIncome.amount = newTransaction.transactionAmount;
-
-                    writeTransaction.addCreateItem(newMonthlyWalletIncome);
-                }
-                else if (getMonthlyWalletIncomeResponse.val == "GENERAL") {
-                    return Err("GENERAL");
-                }
-            }
-            else {
-                // If the monthly-wallet-income item exists, its amount must be updated
-                let updatedMonthlyWalletIncome = getMonthlyWalletIncomeResponse.val;
-                updatedMonthlyWalletIncome.amount += newTransaction.transactionAmount;
-                writeTransaction.addUpdateItem(
-                    MonthlyWalletIncome,
-                    {
-                        userId,
-                        walletId,
-                        year: transactionYear,
-                        month: transactionMonth,
-                        currencyCode: transactionWallet.currencyCode
-                    },
-                    updatedMonthlyWalletIncome
-                );
-            }
-        }
-        else {
-            // Get monthly-wallet-expense
-            const getMonthlyWalletExpenseResponse = await MonthlyWalletExpenseUtils.getMonthlyWalletExpense(
-                userId,
-                walletId,
-                transactionYear,
-                transactionMonth,
-                transactionWallet.currencyCode
-            );
-
-            if (getMonthlyWalletExpenseResponse.err) {
-                // If the monthly-wallet-expense item doesn't exist, it must be created
-                if (getMonthlyWalletExpenseResponse.val == "UNEXISTING_RESOURCE") {
-                    // Initialize monthly-wallet-expense
-                    const newMonthlyWalletExpense = new MonthlyWalletExpense();
-                    newMonthlyWalletExpense.currencyCode = transactionWallet.currencyCode;
-                    newMonthlyWalletExpense.userId = newTransaction.userId;
-                    newMonthlyWalletExpense.walletId = transactionWallet.walletId;
-                    newMonthlyWalletExpense.year = transactionYear;
-                    newMonthlyWalletExpense.month = transactionMonth;
-                    newMonthlyWalletExpense.amount = newTransaction.transactionAmount;
-
-                    writeTransaction.addCreateItem(newMonthlyWalletExpense);
-                }
-                else if (getMonthlyWalletExpenseResponse.val == "GENERAL") {
-                    return Err("GENERAL");
-                }
-            }
-            else {
-                // If the monthly-wallet-expense item exists, its amount must be updated
-                let updatedMonthlyWalletExpense = getMonthlyWalletExpenseResponse.val;
-                updatedMonthlyWalletExpense.amount += newTransaction.transactionAmount;
-                writeTransaction.addUpdateItem(
-                    MonthlyWalletExpense,
-                    {
-                        userId,
-                        walletId,
-                        year: transactionYear,
-                        month: transactionMonth,
-                        currencyCode: transactionWallet.currencyCode
-                    },
-                    updatedMonthlyWalletExpense
-                );
-            }
-        }
-
         try {
-            const result = await getTransactionManger().write(writeTransaction);
+            const transactionToCreated = {
+                id: transactionId,
+                userId,
+                name,
+                amount,
+                carriedOut,
+                categoryId,
+                createdAt: dayjs().unix(),
+                isIncome,
+                walletId
+            };
+            await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .insert(transactions)
+                .values(transactionToCreate);
             
-            if (!result.success) {
+            if (createdTransaction[0].affectedRows == 0) {
                 return Err("GENERAL");
             }
 
-            return Ok(newTransaction);
+            return Ok({
+                ...input,
+                userId
+            });
         }
         catch (err) {
             console.log(err);
@@ -254,7 +154,10 @@ export default class TransactionsUtils {
         input: GetTransactionInput
     ): Promise<Result<Transaction, Errors>> {
         try {
-            const transaction = await DatabaseUtils.getInstance().getEntityManager().findOne(Transaction, input);
+            const transaction = await DatabaseUtils
+                .getInstance()
+                .getEntityManager()
+                .findOne(Transaction, input);
 
             if (!transaction) {
                 return Err("UNEXISTING_RESOURCE");
@@ -269,95 +172,17 @@ export default class TransactionsUtils {
     }
 
     public static async deleteTransaction(
-        input: DeleteTransactionInput
+        transactionId: string
     ): Promise<Result<boolean, Errors>> {
         try {
-            // Initialize TypeDORM write-transaction used to both delete transaction
-            // and update total balance
-            const writeTransaction = new WriteTransaction();
-            writeTransaction.addDeleteItem(Transaction, input);
+            const result = await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .delete(transactions)
+                .where(eq(transactions.id, transactionId));
 
-            // Get transaction
-            const getTransactionResponse = await this.getTransaction(input);
-            // Abort operation if transaction to delete doesn't exist
-            if (getTransactionResponse.err) {
-                return Err(getTransactionResponse.val);
-            }
-            const transactionToDelete = getTransactionResponse.val;
-
-            // Get year of the transaction to create
-            const transactionYear = dayjs.unix(transactionToDelete.transactionTimestamp).get("year");
-            // Get month of the transaction to create
-            const transactionMonth = dayjs.unix(transactionToDelete.transactionTimestamp).get("month") + 1;
-
-            // Get transaction wallet
-            const getTransactionWalletResponse = await WalletsUtils.getWallet(
-                transactionToDelete.userId,
-                transactionToDelete.walletId
-            );
-            if (getTransactionWalletResponse.err) {
-                return Err("GENERAL");
-            }
-            const transactionWallet = getTransactionWalletResponse.val;
-
-            if (transactionToDelete.isIncome) {
-                // Get monthly-wallet-income
-                const getMonthlyWalletIncomeResponse = await MonthlyWalletIncomeUtils.getMonthlyWalletIncome(
-                    transactionToDelete.userId,
-                    transactionToDelete.walletId,
-                    transactionYear,
-                    transactionMonth,
-                    transactionWallet.currencyCode
-                );
-    
-                if (!getMonthlyWalletIncomeResponse.err) {
-                    // If the monthly-wallet-income item exists, its amount must be updated
-                    let updatedMonthlyWalletIncome = getMonthlyWalletIncomeResponse.val;
-                    updatedMonthlyWalletIncome.amount -= transactionToDelete.transactionAmount;
-                    writeTransaction.addUpdateItem(
-                        MonthlyWalletIncome,
-                        {
-                            userId: transactionToDelete.userId,
-                            walletId: transactionToDelete.walletId,
-                            year: transactionYear,
-                            month: transactionMonth,
-                            currencyCode: transactionWallet.currencyCode
-                        },
-                        updatedMonthlyWalletIncome
-                    );
-                }
-            }
-            else {
-                // Get monthly-wallet-expense
-                const getMonthlyWalletExpenseResponse = await MonthlyWalletExpenseUtils.getMonthlyWalletExpense(
-                    transactionToDelete.userId,
-                    transactionToDelete.walletId,
-                    transactionYear,
-                    transactionMonth,
-                    transactionWallet.currencyCode
-                );
-    
-                if (!getMonthlyWalletExpenseResponse.err) {
-                    // If the monthly-wallet-expense item exists, its amount must be updated
-                    let updatedMonthlyWalletExpense = getMonthlyWalletExpenseResponse.val;
-                    updatedMonthlyWalletExpense.amount -= transactionToDelete.transactionAmount;
-                    writeTransaction.addUpdateItem(
-                        MonthlyWalletExpense,
-                        {
-                            userId: transactionToDelete.userId,
-                            walletId: transactionToDelete.walletId,
-                            year: transactionYear,
-                            month: transactionMonth,
-                            currencyCode: transactionWallet.currencyCode
-                        },
-                        updatedMonthlyWalletExpense
-                    );
-                }
-            }
-
-            const result = await getTransactionManger().write(writeTransaction);
-            if (!result.success) {
-                return Err("GENERAL");
+            if (result[0].affectedRows == 0) {
+                return Err("UNEXISTING_RESOURCE");
             }
             
             return Ok(true);

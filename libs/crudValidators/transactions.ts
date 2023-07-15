@@ -19,8 +19,5 @@ export const createTransactionInputRules = {
 
 export const deleteTransactionInputRules = {
     userId: "required|string",
-    walletId: "required|string",
-    transactionId: "required|string",
-    transactionTimestamp: "required|integer",
-    currencyCode: "required|string"
+    transactionId: "required|string"
 };

@@ -1,18 +1,218 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "82dc67a2-169f-44a5-bcce-e86e8f0d9367",
+  "id": "d563b5a4-59c4-4cef-830d-aef0a947e855",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "Currency": {
+      "name": "Currency",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "symbol": {
+          "name": "symbol",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Currency_code_unique": {
+          "name": "Currency_code_unique",
+          "columns": [
+            "code"
+          ]
+        }
+      }
+    },
+    "TransactionCategory": {
+      "name": "TransactionCategory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "TransactionCategory_userId_User_id_fk": {
+          "name": "TransactionCategory_userId_User_id_fk",
+          "tableFrom": "TransactionCategory",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "TransactionCategory_name_unique": {
+          "name": "TransactionCategory_name_unique",
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
+    "Transaction": {
+      "name": "Transaction",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "walletId": {
+          "name": "walletId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "categoryId": {
+          "name": "categoryId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carriedOut": {
+          "name": "carriedOut",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "float",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "isIncome": {
+          "name": "isIncome",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Transaction_userId_User_id_fk": {
+          "name": "Transaction_userId_User_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Transaction_walletId_Wallet_id_fk": {
+          "name": "Transaction_walletId_Wallet_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "Wallet",
+          "columnsFrom": [
+            "walletId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Transaction_categoryId_TransactionCategory_id_fk": {
+          "name": "Transaction_categoryId_TransactionCategory_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "TransactionCategory",
+          "columnsFrom": [
+            "categoryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "User": {
       "name": "User",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar(36)",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "email": {
           "name": "email",
@@ -30,6 +230,77 @@
           "name": "User_email_unique",
           "columns": [
             "email"
+          ]
+        }
+      }
+    },
+    "Wallet": {
+      "name": "Wallet",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "currencyCode": {
+          "name": "currencyCode",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Wallet_userId_User_id_fk": {
+          "name": "Wallet_userId_User_id_fk",
+          "tableFrom": "Wallet",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "Wallet_currencyCode_Currency_id_fk": {
+          "name": "Wallet_currencyCode_Currency_id_fk",
+          "tableFrom": "Wallet",
+          "tableTo": "Currency",
+          "columnsFrom": [
+            "currencyCode"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Wallet_name_unique": {
+          "name": "Wallet_name_unique",
+          "columns": [
+            "name"
           ]
         }
       }

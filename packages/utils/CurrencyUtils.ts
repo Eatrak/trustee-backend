@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { Currency } from "entities/currency";
+import { Currency, currencies } from "schema";
 import DatabaseUtils from "./DatabaseUtils";
 
 export default class CurrencyUtils {
@@ -9,8 +9,11 @@ export default class CurrencyUtils {
      *
      * @returns Currencies.
      */
-    public static async getCurrencies() {
-        const response = await DatabaseUtils.getInstance().getEntityManager().find(Currency, {});
-        return response;
+    public static async getCurrencies(): Promise<Currency[]> {
+        return await DatabaseUtils
+            .getInstance()
+            .getDB()
+            .select()
+            .from(currencies);
     }
 }
