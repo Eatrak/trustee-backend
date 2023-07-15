@@ -24,3 +24,20 @@ export const deleteTransactionInputRules = {
     transactionTimestamp: "required|integer",
     currencyCode: "required|string"
 };
+
+export const updateTransactionInputRules = {
+    attributesForSearching: {
+        walletId: "required|string",
+        transactionId: "required|string",
+        transactionTimestamp: "required|integer"
+    },
+    updatedAttributes: {
+        transactionName: "required|string",
+        walletId: "required|string",
+        categoryId: "required|string",
+        transactionTimestamp: "required|integer",
+        transactionAmount: "required|numeric|min:0.01",
+        isIncome: "required|boolean"
+    },
+    userId: "required|string"
+};

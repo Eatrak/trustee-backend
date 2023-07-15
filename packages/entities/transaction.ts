@@ -27,9 +27,7 @@ import {
   },
 })
 export class Transaction {
-  @AutoGenerateAttribute({
-    strategy: AUTO_GENERATE_ATTRIBUTE_STRATEGY.UUID4,
-  })
+  @Attribute()
   transactionId: string;
 
   @Attribute()

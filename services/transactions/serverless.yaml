@@ -113,3 +113,15 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
+    UpdateTransaction:
+        handler: functions/updateTransaction.handler
+        events:
+            - http:
+                  method: PUT
+                  path: /transactions
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
