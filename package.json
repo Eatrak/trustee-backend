@@ -8,6 +8,8 @@
     "packages/*"
   ],
   "scripts": {
+    "migration:generate": "drizzle-kit generate:mysql",
+    "migration:push": "drizzle-kit push:mysql",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
