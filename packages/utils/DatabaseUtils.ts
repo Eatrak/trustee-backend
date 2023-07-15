@@ -1,17 +1,11 @@
-import { EntityManager, createConnection, getEntityManager } from "@typedorm/core";
-import { DocumentClientV3 } from "@typedorm/document-client";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 
-import { Transaction } from "entities/transaction";
-import { TransactionCategory } from "entities/transactionCategory";
-import { MonthlyWalletIncome } from "entities/monthlyWalletIncome";
-import { Wallet } from "entities/wallet";
-import { Currency } from "entities/currency";
-import { mainTable } from "tables/main";
-import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
+import { DB_HOST, DB_PASSWORD, DB_USERNAME } from "env";
 
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
+    private db: MySql2Database;
 
     /**
      * 
@@ -20,7 +14,7 @@ export default class DatabaseUtils {
     public static getInstance() {
         if (!this.instance) {
             this.instance = new DatabaseUtils();
-            this.instance.initTypeDormConnection();
+            this.instance.initConnection();
         }
 
         return this.instance;
@@ -33,27 +27,19 @@ export default class DatabaseUtils {
      public getTableName(): string {
         if (!process.env.STAGE) throw new Error("STAGE environment variable is missing");
 
-        return `trustee-${process.env.STAGE}`;
+        return "trustee";
     }
 
-    public initTypeDormConnection() {
-        const documentClient = new DocumentClientV3(new DynamoDBClient({}));
-
-        createConnection({
-            table: mainTable,
-            entities: [
-                Wallet,
-                MonthlyWalletIncome,
-                MonthlyWalletExpense,
-                Currency,
-                TransactionCategory,
-                Transaction
-            ],
-            documentClient
+    public async initConnection() {
+        const connection = await mysql.createConnection({
+            host: DB_HOST,
+            user: DB_USERNAME,
+            password: DB_PASSWORD
         });
+        this.db = drizzle(connection);
     }
 
-    public getEntityManager(): EntityManager {
-        return getEntityManager();
+    public getDB(): MySql2Database {
+        return this.db;
     }
 };
