@@ -1,12 +1,12 @@
 import type { Config } from "drizzle-kit";
 
-import { DB_URL } from "./env";
+import { getDbUrl } from "./env.config";
  
 export default {
   schema: "./schema.ts",
   out: "./drizzle",
   driver: 'mysql2',
   dbCredentials: {
-    connectionString: DB_URL
+    connectionString: getDbUrl()
   }
 } satisfies Config;

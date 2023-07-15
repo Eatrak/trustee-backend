@@ -1,7 +1,7 @@
 import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 
-import { DB_HOST, DB_PASSWORD, DB_USERNAME } from "env";
+import { env } from "env.config";
 
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
@@ -32,9 +32,9 @@ export default class DatabaseUtils {
 
     public async initConnection() {
         const connection = await mysql.createConnection({
-            host: DB_HOST,
-            user: DB_USERNAME,
-            password: DB_PASSWORD
+            host: env.DB_HOST,
+            user: env.DB_USERNAME,
+            password: env.DB_PASSWORD
         });
         this.db = drizzle(connection);
     }
