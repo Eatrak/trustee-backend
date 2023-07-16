@@ -1,0 +1,68 @@
+service: trustee-auth
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+custom:
+  webpack:
+    webpackConfig: ../../../webpack.config.js
+    packager: 'npm'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-central-1
+  versionFunctions: false
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
+    restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
+  environment:
+    USER_POOL_ID: !ImportValue TrusteeUserPool
+    USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
+    REGION: !Ref AWS::Region
+    STAGE: ${self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminInitiateAuth
+      Resource: !ImportValue TrusteeUserPoolArn-${self:provider.stage}
+
+functions:
+  SignUp:
+    handler: functions/signUp.handler
+    events:
+      - http:
+          cors: true
+          method: POST
+          path: /sign-up
+
+  SignIn:
+    handler: functions/signIn.handler
+    events:
+      - http:
+          cors: true
+          method: POST
+          path: /sign-in
+
+  CheckAuthentication:
+    handler: functions/checkAuthentication.handler
+    events:
+      - http:
+          cors: true
+          method: GET
+          path: /auth/check

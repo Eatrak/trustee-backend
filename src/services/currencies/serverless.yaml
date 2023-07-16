@@ -1,0 +1,53 @@
+service: trustee-currencies
+frameworkVersion: '3'
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+custom:
+  webpack:
+    webpackConfig: ../../../webpack.config.js
+    packager: 'npm'
+
+provider:
+    name: aws
+    runtime: nodejs18.x
+    region: eu-central-1
+    versionFunctions: false
+    stage: ${opt:stage, 'dev'}
+    apiGateway:
+        restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
+        restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
+    environment:
+        REGION: !Ref AWS::Region
+        STAGE: ${self:provider.stage}
+    iamRoleStatements:
+        - Effect: Allow
+          Action:
+              - dynamodb:Query
+          Resource: !ImportValue TrusteeMainTableArn-${self:provider.stage}
+        - Effect: Allow
+          Action:
+              - dynamodb:Query
+          Resource:
+            Fn::Join:
+              - ""
+              - - !ImportValue TrusteeMainTableArn-${self:provider.stage}
+                - /index/GSI1
+
+functions:
+    GetCurrencies:
+        handler: functions/getCurrencies.handler
+        events:
+            - http:
+                  method: GET
+                  path: /currencies
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email

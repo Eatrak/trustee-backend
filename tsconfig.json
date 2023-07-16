@@ -15,7 +15,14 @@
     "experimentalDecorators": true,
     "baseUrl": "./",
     "paths": {
-      "@libs/*": ["./libs/*"]
+      "@bodies/*": ["./src/shared/bodies/*"],
+      "@crudValidators/*": ["./src/shared/crudValidators/*"],
+      "@requestInterfaces/*": ["./src/shared/requestInterfaces/*"],
+      "@ts-types/*": ["src/shared/ts-types/*"],
+      "@utils/*": ["./src/shared/utils/*"],
+      "@env/*": ["./src/env/*"],
+      "@services/*": ["./src/services/*"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
   "exclude": ["node_modules", "**/*.test.ts"]

@@ -31,7 +31,14 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "@libs": path.resolve(__dirname, 'libs')
+      "@bodies": path.resolve(__dirname, "src/shared/bodies"),
+      "@crudValidators": path.resolve(__dirname, "src/shared/crudValidators"),
+      "@requestInterfaces": path.resolve(__dirname, "src/shared/requestInterfaces"),
+      "@ts-types": path.resolve(__dirname, "src/shared/ts-types"),
+      "@utils": path.resolve(__dirname, "src/shared/utils"),
+      "@env": path.resolve(__dirname, "src/env"),
+      "@services": path.resolve(__dirname, "src/services"),
+      "@shared": path.resolve(__dirname, "src/shared")
     },
     extensions: ['.mjs', '.ts', '.js']
   },
