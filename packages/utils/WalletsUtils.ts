@@ -1,8 +1,9 @@
 import "reflect-metadata";
 import { Ok, Err, Result } from "ts-results";
 
-import { Wallet } from "entities/wallet";
 import DatabaseUtils from "./DatabaseUtils";
+import { Wallet, wallets } from "schema";
+import { eq } from "drizzle-orm";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -13,46 +14,49 @@ export default class WalletsUtils {
      * @param userId ID of the user that owns the wallets.
      * @returns Result of the query used to get user wallets.
      */
-    public static async getWallets(userId: string) {
-        const response = await DatabaseUtils.getInstance().getEntityManager().find(Wallet, { userId }, {
-            queryIndex: "GSI1"
-        });
-        return response;
-    }
-
-    public static async getWallet(
-        userId: string,
-        walletId: string
-    ): Promise<Result<Wallet, Errors>> {
+    public static async getWallets(userId: string): Promise<Result<Wallet[], "GENERAL">> {
         try {
-            const response = await DatabaseUtils.getInstance().getEntityManager().findOne(
-                Wallet,
-                { userId, walletId }
-            );
+            const result = await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .select()
+                .from(wallets)
+                .where(eq(wallets.userId, userId));
 
-            if (!response) {
-                return new Err("UNEXISTING_RESOURCE");
-            }
-
-            return Ok(response);
+            return Ok(result);
         }
         catch (err) {
             console.log(err);
-            return new Err("GENERAL");
+            return Err("GENERAL");
         }
     }
 
     public static async createWallet(
+        id: string,
         userId: string,
-        walletName: string,
-        currencyCode: string
-    ): Promise<Wallet> {
-        const newWallet = new Wallet();
-        newWallet.userId = userId;
-        newWallet.walletName = walletName;
-        newWallet.currencyCode = currencyCode;
+        name: string,
+        currencyId: string
+    ): Promise<Result<Wallet, "GENERAL">> {
+        try {
+            const walletToCreate: Wallet = {
+                id,
+                name,
+                userId,
+                currencyId
+            };
+            await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .insert(wallets)
+                .values(walletToCreate);
 
-        const response: Wallet = await DatabaseUtils.getInstance().getEntityManager().create(newWallet);
-        return response;
+            Ok(walletToCreate);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
+
+        return Err("GENERAL");
     }
 }
