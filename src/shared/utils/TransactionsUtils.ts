@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Ok, Err, Result } from "ts-results";
-import { desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 
 import { CreateTransactionCategoryInput } from "@bodies/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@bodies/transactions/createTransaction";
@@ -41,10 +41,12 @@ export default class TransactionsUtils {
                     createdAt: transactions.createdAt
                 })
                 .from(transactions)
-                .where(eq(transactions.userId, userId))
-                .where(eq(wallets.currencyId, currencyId))
-                .where(gte(transactions.carriedOut, Number.parseInt(startCarriedOut)))
-                .where(lte(transactions.carriedOut, Number.parseInt(endCarriedOut)))
+                .where(and(
+                    eq(transactions.userId, userId),
+                    eq(wallets.currencyId, currencyId),
+                    gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
+                    lte(transactions.carriedOut, Number.parseInt(endCarriedOut))
+                ))
                 .innerJoin(wallets, eq(wallets.id, transactions.walletId))
                 .orderBy(desc(transactions.carriedOut))
                 .limit(this.MAX_TRANSACTIONS_TO_GET);
