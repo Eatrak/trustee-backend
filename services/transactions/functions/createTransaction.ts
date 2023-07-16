@@ -7,6 +7,7 @@ import {
 import Validator from 'validatorjs';
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
+import { v4 as uuid } from 'uuid';
 
 import Utils from 'utils/Utils';
 import { CreateTransactionBody, CreateTransactionInput } from "@libs/bodies/transactions/createTransaction";
@@ -33,7 +34,8 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
-        const createTransactionResponse = await TransactionsUtils.createTransaction(input);
+        const transactionId = uuid();
+        const createTransactionResponse = await TransactionsUtils.createTransaction(transactionId, input);
 
         if (createTransactionResponse.err) {
             return Utils.getInstance().getGeneralServerErrorResponse();

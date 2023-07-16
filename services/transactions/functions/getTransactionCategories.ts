@@ -15,9 +15,15 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
-        const transactionCategories = (await TransactionsUtils.getTransactionCategories(userId)).items;
+        const getTransactionCategoriesResponse = (await TransactionsUtils.getTransactionCategories(userId));
+        if (getTransactionCategoriesResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
+        }
+        const transactionCategories = getTransactionCategoriesResponse.val;
 
-        const response: GetTransactionCategoriesResponse = { transactionCategories };
+        const response: GetTransactionCategoriesResponse = {
+            transactionCategories
+        };
         return Utils.getInstance().getResponse(200, response);
     } catch (err) {
         console.log(err);

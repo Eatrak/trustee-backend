@@ -5,20 +5,20 @@ export const getTransactionsValidator = {
 };
 
 export const createTransactionCategoryRules = {
-    transactionCategoryName: "required|string"
+    name: "required|string"
 };
 
 export const createTransactionInputRules = {
-    transactionName: "required|string",
+    name: "required|string",
     walletId: "required|string",
     categoryId: "required|string",
-    transactionTimestamp: "required|integer",
-    transactionAmount: "required|numeric|min:0.01",
+    carriedOut: "required|integer",
+    amount: "required|numeric|min:0.01",
     isIncome: "required|boolean",
     userId: "required|string"
 };
 
 export const deleteTransactionInputRules = {
     userId: "required|string",
-    transactionId: "required|string"
+    id: "required|string"
 };

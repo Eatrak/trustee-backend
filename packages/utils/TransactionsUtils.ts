@@ -58,13 +58,23 @@ export default class TransactionsUtils {
         }
     }
 
-    public static async getTransactionCategories(userId: string) {
-        return await DatabaseUtils
-            .getInstance()
-            .getDB()
-            .select()
-            .from(transactionCategories)
-            .where(eq(transactionCategories.userId, userId));
+    public static async getTransactionCategories(
+        userId: string
+    ): Promise<Result<TransactionCategory[], "GENERAL">> {
+        try {
+            const result = await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .select()
+                .from(transactionCategories)
+                .where(eq(transactionCategories.userId, userId));
+
+            return Ok(result);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
     }
 
     public static async createTransactionCategory(

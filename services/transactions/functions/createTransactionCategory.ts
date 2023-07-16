@@ -7,6 +7,7 @@ import {
 import Validator from 'validatorjs';
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
+import { v4 as uuid } from 'uuid';
 
 import Utils from 'utils/Utils';
 import TransactionsUtils from "utils/TransactionsUtils";
@@ -20,10 +21,10 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const { transactionCategoryName }: CreateTransactionCategoryBody = event.body ? JSON.parse(event.body) : {};
+    const { name }: CreateTransactionCategoryBody = event.body ? JSON.parse(event.body) : {};
 
     // Validate data
-    const validator = new Validator({ transactionCategoryName }, createTransactionCategoryRules);
+    const validator = new Validator({ name }, createTransactionCategoryRules);
     if (validator.fails()) {
         return Utils.getInstance().getResponse(404, {
             message: "Invalid data",
@@ -32,10 +33,16 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
-        const createdTransactionCategory = await TransactionsUtils.createTransactionCategory({
-            userId,
-            transactionCategoryName
-        });
+        const transactionCategoryId = uuid();
+        const createdTransactionCategoryResponse = await TransactionsUtils.createTransactionCategory(
+            transactionCategoryId,
+            { userId, name }
+        );
+
+        if (createdTransactionCategoryResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
+        }
+        const createdTransactionCategory = createdTransactionCategoryResponse.val;
 
         const response: CreateTransactionCategoryResponse = { createdTransactionCategory };
         return Utils.getInstance().getResponse(201, response);

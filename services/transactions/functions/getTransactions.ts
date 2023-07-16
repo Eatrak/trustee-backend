@@ -17,12 +17,12 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const {
         startCarriedOut,
         endCarriedOut,
-        currencyCode
+        currencyId
     } = event.queryStringParameters as unknown as GetTransactionsInputQueryParams;
     const getTransactionsInput: GetTransactionsInput = {
         startCarriedOut,
         endCarriedOut,
-        currencyCode,
+        currencyId,
         userId
     };
 
