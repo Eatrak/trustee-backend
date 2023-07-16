@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d563b5a4-59c4-4cef-830d-aef0a947e855",
+  "id": "a95158ab-35b9-4e6b-a786-4607c8c3637d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "Currency": {
@@ -132,7 +132,7 @@
         },
         "carriedOut": {
           "name": "carriedOut",
-          "type": "datetime",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -153,7 +153,7 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

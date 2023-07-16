@@ -2,9 +2,9 @@ import { InferModel } from "drizzle-orm";
 import {
   mysqlTable,
   varchar,
-  datetime,
   boolean,
-  float
+  float,
+  int
 } from "drizzle-orm/mysql-core";
 
 
@@ -30,10 +30,10 @@ export const transactions = mysqlTable('Transaction', {
   userId: varchar('userId', { length: UUID_LENGTH }).notNull().references(() => users.id),
   walletId: varchar('walletId', { length: UUID_LENGTH }).notNull().references(() => wallets.id),
   categoryId: varchar('categoryId', { length: UUID_LENGTH }).notNull().references(() => transactionCategories.id),
-  carriedOut: datetime('carriedOut').notNull(),
+  carriedOut: int('carriedOut').notNull(),
   amount: float('amount').notNull(),
   isIncome: boolean('isIncome').notNull(),
-  createdAt: datetime('createdAt').notNull()
+  createdAt: int('createdAt').notNull()
 });
 
 export const transactionCategories = mysqlTable('TransactionCategory', {

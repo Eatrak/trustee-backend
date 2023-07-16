@@ -1,58 +1,18 @@
 import "reflect-metadata";
 import dayjs from 'dayjs';
 import { Ok, Err, Result } from "ts-results";
-import { WriteTransaction, getEntityManager, getTransactionManger } from "@typedorm/core";
-import { QUERY_ORDER } from "@typedorm/common";
-import { eq } from "drizzle-orm";
+import { desc, eq, gte, lte } from "drizzle-orm";
 
-import { GetTransactionsInput } from '@libs/bodies/transactions/getTransactions';
-import { TransactionCategory } from "entities/transactionCategory";
-import { MonthlyWalletIncome } from "entities/monthlyWalletIncome";
-import { MonthlyWalletExpense } from "entities/monthlyWalletExpense";
 import { CreateTransactionCategoryInput } from "@libs/bodies/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@libs/bodies/transactions/createTransaction";
-import DatabaseUtils from "./DatabaseUtils";
-import MonthlyWalletIncomeUtils from "./MonthlyWalletIncomeUtils";
-import MonthlyWalletExpenseUtils from "./MonthlyWalletExpenseUtils";
-import WalletsUtils from "./WalletsUtils";
-import { GetTransactionsByCurrencyInput } from "@libs/bodies/transactions/getTransactionsByCurrency";
-import { DeleteTransactionInput } from "@libs/bodies/transactions/deleteTransaction";
-import { GetTransactionInput } from "@libs/bodies/transactions/getTransaction";
-import { transactions, Transaction } from "schema";
+import { GetTransactionsByCurrencyAndCreationRangeInput } from "@libs/bodies/transactions/getTransactionsByCurrency";
+import DatabaseUtils from "utils/DatabaseUtils";
+import { transactions, Transaction, TransactionCategory, transactionCategories, wallets, currencies } from "schema";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
 export default class TransactionsUtils {
-    static MAX_TRANSACTIONS_TO_GET = 20;
-
-    /**
-     * Get user transactions by creation range.
-     *
-     * @param input Necessary input used to get user transactions by creation range.
-     * @returns Result of the query used to get transactions by creation range.
-     */
-    public static async getTransactionsByCreationRange({
-        userId,
-        startCreationTimestamp,
-        endCreationTimestamp,
-        cursor
-    }: GetTransactionsInput) {
-        const response = await DatabaseUtils.getInstance().getEntityManager().find(Transaction, { userId }, {
-            queryIndex: "GSI1",
-            keyCondition: {
-                GE: `CREATION<${startCreationTimestamp}>`
-            },
-            where: {
-                transactionTimestamp: {
-                    LE: Number.parseInt(endCreationTimestamp!)
-                }
-            },
-            orderBy: QUERY_ORDER.DESC,
-            limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
-            cursor
-        });
-        return response;
-    }
+    static MAX_TRANSACTIONS_TO_GET = 30;
 
     /**
      * Get user transactions by currency and creation range.
@@ -62,49 +22,80 @@ export default class TransactionsUtils {
      */
     public static async getTransactionsByCurrencyAndCreationRange({
         userId,
-        startCreationTimestamp,
-        endCreationTimestamp,
-        cursor,
+        startCarriedOut,
+        endCarriedOut,
         currencyCode
-    }: GetTransactionsByCurrencyInput) {
-        const response = await DatabaseUtils.getInstance().getEntityManager().find(Transaction, { userId, currencyCode }, {
-            queryIndex: "GSI2",
-            keyCondition: {
-                GE: `CREATION<${startCreationTimestamp}>`
-            },
-            where: {
-                transactionTimestamp: {
-                    LE: Number.parseInt(endCreationTimestamp!)
-                }
-            },
-            orderBy: QUERY_ORDER.DESC,
-            limit: TransactionsUtils.MAX_TRANSACTIONS_TO_GET,
-            cursor
-        });
-        return response;
+    }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<Result<Transaction[], "GENERAL">> {
+        try {
+            const result: Transaction[] = await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .select({
+                    userId: transactions.userId,
+                    id: transactions.id,
+                    name: transactions.name,
+                    walletId: transactions.walletId,
+                    categoryId: transactions.categoryId,
+                    carriedOut: transactions.carriedOut,
+                    amount: transactions.amount,
+                    isIncome: transactions.isIncome,
+                    createdAt: transactions.createdAt
+                })
+                .from(transactions)
+                .where(eq(transactions.userId, userId))
+                .where(eq(currencies.code, currencyCode))
+                .where(gte(transactions.carriedOut, Number.parseInt(startCarriedOut)))
+                .where(lte(transactions.carriedOut, Number.parseInt(endCarriedOut)))
+                .innerJoin(wallets, eq(wallets.id, transactions.walletId))
+                .innerJoin(currencies, eq(currencies.id, wallets.currencyId))
+                .orderBy(desc(transactions.carriedOut))
+                .limit(this.MAX_TRANSACTIONS_TO_GET);
+
+            return Ok(result);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
     }
 
     public static async getTransactionCategories(userId: string) {
-        const response = await DatabaseUtils.getInstance().getEntityManager().find(TransactionCategory, { userId });
-        return response;
+        return await DatabaseUtils
+            .getInstance()
+            .getDB()
+            .select()
+            .from(transactionCategories)
+            .where(eq(transactionCategories.userId, userId));
     }
 
     public static async createTransactionCategory(
+        id: string,
         input: CreateTransactionCategoryInput
-    ): Promise<TransactionCategory> {
-        const { userId, transactionCategoryName } = input;
+    ): Promise<Result<TransactionCategory, "GENERAL">> {
+        try {
+            const { userId, name } = input;
 
-        // Create new transaction category
-        const newTransactionCategory = new TransactionCategory();
-        newTransactionCategory.userId = userId;
-        newTransactionCategory.transactionCategoryName = transactionCategoryName;
-        const response: TransactionCategory = await DatabaseUtils.getInstance().getEntityManager().create(newTransactionCategory);
+            const transactionCategoryToCreate: TransactionCategory = {
+                id,
+                name,
+                userId
+            };
+            await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .insert(transactionCategories)
+                .values(transactionCategoryToCreate);
 
-        return response;
+            return Ok(transactionCategoryToCreate);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
     }
 
     public static async createTransaction(
-        transactionId: string,
+        id: string,  
         input: CreateTransactionInput
     ): Promise<Result<Transaction, "GENERAL">> {
         const {
@@ -118,8 +109,8 @@ export default class TransactionsUtils {
         } = input;
 
         try {
-            const transactionToCreated = {
-                id: transactionId,
+            const transactionToCreate: Transaction = {
+                id,
                 userId,
                 name,
                 amount,
@@ -129,41 +120,17 @@ export default class TransactionsUtils {
                 isIncome,
                 walletId
             };
-            await DatabaseUtils
+            const result = await DatabaseUtils
                 .getInstance()
                 .getDB()
                 .insert(transactions)
                 .values(transactionToCreate);
             
-            if (createdTransaction[0].affectedRows == 0) {
+            if (result[0].affectedRows == 0) {
                 return Err("GENERAL");
             }
 
-            return Ok({
-                ...input,
-                userId
-            });
-        }
-        catch (err) {
-            console.log(err);
-            return Err("GENERAL");
-        }
-    }
-
-    public static async getTransaction(
-        input: GetTransactionInput
-    ): Promise<Result<Transaction, Errors>> {
-        try {
-            const transaction = await DatabaseUtils
-                .getInstance()
-                .getEntityManager()
-                .findOne(Transaction, input);
-
-            if (!transaction) {
-                return Err("UNEXISTING_RESOURCE");
-            }
-
-            return Ok(transaction);
+            return Ok(transactionToCreate);
         }
         catch (err) {
             console.log(err);
@@ -172,14 +139,14 @@ export default class TransactionsUtils {
     }
 
     public static async deleteTransaction(
-        transactionId: string
+        id: string
     ): Promise<Result<boolean, Errors>> {
         try {
             const result = await DatabaseUtils
                 .getInstance()
                 .getDB()
                 .delete(transactions)
-                .where(eq(transactions.id, transactionId));
+                .where(eq(transactions.id, id));
 
             if (result[0].affectedRows == 0) {
                 return Err("UNEXISTING_RESOURCE");

@@ -1,6 +1,7 @@
 export const getTransactionsValidator = {
-    startCreationTimestamp: "integer",
-    endCreationTimestamp: "integer"
+    startCarriedOut: "required|integer",
+    endCarriedOut: "required|integer",
+    currencyCode: "required|string"
 };
 
 export const createTransactionCategoryRules = {

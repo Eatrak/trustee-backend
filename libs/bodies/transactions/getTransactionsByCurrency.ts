@@ -1,9 +1,6 @@
-import { DocumentClientTypes } from "@typedorm/document-client";
-
-export interface GetTransactionsByCurrencyInput {
-    startCreationTimestamp?: string;
-    endCreationTimestamp?: string;
+export interface GetTransactionsByCurrencyAndCreationRangeInput {
+    startCarriedOut: string;
+    endCarriedOut: string;
+    currencyCode: string;
     userId: string;
-    cursor?: DocumentClientTypes.Key;
-    currencyCode?: string;
 }

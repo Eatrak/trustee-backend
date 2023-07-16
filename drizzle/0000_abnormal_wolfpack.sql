@@ -18,10 +18,10 @@ CREATE TABLE `Transaction` (
 	`userId` varchar(36) NOT NULL,
 	`walletId` varchar(36) NOT NULL,
 	`categoryId` varchar(36) NOT NULL,
-	`carriedOut` datetime NOT NULL,
+	`carriedOut` int NOT NULL,
 	`amount` float NOT NULL,
 	`isIncome` boolean NOT NULL,
-	`createdAt` datetime NOT NULL
+	`createdAt` int NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `User` (

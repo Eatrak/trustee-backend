@@ -4,5 +4,5 @@ export interface CreateTransactionCategoryBody {
 
 export interface CreateTransactionCategoryInput {
     userId: string,
-    transactionCategoryName: string
+    name: string
 }

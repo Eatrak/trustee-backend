@@ -1,8 +1,5 @@
-import { DocumentClientTypes } from "@typedorm/document-client";
-
-import { ITransaction } from "../../../packages/entities/transaction";
+import { Transaction } from "schema";
 
 export interface GetTransactionsResponse {
-    transactions: ITransaction[],
-    cursor?: DocumentClientTypes.Key
+    transactions: Transaction[]
 }
