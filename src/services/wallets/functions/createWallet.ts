@@ -12,6 +12,7 @@ import Utils from '@utils/Utils';
 import WalletsUtils from "@utils/WalletsUtils";
 import { CreateWalletBody } from "@bodies/transactions/createWallet";
 import { CreateWalletResponse } from "@requestInterfaces/transactions/createWallet";
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -22,6 +23,8 @@ export const handler: APIGatewayProxyHandler = async (
     const { name, currencyId } = event.body as unknown as CreateWalletBody;
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         const walletId = uuid();
         const createWalletResponse = await WalletsUtils.createWallet(
             walletId,

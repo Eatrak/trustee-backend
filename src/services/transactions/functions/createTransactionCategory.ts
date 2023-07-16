@@ -13,6 +13,7 @@ import TransactionsUtils from "@utils/TransactionsUtils";
 import { CreateTransactionCategoryBody } from "@bodies/transactions/createTransactionCategory";
 import { CreateTransactionCategoryResponse } from "@requestInterfaces/transactions/createTransactionCategory";
 import { createTransactionCategoryRules } from "@crudValidators/transactions";
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -32,6 +33,8 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         const transactionCategoryId = uuid();
         const createdTransactionCategoryResponse = await TransactionsUtils.createTransactionCategory(
             transactionCategoryId,

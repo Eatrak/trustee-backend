@@ -8,6 +8,7 @@ import TransactionsUtils from '@utils/TransactionsUtils';
 import { GetTransactionsInputQueryParams, GetTransactionsInput } from '@bodies/transactions/getTransactions';
 import { getTransactionsValidator } from '@crudValidators/transactions';
 import { GetTransactionsResponse } from '@requestInterfaces/transactions/getTransactions';
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -32,6 +33,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     }
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         // Get user transactions by both creation-range and currency
         const getTransactionsResponse = await TransactionsUtils.getTransactionsByCurrencyAndCreationRange(getTransactionsInput);
         if (getTransactionsResponse.err) {

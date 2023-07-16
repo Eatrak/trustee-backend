@@ -14,6 +14,7 @@ import {
     DeleteTransactionInput,
     DeleteTransactionQueryParameters
 } from "@bodies/transactions/deleteTransaction";
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -31,6 +32,8 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         const deleteTransactionResponse = await TransactionsUtils.deleteTransaction(
             input.id
         );

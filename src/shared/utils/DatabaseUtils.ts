@@ -14,7 +14,6 @@ export default class DatabaseUtils {
     public static getInstance() {
         if (!this.instance) {
             this.instance = new DatabaseUtils();
-            this.instance.initConnection();
         }
 
         return this.instance;
@@ -34,7 +33,9 @@ export default class DatabaseUtils {
         const connection = await mysql.createConnection({
             host: env.DB_HOST,
             user: env.DB_USERNAME,
-            password: env.DB_PASSWORD
+            password: env.DB_PASSWORD,
+            database: env.DB_NAME,
+            port: env.DB_PORT
         });
         this.db = drizzle(connection);
     }

@@ -10,6 +10,7 @@ import en from 'validatorjs/src/lang/en';
 import Utils from '@utils/Utils';
 import WalletsUtils from "@utils/WalletsUtils";
 import { GetWalletsResponse } from "@requestInterfaces/transactions/getWallets";
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -19,6 +20,8 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         const getWalletsResponse = (await WalletsUtils.getWallets(userId));
         if (getWalletsResponse.err) {
             return Utils.getInstance().getGeneralServerErrorResponse();

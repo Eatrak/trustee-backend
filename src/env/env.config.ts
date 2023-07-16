@@ -7,7 +7,8 @@ interface EnvironmentVariables {
     DB_USERNAME: string,
     DB_HOST: string,
     DB_PASSWORD: string,
-    DB_PORT: number
+    DB_PORT: number,
+    DB_URL: string
 }
 
 export type Environments = {
@@ -20,15 +21,3 @@ export const env = environments[currentEnvironmentName]!;
 
 if (!env)
     throw new Error(`The environment with name "${currentEnvironmentName}" doesn't exist.`);
-
-export const getDbUrl = () => {
-    const {
-        DB_USERNAME,
-        DB_PASSWORD,
-        DB_HOST,
-        DB_PORT,
-        DB_NAME
-    } = env;
-
-    return `mysql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
-};

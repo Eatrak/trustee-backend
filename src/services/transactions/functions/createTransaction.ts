@@ -13,6 +13,7 @@ import { CreateTransactionBody, CreateTransactionInput } from "@bodies/transacti
 import TransactionsUtils from "@utils/TransactionsUtils";
 import { createTransactionInputRules } from "@crudValidators/transactions";
 import { CreateTransactionResponse } from "@requestInterfaces/transactions/createTransactionResponse";
+import DatabaseUtils from '@utils/DatabaseUtils';
 
 Validator.setMessages('en', en);
 
@@ -33,6 +34,8 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
+        await DatabaseUtils.getInstance().initConnection();
+
         const transactionId = uuid();
         const createTransactionResponse = await TransactionsUtils.createTransaction(transactionId, input);
 
