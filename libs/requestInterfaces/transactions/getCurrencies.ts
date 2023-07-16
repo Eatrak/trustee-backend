@@ -1,4 +1,4 @@
-import { Currency } from "entities/currency";
+import { Currency } from "schema";
 
 export interface GetCurrenciesResponse {
     currencies: Currency[]

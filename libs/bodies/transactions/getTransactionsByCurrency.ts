@@ -1,6 +1,6 @@
 export interface GetTransactionsByCurrencyAndCreationRangeInput {
     startCarriedOut: string;
     endCarriedOut: string;
-    currencyCode: string;
+    currencyId: string;
     userId: string;
 }

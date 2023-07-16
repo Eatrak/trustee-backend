@@ -1,5 +1,5 @@
 export interface DeleteTransactionQueryParameters {
-    transactionId: string
+    id: string
 }
 
 export interface DeleteTransactionInput extends DeleteTransactionQueryParameters {

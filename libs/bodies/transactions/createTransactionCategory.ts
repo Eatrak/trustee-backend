@@ -1,5 +1,5 @@
 export interface CreateTransactionCategoryBody {
-    transactionCategoryName: string
+    name: string
 }
 
 export interface CreateTransactionCategoryInput {

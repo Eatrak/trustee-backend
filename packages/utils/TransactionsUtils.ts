@@ -24,7 +24,7 @@ export default class TransactionsUtils {
         userId,
         startCarriedOut,
         endCarriedOut,
-        currencyCode
+        currencyId
     }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<Result<Transaction[], "GENERAL">> {
         try {
             const result: Transaction[] = await DatabaseUtils
@@ -43,11 +43,10 @@ export default class TransactionsUtils {
                 })
                 .from(transactions)
                 .where(eq(transactions.userId, userId))
-                .where(eq(currencies.code, currencyCode))
+                .where(eq(wallets.currencyId, currencyId))
                 .where(gte(transactions.carriedOut, Number.parseInt(startCarriedOut)))
                 .where(lte(transactions.carriedOut, Number.parseInt(endCarriedOut)))
                 .innerJoin(wallets, eq(wallets.id, transactions.walletId))
-                .innerJoin(currencies, eq(currencies.id, wallets.currencyId))
                 .orderBy(desc(transactions.carriedOut))
                 .limit(this.MAX_TRANSACTIONS_TO_GET);
 

@@ -1,4 +1,4 @@
-import { TransactionCategory } from "entities/transactionCategory";
+import { TransactionCategory } from "schema";
 
 export interface CreateTransactionCategoryResponse {
     createdTransactionCategory: TransactionCategory

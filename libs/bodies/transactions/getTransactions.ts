@@ -1,12 +1,12 @@
 export interface GetTransactionsInputQueryParams {
     startCarriedOut: string;
     endCarriedOut: string;
-    currencyCode: string;
+    currencyId: string;
 }
 
 export interface GetTransactionsInput {
     startCarriedOut: string;
     endCarriedOut: string;
     userId: string;
-    currencyCode: string;
+    currencyId: string;
 }

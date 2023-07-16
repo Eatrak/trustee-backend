@@ -1,4 +1,4 @@
-import { Wallet } from "entities/wallet";
+import { Wallet } from "schema";
 
 export interface GetWalletsResponse {
     wallets: Wallet[]
