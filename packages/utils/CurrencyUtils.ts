@@ -1,7 +1,8 @@
 import "reflect-metadata";
+import { Err, Ok, Result } from "ts-results";
 
 import { Currency, currencies } from "schema";
-import DatabaseUtils from "./DatabaseUtils";
+import DatabaseUtils from "utils/DatabaseUtils";
 
 export default class CurrencyUtils {
     /**
@@ -9,11 +10,19 @@ export default class CurrencyUtils {
      *
      * @returns Currencies.
      */
-    public static async getCurrencies(): Promise<Currency[]> {
-        return await DatabaseUtils
-            .getInstance()
-            .getDB()
-            .select()
-            .from(currencies);
+    public static async getCurrencies(): Promise<Result<Currency[], "GENERAL">> {
+        try {
+            const result = await DatabaseUtils
+                .getInstance()
+                .getDB()
+                .select()
+                .from(currencies);
+
+            return Ok(result);
+        }
+        catch (err) {
+            console.log(err);
+            return Err("GENERAL");
+        }
     }
 }

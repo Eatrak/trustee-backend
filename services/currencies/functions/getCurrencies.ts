@@ -18,7 +18,11 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     try {
-        const currencies = (await CurrencyUtils.getCurrencies()).items;
+        const getCurrenciesResponse = (await CurrencyUtils.getCurrencies());
+        if (getCurrenciesResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
+        }
+        const currencies = getCurrenciesResponse.val;
 
         const response: GetCurrenciesResponse = { currencies };
         return Utils.getInstance().getResponse(200, response);

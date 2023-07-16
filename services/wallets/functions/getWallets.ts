@@ -20,7 +20,11 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
-        const wallets = (await WalletsUtils.getWallets(userId)).items;
+        const getWalletsResponse = (await WalletsUtils.getWallets(userId));
+        if (getWalletsResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
+        }
+        const wallets = getWalletsResponse.val;
 
         const response: GetWalletsResponse = { wallets };
         return Utils.getInstance().getResponse(200, response);

@@ -7,6 +7,7 @@ import {
 import Validator from 'validatorjs';
 //@ts-ignore
 import en from 'validatorjs/src/lang/en';
+import { v4 as uuid } from 'uuid';
 
 import Utils from 'utils/Utils';
 import WalletsUtils from "utils/WalletsUtils";
@@ -19,14 +20,20 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const { walletName, currencyCode }: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
+    const { name, currencyId } = event.body as unknown as CreateWalletBody;
 
     try {
-        const createdWallet = await WalletsUtils.createWallet(
+        const walletId = uuid();
+        const createWalletResponse = await WalletsUtils.createWallet(
+            walletId,
             userId,
-            walletName,
-            currencyCode
+            name,
+            currencyId
         );
+        if (createWalletResponse.err) {
+            return Utils.getInstance().getGeneralServerErrorResponse();
+        }
+        const createdWallet = createWalletResponse.val;
 
         const response: CreateWalletResponse = { createdWallet };
         return Utils.getInstance().getResponse(201, response);

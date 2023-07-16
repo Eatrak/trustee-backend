@@ -51,27 +51,3 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
-    GetTotalIncomeByCurrency:
-        handler: functions/getTotalIncomeByCurrency.handler
-        events:
-            - http:
-                  method: GET
-                  path: /currencies/income
-                  cors: true
-                  authorizer:
-                      type: COGNITO_USER_POOLS
-                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
-                      claims:
-                          - email
-    GetTotalExpenseByCurrency:
-        handler: functions/getTotalExpenseByCurrency.handler
-        events:
-            - http:
-                  method: GET
-                  path: /currencies/expense
-                  cors: true
-                  authorizer:
-                      type: COGNITO_USER_POOLS
-                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
-                      claims:
-                          - email
