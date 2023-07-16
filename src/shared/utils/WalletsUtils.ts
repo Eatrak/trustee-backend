@@ -49,13 +49,11 @@ export default class WalletsUtils {
                 .insert(wallets)
                 .values(walletToCreate);
 
-            Ok(walletToCreate);
+            return Ok(walletToCreate);
         }
         catch (err) {
             console.log(err);
             return Err("GENERAL");
         }
-
-        return Err("GENERAL");
     }
 }

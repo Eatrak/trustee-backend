@@ -46,7 +46,7 @@ export const wallets = mysqlTable('Wallet', {
   id: varchar('id', { length: UUID_LENGTH }).primaryKey(),
   name: varchar('name', { length: 256 }).notNull().unique(),
   userId: varchar('userId', { length: UUID_LENGTH }).notNull().references(() => users.id),
-  currencyId: varchar('currencyCode', { length: UUID_LENGTH }).notNull().references(() => currencies.id)
+  currencyId: varchar('currencyId', { length: UUID_LENGTH }).notNull().references(() => currencies.id)
 });
 
 // Type definitions

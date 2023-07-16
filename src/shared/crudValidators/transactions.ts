@@ -1,7 +1,7 @@
 export const getTransactionsValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
-    currencyCode: "required|string"
+    currencyId: "required|string"
 };
 
 export const createTransactionCategoryRules = {
