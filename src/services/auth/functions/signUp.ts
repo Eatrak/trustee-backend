@@ -8,6 +8,7 @@ import { signUpEnvironmentValidator, signUpValidator } from "@crudValidators/aut
 import { SignUpBody } from "@bodies/auth/signUp";
 import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
+import DatabaseUtils from "@utils/DatabaseUtils";
 
 // Environment variables
 const USER_POOL_ID = process.env.USER_POOL_ID!;
@@ -66,6 +67,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         if (!setUserPasswordResponse) {
             return Utils.getInstance().getGeneralServerErrorResponse();
         }
+
+        await DatabaseUtils.getInstance().initConnection();
 
         // Create user in DynamoDB
         await UsersUtils.createDBUser(userId, userInfo.email);
