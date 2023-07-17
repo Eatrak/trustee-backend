@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "9efcf53a-6fc5-4e19-aceb-2de53ed16f89",
+  "id": "39e63958-8582-4bb2-a94c-957cf85f368b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "Currency": {
@@ -296,14 +296,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "Wallet_name_unique": {
-          "name": "Wallet_name_unique",
-          "columns": [
-            "name"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     }
   },
   "schemas": {},

@@ -34,8 +34,7 @@ CREATE TABLE `Wallet` (
 	`id` varchar(36) PRIMARY KEY NOT NULL,
 	`name` varchar(256) NOT NULL,
 	`userId` varchar(36) NOT NULL,
-	`currencyId` varchar(36) NOT NULL,
-	CONSTRAINT `Wallet_name_unique` UNIQUE(`name`)
+	`currencyId` varchar(36) NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE `TransactionCategory` ADD CONSTRAINT `TransactionCategory_userId_User_id_fk` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
