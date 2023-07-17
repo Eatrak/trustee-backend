@@ -4,6 +4,16 @@ import Validator from "validatorjs";
 
 import { AuthorizerCustomClaims } from "@ts-types/auth";
 
+export interface ErrorResponseAttributes {
+    id: string,
+    code: number,
+    status: number
+}
+
+export interface ErrorResponse {
+    error: ErrorResponseAttributes
+}
+
 export default class Utils {
     private static instance?: Utils;
     private cognitoClient: CognitoIdentityProviderClient;
@@ -48,6 +58,14 @@ export default class Utils {
         return Utils.getInstance().getResponse(500, {
             message: "Something went wrong"
         });
+    }
+
+    public getErrorResponse(
+        errorAttributes: ErrorResponseAttributes
+    ): ErrorResponse {
+        return {
+            error: errorAttributes
+        };
     }
 
     /**
