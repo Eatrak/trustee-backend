@@ -8,7 +8,7 @@ export default class DatabaseUtils {
     private db: MySql2Database;
 
     /**
-     * 
+     *
      * @returns Singleton istance of the Utils class.
      */
     public static getInstance() {
@@ -20,10 +20,10 @@ export default class DatabaseUtils {
     }
 
     /**
-     * 
+     *
      * @returns DynamoDB table name.
      */
-     public getTableName(): string {
+    public getTableName(): string {
         if (!process.env.STAGE) throw new Error("STAGE environment variable is missing");
 
         return "trustee";
@@ -35,7 +35,7 @@ export default class DatabaseUtils {
             user: env.DB_USERNAME,
             password: env.DB_PASSWORD,
             database: env.DB_NAME,
-            port: env.DB_PORT
+            port: env.DB_PORT,
         });
         this.db = drizzle(connection);
     }
@@ -43,4 +43,4 @@ export default class DatabaseUtils {
     public getDB(): MySql2Database {
         return this.db;
     }
-};
+}

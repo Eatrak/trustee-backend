@@ -1,11 +1,11 @@
 export const getTransactionsValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
-    currencyId: "required|string"
+    currencyId: "required|string",
 };
 
 export const createTransactionCategoryRules = {
-    name: "required|string"
+    name: "required|string",
 };
 
 export const createTransactionInputRules = {
@@ -15,10 +15,10 @@ export const createTransactionInputRules = {
     carriedOut: "required|integer",
     amount: "required|numeric|min:0.01",
     isIncome: "required|boolean",
-    userId: "required|string"
+    userId: "required|string",
 };
 
 export const deleteTransactionInputRules = {
     userId: "required|string",
-    id: "required|string"
+    id: "required|string",
 };

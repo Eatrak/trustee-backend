@@ -1,7 +1,7 @@
 export interface TotalIncomeByCurrency {
-    [currencyCode: string]: number
+    [currencyCode: string]: number;
 }
 
 export interface TotalExpenseByCurrency {
-    [currencyCode: string]: number
+    [currencyCode: string]: number;
 }

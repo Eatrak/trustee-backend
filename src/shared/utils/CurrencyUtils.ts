@@ -11,15 +11,13 @@ export default class CurrencyUtils {
      */
     public static async getCurrencies(): Promise<Result<Currency[], "GENERAL">> {
         try {
-            const result = await DatabaseUtils
-                .getInstance()
+            const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .select()
                 .from(currencies);
 
             return Ok(result);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }

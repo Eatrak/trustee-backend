@@ -5,14 +5,14 @@ export const signUpValidator = {
     name: "required|string",
     surname: "required|string",
     email: "required|email",
-    password: "required|string|min:5|max:30"
+    password: "required|string|min:5|max:30",
 };
 
 /**
  * Validator for sign-up environment variables.
  */
 export const signUpEnvironmentValidator = {
-    USER_POOL_ID: "required|string"
+    USER_POOL_ID: "required|string",
 };
 
 /**
@@ -20,7 +20,7 @@ export const signUpEnvironmentValidator = {
  */
 export const signInValidator = {
     email: "required|string",
-    password: "required|string"
+    password: "required|string",
 };
 
 /**
@@ -28,5 +28,5 @@ export const signInValidator = {
  */
 export const signInEnvironmentValidator = {
     USER_POOL_ID: "required|string",
-    USER_POOL_CLIENT_ID: "required|string"
+    USER_POOL_CLIENT_ID: "required|string",
 };

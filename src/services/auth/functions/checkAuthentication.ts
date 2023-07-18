@@ -1,6 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from "aws-lambda";
+import {
+    APIGatewayProxyEvent,
+    APIGatewayProxyHandler,
+    APIGatewayProxyResult,
+} from "aws-lambda";
 import jwt from "jsonwebtoken";
-import jwkToPem from 'jwk-to-pem';
+import jwkToPem from "jwk-to-pem";
 
 import Utils from "@utils/Utils";
 import { JsonWebKey } from "src/shared/ts-types/auth";
@@ -12,9 +16,9 @@ const jwksURI = `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}/.we
 let jsonWebKeys: JsonWebKey[] | null;
 
 function decodeTokenHeader(token: string) {
-    const [headerEncoded] = token.split('.');
-    const buff = Buffer.from(headerEncoded, 'base64');
-    const text = buff.toString('ascii');
+    const [headerEncoded] = token.split(".");
+    const buff = Buffer.from(headerEncoded, "base64");
+    const text = buff.toString("ascii");
     return JSON.parse(text);
 }
 
@@ -29,17 +33,17 @@ async function getJsonWebKeyWithKID(kid: string) {
             return jwk;
         }
     }
-    return null
+    return null;
 }
 
 function verifyJsonWebTokenSignature(token: string, jsonWebKey: any) {
     const pem = jwkToPem(jsonWebKey);
-    const decodedToken = jwt.verify(token, pem, {algorithms: ['RS256']});
+    const decodedToken = jwt.verify(token, pem, { algorithms: ["RS256"] });
     return decodedToken;
 }
 
 export const handler: APIGatewayProxyHandler = async (
-    event: APIGatewayProxyEvent
+    event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     try {
         const authToken = event.headers.Authorization!.split(" ")[1];
@@ -48,14 +52,13 @@ export const handler: APIGatewayProxyHandler = async (
         const decodedAuthToken = verifyJsonWebTokenSignature(authToken, jsonWebKey);
 
         return Utils.getInstance().getResponse(200, {
-            decodedAuthToken
+            decodedAuthToken,
         });
-    }
-    catch (err) {
+    } catch (err) {
         console.log(err);
 
         return Utils.getInstance().getResponse(401, {
-            message: "You are not authenticated. Please, perform the login"
+            message: "You are not authenticated. Please, perform the login",
         });
     }
 };

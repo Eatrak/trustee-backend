@@ -1,8 +1,8 @@
 export interface CreateTransactionCategoryBody {
-    name: string
+    name: string;
 }
 
 export interface CreateTransactionCategoryInput {
-    userId: string,
-    name: string
+    userId: string;
+    name: string;
 }

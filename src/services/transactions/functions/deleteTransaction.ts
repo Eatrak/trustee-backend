@@ -1,28 +1,29 @@
 import {
     APIGatewayProxyEvent,
     APIGatewayProxyHandler,
-    APIGatewayProxyResult
-} from 'aws-lambda';
-import Validator from 'validatorjs';
+    APIGatewayProxyResult,
+} from "aws-lambda";
+import Validator from "validatorjs";
 //@ts-ignore
-import en from 'validatorjs/src/lang/en';
+import en from "validatorjs/src/lang/en";
 
-import Utils from '@utils/Utils';
+import Utils from "@utils/Utils";
 import TransactionsUtils from "@utils/TransactionsUtils";
 import { deleteTransactionInputRules } from "@crudValidators/transactions";
 import {
     DeleteTransactionInput,
-    DeleteTransactionQueryParameters
+    DeleteTransactionQueryParameters,
 } from "@bodies/transactions/deleteTransaction";
-import DatabaseUtils from '@utils/DatabaseUtils';
+import DatabaseUtils from "@utils/DatabaseUtils";
 
-Validator.setMessages('en', en);
+Validator.setMessages("en", en);
 
 export const handler: APIGatewayProxyHandler = async (
-    event: APIGatewayProxyEvent
+    event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const pathParameters = event.queryStringParameters as unknown as DeleteTransactionQueryParameters;
+    const pathParameters =
+        event.queryStringParameters as unknown as DeleteTransactionQueryParameters;
     const input: DeleteTransactionInput = { ...pathParameters, userId };
 
     // Validate data
@@ -35,7 +36,7 @@ export const handler: APIGatewayProxyHandler = async (
         await DatabaseUtils.getInstance().initConnection();
 
         const deleteTransactionResponse = await TransactionsUtils.deleteTransaction(
-            input.id
+            input.id,
         );
 
         if (deleteTransactionResponse.err) {

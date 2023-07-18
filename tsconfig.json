@@ -1,29 +1,29 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "strict": true,
-    "preserveConstEnums": true,
-    "noEmit": false,
-    "sourceMap": false,
-    "module":"CommonJS",
-    "moduleResolution":"node",
-    "esModuleInterop": true, 
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictPropertyInitialization": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "baseUrl": "./",
-    "paths": {
-      "@bodies/*": ["./src/shared/bodies/*"],
-      "@crudValidators/*": ["./src/shared/crudValidators/*"],
-      "@requestInterfaces/*": ["./src/shared/requestInterfaces/*"],
-      "@ts-types/*": ["src/shared/ts-types/*"],
-      "@utils/*": ["./src/shared/utils/*"],
-      "@env/*": ["./src/env/*"],
-      "@services/*": ["./src/services/*"],
-      "@shared/*": ["./src/shared/*"]
-    }
-  },
-  "exclude": ["node_modules", "**/*.test.ts"]
+    "compilerOptions": {
+        "target": "es2020",
+        "strict": true,
+        "preserveConstEnums": true,
+        "noEmit": false,
+        "sourceMap": false,
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "strictPropertyInitialization": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "baseUrl": "./",
+        "paths": {
+            "@bodies/*": ["./src/shared/bodies/*"],
+            "@crudValidators/*": ["./src/shared/crudValidators/*"],
+            "@requestInterfaces/*": ["./src/shared/requestInterfaces/*"],
+            "@ts-types/*": ["src/shared/ts-types/*"],
+            "@utils/*": ["./src/shared/utils/*"],
+            "@env/*": ["./src/env/*"],
+            "@services/*": ["./src/services/*"],
+            "@shared/*": ["./src/shared/*"]
+        }
+    },
+    "exclude": ["node_modules", "**/*.test.ts"]
 }

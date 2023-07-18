@@ -1,28 +1,28 @@
 import {
     APIGatewayProxyEvent,
     APIGatewayProxyHandler,
-    APIGatewayProxyResult
-} from 'aws-lambda';
-import Validator from 'validatorjs';
+    APIGatewayProxyResult,
+} from "aws-lambda";
+import Validator from "validatorjs";
 //@ts-ignore
-import en from 'validatorjs/src/lang/en';
+import en from "validatorjs/src/lang/en";
 
-import Utils from '@utils/Utils';
+import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
 import { GetWalletsResponse } from "@requestInterfaces/transactions/getWallets";
-import DatabaseUtils from '@utils/DatabaseUtils';
+import DatabaseUtils from "@utils/DatabaseUtils";
 
-Validator.setMessages('en', en);
+Validator.setMessages("en", en);
 
 export const handler: APIGatewayProxyHandler = async (
-    event: APIGatewayProxyEvent
+    event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
         await DatabaseUtils.getInstance().initConnection();
 
-        const getWalletsResponse = (await WalletsUtils.getWallets(userId));
+        const getWalletsResponse = await WalletsUtils.getWallets(userId);
         if (getWalletsResponse.err) {
             return Utils.getInstance().getGeneralServerErrorResponse();
         }

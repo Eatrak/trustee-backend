@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { Ok, Err, Result } from "ts-results";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 
@@ -6,7 +6,13 @@ import { CreateTransactionCategoryInput } from "@bodies/transactions/createTrans
 import { CreateTransactionInput } from "@bodies/transactions/createTransaction";
 import { GetTransactionsByCurrencyAndCreationRangeInput } from "@bodies/transactions/getTransactionsByCurrency";
 import DatabaseUtils from "@utils/DatabaseUtils";
-import { transactions, Transaction, TransactionCategory, transactionCategories, wallets } from "@shared/schema";
+import {
+    transactions,
+    Transaction,
+    TransactionCategory,
+    transactionCategories,
+    wallets,
+} from "@shared/schema";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -23,11 +29,12 @@ export default class TransactionsUtils {
         userId,
         startCarriedOut,
         endCarriedOut,
-        currencyId
-    }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<Result<Transaction[], "GENERAL">> {
+        currencyId,
+    }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
+        Result<Transaction[], "GENERAL">
+    > {
         try {
-            const result: Transaction[] = await DatabaseUtils
-                .getInstance()
+            const result: Transaction[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
                     userId: transactions.userId,
@@ -38,41 +45,40 @@ export default class TransactionsUtils {
                     carriedOut: transactions.carriedOut,
                     amount: transactions.amount,
                     isIncome: transactions.isIncome,
-                    createdAt: transactions.createdAt
+                    createdAt: transactions.createdAt,
                 })
                 .from(transactions)
-                .where(and(
-                    eq(transactions.userId, userId),
-                    eq(wallets.currencyId, currencyId),
-                    gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
-                    lte(transactions.carriedOut, Number.parseInt(endCarriedOut))
-                ))
+                .where(
+                    and(
+                        eq(transactions.userId, userId),
+                        eq(wallets.currencyId, currencyId),
+                        gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
+                        lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
+                    ),
+                )
                 .innerJoin(wallets, eq(wallets.id, transactions.walletId))
                 .orderBy(desc(transactions.carriedOut))
                 .limit(this.MAX_TRANSACTIONS_TO_GET);
 
             return Ok(result);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }
     }
 
     public static async getTransactionCategories(
-        userId: string
+        userId: string,
     ): Promise<Result<TransactionCategory[], "GENERAL">> {
         try {
-            const result = await DatabaseUtils
-                .getInstance()
+            const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .select()
                 .from(transactionCategories)
                 .where(eq(transactionCategories.userId, userId));
 
             return Ok(result);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }
@@ -80,7 +86,7 @@ export default class TransactionsUtils {
 
     public static async createTransactionCategory(
         id: string,
-        input: CreateTransactionCategoryInput
+        input: CreateTransactionCategoryInput,
     ): Promise<Result<TransactionCategory, "GENERAL">> {
         try {
             const { userId, name } = input;
@@ -88,35 +94,26 @@ export default class TransactionsUtils {
             const transactionCategoryToCreate: TransactionCategory = {
                 id,
                 name,
-                userId
+                userId,
             };
-            await DatabaseUtils
-                .getInstance()
+            await DatabaseUtils.getInstance()
                 .getDB()
                 .insert(transactionCategories)
                 .values(transactionCategoryToCreate);
 
             return Ok(transactionCategoryToCreate);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }
     }
 
     public static async createTransaction(
-        id: string,  
-        input: CreateTransactionInput
+        id: string,
+        input: CreateTransactionInput,
     ): Promise<Result<Transaction, "GENERAL">> {
-        const {
-            userId,
-            categoryId,
-            isIncome,
-            amount,
-            carriedOut,
-            name,
-            walletId
-        } = input;
+        const { userId, categoryId, isIncome, amount, carriedOut, name, walletId } =
+            input;
 
         try {
             const transactionToCreate: Transaction = {
@@ -128,32 +125,27 @@ export default class TransactionsUtils {
                 categoryId,
                 createdAt: dayjs().unix(),
                 isIncome,
-                walletId
+                walletId,
             };
-            const result = await DatabaseUtils
-                .getInstance()
+            const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .insert(transactions)
                 .values(transactionToCreate);
-            
+
             if (result[0].affectedRows == 0) {
                 return Err("GENERAL");
             }
 
             return Ok(transactionToCreate);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }
     }
 
-    public static async deleteTransaction(
-        id: string
-    ): Promise<Result<boolean, Errors>> {
+    public static async deleteTransaction(id: string): Promise<Result<boolean, Errors>> {
         try {
-            const result = await DatabaseUtils
-                .getInstance()
+            const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .delete(transactions)
                 .where(eq(transactions.id, id));
@@ -161,10 +153,9 @@ export default class TransactionsUtils {
             if (result[0].affectedRows == 0) {
                 return Err("UNEXISTING_RESOURCE");
             }
-            
+
             return Ok(true);
-        }
-        catch (err) {
+        } catch (err) {
             console.log(err);
             return Err("GENERAL");
         }

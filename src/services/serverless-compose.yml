@@ -1,7 +1,7 @@
 services:
-  currencies:
-    path: currencies
-  transactions:
-    path: transactions
-  wallets:
-    path: wallets
+    currencies:
+        path: currencies
+    transactions:
+        path: transactions
+    wallets:
+        path: wallets

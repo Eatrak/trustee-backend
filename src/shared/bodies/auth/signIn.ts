@@ -3,7 +3,7 @@
  */
 export interface SignInBody {
     userInfo: {
-        email: string,
-        password: string
-    }
-};
+        email: string;
+        password: string;
+    };
+}

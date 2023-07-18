@@ -1,12 +1,12 @@
 export interface AuthorizerCustomClaims {
-    userId: string
+    userId: string;
 }
 
 export interface JsonWebKey {
-    alg: string,
-    e: string,
-    kid: string,
-    kty: string,
-    n: string,
-    use: string
+    alg: string;
+    e: string;
+    kid: string;
+    kty: string;
+    n: string;
+    use: string;
 }

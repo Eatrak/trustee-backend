@@ -1,16 +1,16 @@
 service: trustee-currencies
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 plugins:
-  - serverless-webpack
+    - serverless-webpack
 
 package:
-  individually: true
+    individually: true
 
 custom:
-  webpack:
-    webpackConfig: ../../../webpack.config.js
-    packager: 'npm'
+    webpack:
+        webpackConfig: ../../../webpack.config.js
+        packager: "npm"
 
 provider:
     name: aws
@@ -33,10 +33,10 @@ provider:
           Action:
               - dynamodb:Query
           Resource:
-            Fn::Join:
-              - ""
-              - - !ImportValue TrusteeMainTableArn-${self:provider.stage}
-                - /index/GSI1
+              Fn::Join:
+                  - ""
+                  - - !ImportValue TrusteeMainTableArn-${self:provider.stage}
+                    - /index/GSI1
 
 functions:
     GetCurrencies:

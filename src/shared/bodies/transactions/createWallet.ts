@@ -1,4 +1,4 @@
 export interface CreateWalletBody {
-    name: string,
-    currencyId: string
+    name: string;
+    currencyId: string;
 }
