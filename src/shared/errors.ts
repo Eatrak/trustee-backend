@@ -9,12 +9,18 @@ const getErrorType = (status: number, code: string): number => {
 export enum ErrorType {}
 
 class Error {
-    error: ErrorType;
-    id: string;
+    private error: ErrorType;
+    private id: string;
 
     constructor(error: ErrorType) {
         this.error = error;
         this.setId(uuid());
+        console.log(
+            `Error:\n
+            id: ${this.getId()}\n
+            code: ${this.getCode()}\n
+            status: ${this.getStatus()}\n`,
+        );
     }
 
     private setId(id: string) {
@@ -26,7 +32,9 @@ class Error {
     }
 
     getStatus() {
-        return this.error.toString().split(ERROR_TYPE_ATTRIBUTES_SEPARATOR)[0];
+        return Number.parseInt(
+            this.error.toString().split(ERROR_TYPE_ATTRIBUTES_SEPARATOR)[0],
+        );
     }
 
     getCode() {

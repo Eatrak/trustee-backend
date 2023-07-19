@@ -3,10 +3,11 @@ import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-
 import Validator from "validatorjs";
 
 import { AuthorizerCustomClaims } from "@ts-types/auth";
+import Error from "@shared/errors";
 
 export interface ErrorResponseAttributes {
     id: string;
-    code: number;
+    code: string;
     status: number;
 }
 
@@ -64,9 +65,13 @@ export default class Utils {
         });
     }
 
-    public getErrorResponse(errorAttributes: ErrorResponseAttributes): ErrorResponse {
+    public getErrorResponse({ getId, getCode, getStatus }: Error): ErrorResponse {
         return {
-            error: errorAttributes,
+            error: {
+                id: getId(),
+                code: getCode(),
+                status: getStatus(),
+            },
         };
     }
 
