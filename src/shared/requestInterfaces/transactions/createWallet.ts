@@ -1,5 +1,11 @@
-import { Wallet } from "@shared/schema";
+import { Result } from "ts-results";
 
-export interface CreateWalletResponse {
-    createdWallet: Wallet;
-}
+import { Wallet } from "@shared/schema";
+import Error from "@shared/errors";
+
+export type CreateWalletResponse = Result<
+    {
+        createdWallet: Wallet;
+    },
+    Error
+>;

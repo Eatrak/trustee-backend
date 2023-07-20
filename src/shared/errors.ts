@@ -6,7 +6,9 @@ const getErrorType = (status: number, code: string): number => {
     return Number.parseInt(`${status}|${code}`);
 };
 
-export enum ErrorType {}
+export enum ErrorType {
+    WALLETS__CREATE__GENERAL = getErrorType(500, "0001"),
+}
 
 class Error {
     private error: ErrorType;

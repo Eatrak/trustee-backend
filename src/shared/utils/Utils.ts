@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 import Validator from "validatorjs";
+import { Err } from "ts-results";
 
 import { AuthorizerCustomClaims } from "@ts-types/auth";
 import Error from "@shared/errors";
@@ -65,14 +66,9 @@ export default class Utils {
         });
     }
 
-    public getErrorResponse({ getId, getCode, getStatus }: Error): ErrorResponse {
-        return {
-            error: {
-                id: getId(),
-                code: getCode(),
-                status: getStatus(),
-            },
-        };
+    public getErrorResponse(error: Err<Error>) {
+        const { getStatus } = error.val;
+        return this.getResponse(getStatus(), error);
     }
 
     /**

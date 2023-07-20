@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 
 import DatabaseUtils from "./DatabaseUtils";
 import { Wallet, wallets } from "@shared/schema";
+import Error, { ErrorType } from "@shared/errors";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -33,7 +34,7 @@ export default class WalletsUtils {
         userId: string,
         name: string,
         currencyId: string,
-    ): Promise<Result<Wallet, "GENERAL">> {
+    ): Promise<Result<Wallet, Error>> {
         try {
             const walletToCreate: Wallet = {
                 id,
@@ -49,7 +50,7 @@ export default class WalletsUtils {
             return Ok(walletToCreate);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(new Error(ErrorType.WALLETS__CREATE__GENERAL));
         }
     }
 }

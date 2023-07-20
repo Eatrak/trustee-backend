@@ -7,12 +7,14 @@ import Validator from "validatorjs";
 //@ts-ignore
 import en from "validatorjs/src/lang/en";
 import { v4 as uuid } from "uuid";
+import { Err, Ok } from "ts-results";
 
 import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
 import { CreateWalletBody } from "@bodies/transactions/createWallet";
 import { CreateWalletResponse } from "@requestInterfaces/transactions/createWallet";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import Error, { ErrorType } from "@shared/errors";
 
 Validator.setMessages("en", en);
 
@@ -39,11 +41,15 @@ export const handler: APIGatewayProxyHandler = async (
         }
         const createdWallet = createWalletResponse.val;
 
-        const response: CreateWalletResponse = { createdWallet };
+        const response: CreateWalletResponse = Ok({ createdWallet });
         return Utils.getInstance().getResponse(201, response);
     } catch (err) {
         console.log(err);
     }
 
-    return Utils.getInstance().getGeneralServerErrorResponse();
+    const response: CreateWalletResponse = Err(
+        new Error(ErrorType.WALLETS__CREATE__GENERAL),
+    );
+
+    return Utils.getInstance().getErrorResponse(response);
 };
