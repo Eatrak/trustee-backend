@@ -51,13 +51,13 @@ export const handler: APIGatewayProxyHandler = async (
         const jsonWebKey = await getJsonWebKeyWithKID(tokenHeader.kid);
         const decodedAuthToken = verifyJsonWebTokenSignature(authToken, jsonWebKey);
 
-        return Utils.getInstance().getResponse(200, {
+        return Utils.getInstance().getSuccessfulResponse(200, {
             decodedAuthToken,
         });
     } catch (err) {
         console.log(err);
 
-        return Utils.getInstance().getResponse(401, {
+        return Utils.getInstance().getSuccessfulResponse(401, {
             message: "You are not authenticated. Please, perform the login",
         });
     }

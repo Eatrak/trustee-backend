@@ -2,8 +2,8 @@ import { v4 as uuid } from "uuid";
 
 const ERROR_TYPE_ATTRIBUTES_SEPARATOR = "|";
 
-const getErrorType = (status: number, code: string): number => {
-    return Number.parseInt(`${status}|${code}`);
+const getErrorType = (status: number, code: string) => {
+    return `${status}|${code}` as unknown as number;
 };
 
 export enum ErrorType {
@@ -15,14 +15,9 @@ class Error {
     private id: string;
 
     constructor(error: ErrorType) {
-        this.error = error;
         this.setId(uuid());
-        console.log(
-            `Error:\n
-            id: ${this.getId()}\n
-            code: ${this.getCode()}\n
-            status: ${this.getStatus()}\n`,
-        );
+        this.error = error;
+        this.log();
     }
 
     private setId(id: string) {
@@ -41,6 +36,16 @@ class Error {
 
     getCode() {
         return this.error.toString().split(ERROR_TYPE_ATTRIBUTES_SEPARATOR)[1];
+    }
+
+    log() {
+        console.log(
+            `[X] ERROR -> (
+                id: ${this.getId()},
+                code: ${this.getCode()},
+                status: ${this.getStatus()}
+            )`,
+        );
     }
 }
 

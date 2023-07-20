@@ -33,7 +33,9 @@ export const handler: APIGatewayProxyHandler = async (
     const validator = new Validator(input, createTransactionInputRules);
 
     if (validator.fails()) {
-        return Utils.getInstance().getResponse(404, { errors: validator.errors });
+        return Utils.getInstance().getSuccessfulResponse(404, {
+            errors: validator.errors,
+        });
     }
 
     try {
@@ -52,7 +54,7 @@ export const handler: APIGatewayProxyHandler = async (
         const response: CreateTransactionResponse = {
             createdTransaction: createTransactionResponse.val,
         };
-        return Utils.getInstance().getResponse(201, response);
+        return Utils.getInstance().getSuccessfulResponse(201, response);
     } catch (err) {
         console.log(err);
     }

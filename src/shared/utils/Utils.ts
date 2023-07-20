@@ -1,20 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
 import Validator from "validatorjs";
-import { Err } from "ts-results";
 
 import { AuthorizerCustomClaims } from "@ts-types/auth";
 import Error from "@shared/errors";
-
-export interface ErrorResponseAttributes {
-    id: string;
-    code: string;
-    status: number;
-}
-
-export interface ErrorResponse {
-    error: ErrorResponseAttributes;
-}
+import { SuccessfulResponseBody, ErrorResponseBody } from "@shared/errors/types";
 
 export default class Utils {
     private static instance?: Utils;
@@ -37,15 +27,20 @@ export default class Utils {
     /**
      *
      * @param statusCode HTTP status code of the response.
-     * @param body Body of the response.
+     * @param data Body of the response.
      * @param contentType Content-Type of the response; by default it is JSON type.
      * @returns Lambda response.
      */
-    public getResponse(
+    public getSuccessfulResponse<SuccessfulResponseData>(
         statusCode: number,
-        body: any,
+        data: SuccessfulResponseData,
         contentType: string = "application/json",
     ): APIGatewayProxyResult {
+        const body: SuccessfulResponseBody<SuccessfulResponseData> = {
+            error: false,
+            data,
+        };
+
         return {
             statusCode: statusCode,
             headers: {
@@ -61,14 +56,29 @@ export default class Utils {
      * @returns Lambda response that rappresents a generic internal server error.
      */
     public getGeneralServerErrorResponse() {
-        return Utils.getInstance().getResponse(500, {
+        return Utils.getInstance().getSuccessfulResponse(500, {
             message: "Something went wrong",
         });
     }
 
-    public getErrorResponse(error: Err<Error>) {
-        const { getStatus } = error.val;
-        return this.getResponse(getStatus(), error);
+    public getErrorResponse(error: Error, contentType: string = "application/json") {
+        const body: ErrorResponseBody = {
+            error: true,
+            data: {
+                id: error.getId(),
+                code: error.getCode(),
+                status: error.getStatus(),
+            },
+        };
+
+        return {
+            statusCode: error.getStatus(),
+            headers: {
+                "Content-Type": contentType,
+                "Access-Control-Allow-Origin": "*",
+            },
+            body: JSON.stringify(body),
+        };
     }
 
     /**

@@ -27,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (
         const currencies = getCurrenciesResponse.val;
 
         const response: GetCurrenciesResponse = { currencies };
-        return Utils.getInstance().getResponse(200, response);
+        return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
     }

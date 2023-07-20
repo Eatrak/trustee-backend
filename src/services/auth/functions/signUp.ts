@@ -27,13 +27,13 @@ export const handler: APIGatewayProxyHandler = async (
         signUpEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getResponse(500, {
+        return Utils.getInstance().getSuccessfulResponse(500, {
             message: "Server error, try later",
         });
     }
 
     if (!event.body) {
-        return Utils.getInstance().getResponse(400, {
+        return Utils.getInstance().getSuccessfulResponse(400, {
             message: "Body undefined",
         });
     }
@@ -45,7 +45,7 @@ export const handler: APIGatewayProxyHandler = async (
     const validation = new Validator(userInfo, signUpValidator);
 
     if (validation.fails()) {
-        return Utils.getInstance().getResponse(400, {
+        return Utils.getInstance().getSuccessfulResponse(400, {
             message: "Invalid data sent",
             errors: validation.errors,
         });
@@ -85,7 +85,7 @@ export const handler: APIGatewayProxyHandler = async (
         // Create user in DynamoDB
         await UsersUtils.createDBUser(userId, userInfo.email);
 
-        return Utils.getInstance().getResponse(201, {
+        return Utils.getInstance().getSuccessfulResponse(201, {
             message: "User created",
             user: {
                 id: userId,

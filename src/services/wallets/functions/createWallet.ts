@@ -37,19 +37,16 @@ export const handler: APIGatewayProxyHandler = async (
             currencyId,
         );
         if (createWalletResponse.err) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+            const error = new Error(ErrorType.WALLETS__CREATE__GENERAL);
+            return Utils.getInstance().getErrorResponse(error);
         }
         const createdWallet = createWalletResponse.val;
 
-        const response: CreateWalletResponse = Ok({ createdWallet });
-        return Utils.getInstance().getResponse(201, response);
+        return Utils.getInstance().getSuccessfulResponse(201, { createdWallet });
     } catch (err) {
         console.log(err);
+
+        const error = new Error(ErrorType.WALLETS__CREATE__GENERAL);
+        return Utils.getInstance().getErrorResponse(error);
     }
-
-    const response: CreateWalletResponse = Err(
-        new Error(ErrorType.WALLETS__CREATE__GENERAL),
-    );
-
-    return Utils.getInstance().getErrorResponse(response);
 };

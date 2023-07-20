@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (
         const wallets = getWalletsResponse.val;
 
         const response: GetWalletsResponse = { wallets };
-        return Utils.getInstance().getResponse(200, response);
+        return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
     }

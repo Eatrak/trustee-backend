@@ -28,7 +28,7 @@ export const handler: APIGatewayProxyHandler = async (
     // Validate data
     const validator = new Validator({ name }, createTransactionCategoryRules);
     if (validator.fails()) {
-        return Utils.getInstance().getResponse(404, {
+        return Utils.getInstance().getSuccessfulResponse(404, {
             message: "Invalid data",
             errors: validator.errors,
         });
@@ -52,7 +52,7 @@ export const handler: APIGatewayProxyHandler = async (
         const response: CreateTransactionCategoryResponse = {
             createdTransactionCategory,
         };
-        return Utils.getInstance().getResponse(201, response);
+        return Utils.getInstance().getSuccessfulResponse(201, response);
     } catch (err) {
         console.log(err);
     }

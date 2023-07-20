@@ -1,11 +1,4 @@
-import { Result } from "ts-results";
-
 import { Wallet } from "@shared/schema";
-import Error from "@shared/errors";
+import { Response } from "@shared/errors/types";
 
-export type CreateWalletResponse = Result<
-    {
-        createdWallet: Wallet;
-    },
-    Error
->;
+export type CreateWalletResponse = Response<{ createdWallet: Wallet }>;

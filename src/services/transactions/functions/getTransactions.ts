@@ -38,7 +38,7 @@ export const handler: APIGatewayProxyHandler = async (
         getTransactionsValidator,
     );
     if (getTransactionsValidation.fails()) {
-        return Utils.getInstance().getResponse(400, {
+        return Utils.getInstance().getSuccessfulResponse(400, {
             errors: getTransactionsValidation.errors,
         });
     }
@@ -58,7 +58,7 @@ export const handler: APIGatewayProxyHandler = async (
 
         const response: GetTransactionsResponse = { transactions };
 
-        return Utils.getInstance().getResponse(200, response);
+        return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
     }
