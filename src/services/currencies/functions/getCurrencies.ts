@@ -15,27 +15,27 @@ import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
 
-export const handler: APIGatewayProxyHandler = async (
-    event: APIGatewayProxyEvent,
-): Promise<APIGatewayProxyResult> => {
-    try {
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+export const handler: APIGatewayProxyHandler =
+    async (): Promise<APIGatewayProxyResult> => {
+        try {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
+
+            const getCurrenciesResponse = await CurrencyUtils.getCurrencies();
+            if (getCurrenciesResponse.err) {
+                return Utils.getInstance().getErrorResponse(getCurrenciesResponse.val);
+            }
+            const currencies = getCurrenciesResponse.val;
+
+            const response: GetCurrenciesResponseData = { currencies };
+            return Utils.getInstance().getSuccessfulResponse(200, response);
+        } catch (err) {
+            console.log(err);
         }
 
-        const getCurrenciesResponse = await CurrencyUtils.getCurrencies();
-        if (getCurrenciesResponse.err) {
-            return Utils.getInstance().getErrorResponse(getCurrenciesResponse.val);
-        }
-        const currencies = getCurrenciesResponse.val;
-
-        const response: GetCurrenciesResponseData = { currencies };
-        return Utils.getInstance().getSuccessfulResponse(200, response);
-    } catch (err) {
-        console.log(err);
-    }
-
-    return Utils.getInstance().getErrorResponse(ErrorType.CURRENCIES__GET__GENERAL);
-};
+        return Utils.getInstance().getErrorResponse(ErrorType.CURRENCIES__GET__GENERAL);
+    };
