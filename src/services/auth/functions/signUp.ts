@@ -6,7 +6,7 @@ import {
 import Validator from "validatorjs";
 //@ts-ignore
 import en from "validatorjs/src/lang/en";
-import { ulid } from "ulid";
+import { v4 as uuid } from "uuid";
 
 import { signUpEnvironmentValidator, signUpValidator } from "@crudValidators/auth";
 import { SignUpBody } from "@bodies/auth/signUp";
@@ -48,7 +48,7 @@ export const handler: APIGatewayProxyHandler = async (
     // User creation
     try {
         // Generate user ID
-        const userId = ulid();
+        const userId = uuid();
 
         // Create the user in Cognito
         const createCognitoUserResponse = await UsersUtils.createCognitoUser(
