@@ -14,7 +14,7 @@ import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
-import { SignUpResponse, SignUpResponseData } from "@requestInterfaces/auth/signUp";
+import { SignUpResponseData } from "@requestInterfaces/auth/signUp";
 
 // Environment variables
 const USER_POOL_ID = process.env.USER_POOL_ID!;
