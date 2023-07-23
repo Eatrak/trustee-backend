@@ -11,9 +11,11 @@ enum ErrorType {
     AUTH__SIGN_IN__AUTHENTICATION = getErrorType(500, "00008"),
     AUTH__SIGN_IN__USER_NOT_FOUND = getErrorType(404, "00009"),
     AUTH__SIGN_IN__READING_GENERATED_ID_TOKEN = getErrorType(500, "00010"),
-    WALLETS__CREATE__GENERAL = getErrorType(500, "00011"),
-    GENERAL__DB__INITIALIZATION = getErrorType(500, "00012"),
-    GENERAL__SERVER = getErrorType(500, "00013"),
+    CURRENCIES__GET__GET_CURRENCIES = getErrorType(500, "00011"),
+    CURRENCIES__GET__GENERAL = getErrorType(500, "00012"),
+    WALLETS__CREATE__GENERAL = getErrorType(500, "00013"),
+    GENERAL__DB__INITIALIZATION = getErrorType(500, "00014"),
+    GENERAL__SERVER = getErrorType(500, "00015"),
 }
 
 export default ErrorType;
