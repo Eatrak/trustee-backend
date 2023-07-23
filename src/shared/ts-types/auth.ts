@@ -10,3 +10,7 @@ export interface JsonWebKey {
     n: string;
     use: string;
 }
+
+export interface CognitoException {
+    __type: "UserNotFoundException" | "NotAuthorizedException";
+}

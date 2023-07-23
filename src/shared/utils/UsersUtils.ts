@@ -2,6 +2,7 @@ import {
     AdminCreateUserCommand,
     AdminInitiateAuthCommand,
     AdminSetUserPasswordCommand,
+    AdminInitiateAuthCommandOutput,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { Err, Ok, Result } from "ts-results";
 
@@ -9,6 +10,7 @@ import Utils from "@utils/Utils";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import { User, users } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
+import { CognitoException } from "@ts-types/auth";
 
 export default class UsersUtils {
     /**
@@ -132,16 +134,33 @@ export default class UsersUtils {
         clientId: string,
         email: string,
         password: string,
-    ) {
-        return await Utils.getInstance()
-            .getCognitoClient()
-            .send(
-                new AdminInitiateAuthCommand({
-                    UserPoolId: userPoolId,
-                    ClientId: clientId,
-                    AuthParameters: { USERNAME: email, PASSWORD: password },
-                    AuthFlow: "ADMIN_NO_SRP_AUTH",
-                }),
-            );
+    ): Promise<Result<AdminInitiateAuthCommandOutput, ErrorType>> {
+        try {
+            const result = await Utils.getInstance()
+                .getCognitoClient()
+                .send(
+                    new AdminInitiateAuthCommand({
+                        UserPoolId: userPoolId,
+                        ClientId: clientId,
+                        AuthParameters: { USERNAME: email, PASSWORD: password },
+                        AuthFlow: "ADMIN_NO_SRP_AUTH",
+                    }),
+                );
+
+            return Ok(result);
+        } catch (err) {
+            console.log(err);
+
+            const errorType = (err as CognitoException).__type;
+
+            switch (errorType) {
+                case "UserNotFoundException":
+                    return Err(ErrorType.AUTH__SIGN_IN__USER_NOT_FOUND);
+                case "NotAuthorizedException":
+                    return Err(ErrorType.AUTH__SIGN_IN__USER_NOT_FOUND);
+                default:
+                    return Err(ErrorType.AUTH__SIGN_IN__AUTHENTICATION);
+            }
+        }
     }
 }

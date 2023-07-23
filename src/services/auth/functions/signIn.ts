@@ -11,6 +11,7 @@ import { signInEnvironmentValidator, signInValidator } from "@crudValidators/aut
 import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import { SignInBody } from "@bodies/auth/signIn";
+import ErrorType from "@shared/errors/list";
 
 // Environment variables
 const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env;
@@ -25,46 +26,45 @@ export const handler: APIGatewayProxyHandler = async (
         signInEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getSuccessfulResponse(500, {
-            message: "Server error, try later",
-        });
+        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__SIGN_IN__ENV);
     }
 
-    // Body validation
-    if (!event.body) {
-        return Utils.getInstance().getSuccessfulResponse(400, {
-            message: "Body undefined",
-        });
-    }
-
-    const body: SignInBody = JSON.parse(event.body);
+    const body: SignInBody = event.body ? JSON.parse(event.body) : {};
 
     // Data validation
     const validation = new Validator(body.userInfo, signInValidator);
-
     if (validation.fails()) {
-        return Utils.getInstance().getSuccessfulResponse(400, {
-            message: "Invalid data sent",
-            errors: validation.errors,
-        });
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.AUTH__SIGN_IN__DATA_VALIDATION,
+        );
     }
 
     try {
         const { email, password } = body.userInfo;
         // User authentication
-        const response = await UsersUtils.authenticateUser(
+        const authenticateUserResponse = await UsersUtils.authenticateUser(
             USER_POOL_ID!,
             USER_POOL_CLIENT_ID!,
             email,
             password,
         );
+        if (authenticateUserResponse.err) {
+            return Utils.getInstance().getErrorResponse(authenticateUserResponse.val);
+        }
+        const { AuthenticationResult } = authenticateUserResponse.val;
+
+        if (!AuthenticationResult) {
+            return Utils.getInstance().getErrorResponse(
+                ErrorType.AUTH__SIGN_IN__READING_GENERATED_ID_TOKEN,
+            );
+        }
 
         return Utils.getInstance().getSuccessfulResponse(200, {
-            authToken: response.AuthenticationResult?.IdToken,
+            authToken: AuthenticationResult.IdToken,
         });
     } catch (err) {
         console.log(err);
 
-        return Utils.getInstance().getGeneralServerErrorResponse();
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
 };

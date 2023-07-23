@@ -14,7 +14,8 @@ import WalletsUtils from "@utils/WalletsUtils";
 import { CreateWalletBody } from "@bodies/transactions/createWallet";
 import { CreateWalletResponse } from "@requestInterfaces/transactions/createWallet";
 import DatabaseUtils from "@utils/DatabaseUtils";
-import Error, { ErrorType } from "@shared/errors";
+import Error from "@shared/errors";
+import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
 
