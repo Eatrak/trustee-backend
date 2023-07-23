@@ -1,5 +1,5 @@
 import { InferModel } from "drizzle-orm";
-import { mysqlTable, varchar, boolean, float, int } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, boolean, float, int, unique } from "drizzle-orm/mysql-core";
 
 const UUID_LENGTH = 36;
 
@@ -42,16 +42,22 @@ export const transactionCategories = mysqlTable("TransactionCategory", {
         .references(() => users.id),
 });
 
-export const wallets = mysqlTable("Wallet", {
-    id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
-    name: varchar("name", { length: 256 }).notNull(),
-    userId: varchar("userId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => users.id),
-    currencyId: varchar("currencyId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => currencies.id),
-});
+export const wallets = mysqlTable(
+    "Wallet",
+    {
+        id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
+        name: varchar("name", { length: 256 }).notNull(),
+        userId: varchar("userId", { length: UUID_LENGTH })
+            .notNull()
+            .references(() => users.id),
+        currencyId: varchar("currencyId", { length: UUID_LENGTH })
+            .notNull()
+            .references(() => currencies.id),
+    },
+    (t) => ({
+        unq: unique().on(t.name, t.currencyId),
+    }),
+);
 
 // Type definitions
 export type User = InferModel<typeof users, "select">;
