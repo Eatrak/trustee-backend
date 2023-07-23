@@ -1,14 +1,12 @@
 import { v4 as uuid } from "uuid";
 
+import { ErrorType } from "./list";
+
 const ERROR_TYPE_ATTRIBUTES_SEPARATOR = "|";
 
-const getErrorType = (status: number, code: string) => {
+export const getErrorType = (status: number, code: string) => {
     return `${status}|${code}` as unknown as number;
 };
-
-export enum ErrorType {
-    WALLETS__CREATE__GENERAL = getErrorType(500, "0001"),
-}
 
 class Error {
     private error: ErrorType;
