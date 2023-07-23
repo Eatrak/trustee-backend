@@ -13,6 +13,7 @@ import {
     transactionCategories,
     wallets,
 } from "@shared/schema";
+import ErrorType from "@shared/errors/list";
 
 export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
 
@@ -111,11 +112,11 @@ export default class TransactionsUtils {
     public static async createTransaction(
         id: string,
         input: CreateTransactionInput,
-    ): Promise<Result<Transaction, "GENERAL">> {
-        const { userId, categoryId, isIncome, amount, carriedOut, name, walletId } =
-            input;
-
+    ): Promise<Result<Transaction, ErrorType>> {
         try {
+            const { userId, categoryId, isIncome, amount, carriedOut, name, walletId } =
+                input;
+
             const transactionToCreate: Transaction = {
                 id,
                 userId,
@@ -133,13 +134,13 @@ export default class TransactionsUtils {
                 .values(transactionToCreate);
 
             if (result[0].affectedRows == 0) {
-                return Err("GENERAL");
+                return Err(ErrorType.TRANSACTIONS__CREATE__NOT_PERFORMED);
             }
 
             return Ok(transactionToCreate);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.TRANSACTIONS__CREATE__GENERAL);
         }
     }
 

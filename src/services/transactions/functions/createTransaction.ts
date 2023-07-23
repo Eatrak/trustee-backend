@@ -15,8 +15,9 @@ import {
 } from "@APIs/input/transactions/createTransaction";
 import TransactionsUtils from "@utils/TransactionsUtils";
 import { createTransactionInputRules } from "@crudValidators/transactions";
-import { CreateTransactionResponse } from "@APIs/output/transactions/createTransactionResponse";
+import { CreateTransactionResponseData } from "@APIs/output/transactions/createTransaction";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
 
@@ -30,34 +31,37 @@ export const handler: APIGatewayProxyHandler = async (
         userId,
     };
 
+    // Validate data
     const validator = new Validator(input, createTransactionInputRules);
-
     if (validator.fails()) {
-        return Utils.getInstance().getSuccessfulResponse(404, {
-            errors: validator.errors,
-        });
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.TRANSACTIONS__CREATE__DATA_VALIDATION,
+        );
     }
 
     try {
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
         const transactionId = uuid();
         const createTransactionResponse = await TransactionsUtils.createTransaction(
             transactionId,
             input,
         );
-
         if (createTransactionResponse.err) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+            return Utils.getInstance().getErrorResponse(createTransactionResponse.val);
         }
+        const createdTransaction = createTransactionResponse.val;
 
-        const response: CreateTransactionResponse = {
-            createdTransaction: createTransactionResponse.val,
+        const response: CreateTransactionResponseData = {
+            createdTransaction,
         };
         return Utils.getInstance().getSuccessfulResponse(201, response);
     } catch (err) {
         console.log(err);
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
-
-    return Utils.getInstance().getGeneralServerErrorResponse();
 };
