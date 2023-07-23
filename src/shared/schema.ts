@@ -8,6 +8,8 @@ const UUID_LENGTH = 36;
 export const users = mysqlTable("User", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
     email: varchar("email", { length: 256 }).notNull().unique(),
+    name: varchar("name", { length: 256 }).notNull(),
+    surname: varchar("surname", { length: 256 }).notNull(),
 });
 
 export const currencies = mysqlTable("Currency", {

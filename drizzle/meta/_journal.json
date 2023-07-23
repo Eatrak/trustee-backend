@@ -15,6 +15,13 @@
       "when": 1689831106810,
       "tag": "0001_curvy_cyclops",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1690104243167,
+      "tag": "0002_awesome_kulan_gath",
+      "breakpoints": true
     }
   ]
 }
