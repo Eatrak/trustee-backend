@@ -13,6 +13,7 @@ import { SignUpBody } from "@bodies/auth/signUp";
 import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import ErrorType from "@shared/errors/list";
 
 // Environment variables
 const USER_POOL_ID = process.env.USER_POOL_ID!;
@@ -27,28 +28,21 @@ export const handler: APIGatewayProxyHandler = async (
         signUpEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getSuccessfulResponse(500, {
-            message: "Server error, try later",
-        });
-    }
-
-    if (!event.body) {
-        return Utils.getInstance().getSuccessfulResponse(400, {
-            message: "Body undefined",
-        });
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
 
     // Data validation
-    const body: SignUpBody = JSON.parse(event.body);
-    const { userInfo } = body;
+    const body: SignUpBody = event.body ? JSON.parse(event.body) : {};
 
-    const validation = new Validator(userInfo, signUpValidator);
+    const validation = new Validator(body.userInfo, signUpValidator);
+    const { name, email, password, surname } = body.userInfo;
 
     if (validation.fails()) {
-        return Utils.getInstance().getSuccessfulResponse(400, {
-            message: "Invalid data sent",
-            errors: validation.errors,
-        });
+        console.log(validation.errors);
+
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.AUTH__SIGN_UP__DATA_VALIDATION,
+        );
     }
 
     // User creation
@@ -60,41 +54,48 @@ export const handler: APIGatewayProxyHandler = async (
         const createCognitoUserResponse = await UsersUtils.createCognitoUser(
             USER_POOL_ID,
             userId,
-            userInfo.name,
-            userInfo.surname,
-            userInfo.email,
+            name,
+            surname,
+            email,
         );
-
-        if (!createCognitoUserResponse.User) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+        if (createCognitoUserResponse.err) {
+            return Utils.getInstance().getErrorResponse(createCognitoUserResponse.val);
         }
 
         // Set the user password in Cognito
         const setUserPasswordResponse = await UsersUtils.setCognitoUserPassword(
             USER_POOL_ID,
-            userInfo.email,
-            userInfo.password,
+            email,
+            password,
         );
-
-        if (!setUserPasswordResponse) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+        if (setUserPasswordResponse.err) {
+            return Utils.getInstance().getErrorResponse(setUserPasswordResponse.val);
         }
 
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
-        // Create user in DynamoDB
-        await UsersUtils.createDBUser(userId, userInfo.email);
+        // Create user in the DB
+        const createDBUserResponse = await UsersUtils.createDBUser(
+            userId,
+            email,
+            name,
+            surname,
+        );
+        if (createDBUserResponse.err) {
+            return Utils.getInstance().getErrorResponse(createDBUserResponse.val);
+        }
+        const createdUser = createDBUserResponse.val;
 
         return Utils.getInstance().getSuccessfulResponse(201, {
-            message: "User created",
-            user: {
-                id: userId,
-                email: userInfo.email,
-            },
+            createdUser,
         });
     } catch (err) {
         console.log(err);
 
-        return Utils.getInstance().getGeneralServerErrorResponse();
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
 };

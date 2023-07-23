@@ -3,10 +3,12 @@ import {
     AdminInitiateAuthCommand,
     AdminSetUserPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { Err, Ok, Result } from "ts-results";
 
 import Utils from "@utils/Utils";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import { User, users } from "@shared/schema";
+import ErrorType from "@shared/errors/list";
 
 export default class UsersUtils {
     /**
@@ -15,12 +17,26 @@ export default class UsersUtils {
      * @param email User email.
      * @returns Command to create a user in DynamoDB.
      */
-    public static async createDBUser(id: string, email: string) {
-        const userToCreate: User = {
-            id,
-            email,
-        };
-        await DatabaseUtils.getInstance().getDB().insert(users).values(userToCreate);
+    public static async createDBUser(
+        id: string,
+        email: string,
+        name: string,
+        surname: string,
+    ): Promise<Result<User, ErrorType>> {
+        try {
+            const userToCreate: User = {
+                id,
+                email,
+                name,
+                surname,
+            };
+            await DatabaseUtils.getInstance().getDB().insert(users).values(userToCreate);
+
+            return Ok(userToCreate);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.AUTH__SIGN_UP__DB_USER_CREATION);
+        }
     }
 
     /**
@@ -35,34 +51,41 @@ export default class UsersUtils {
         name: string,
         surname: string,
         email: string,
-    ) {
-        return await Utils.getInstance()
-            .getCognitoClient()
-            .send(
-                new AdminCreateUserCommand({
-                    UserPoolId: userPoolId,
-                    Username: email,
-                    UserAttributes: [
-                        {
-                            Name: "email",
-                            Value: email,
-                        },
-                        {
-                            Name: "custom:name",
-                            Value: name,
-                        },
-                        {
-                            Name: "custom:surname",
-                            Value: surname,
-                        },
-                        {
-                            Name: "custom:id",
-                            Value: userId,
-                        },
-                    ],
-                    MessageAction: "SUPPRESS",
-                }),
-            );
+    ): Promise<Result<undefined, ErrorType>> {
+        try {
+            await Utils.getInstance()
+                .getCognitoClient()
+                .send(
+                    new AdminCreateUserCommand({
+                        UserPoolId: userPoolId,
+                        Username: email,
+                        UserAttributes: [
+                            {
+                                Name: "email",
+                                Value: email,
+                            },
+                            {
+                                Name: "custom:name",
+                                Value: name,
+                            },
+                            {
+                                Name: "custom:surname",
+                                Value: surname,
+                            },
+                            {
+                                Name: "custom:id",
+                                Value: userId,
+                            },
+                        ],
+                        MessageAction: "SUPPRESS",
+                    }),
+                );
+
+            return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.AUTH__SIGN_UP__COGNITO_USER_CREATION);
+        }
     }
 
     /**
@@ -76,17 +99,24 @@ export default class UsersUtils {
         userPoolId: string,
         email: string,
         password: string,
-    ) {
-        return await Utils.getInstance()
-            .getCognitoClient()
-            .send(
-                new AdminSetUserPasswordCommand({
-                    UserPoolId: userPoolId,
-                    Username: email,
-                    Password: password,
-                    Permanent: true,
-                }),
-            );
+    ): Promise<Result<undefined, ErrorType>> {
+        try {
+            await Utils.getInstance()
+                .getCognitoClient()
+                .send(
+                    new AdminSetUserPasswordCommand({
+                        UserPoolId: userPoolId,
+                        Username: email,
+                        Password: password,
+                        Permanent: true,
+                    }),
+                );
+
+            return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.AUTH__SIGN_UP__COGNITO_USER_PASSWORD_SETTING);
+        }
     }
 
     /**

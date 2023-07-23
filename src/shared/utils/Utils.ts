@@ -5,6 +5,7 @@ import Validator from "validatorjs";
 import { AuthorizerCustomClaims } from "@ts-types/auth";
 import Error from "@shared/errors";
 import { SuccessfulResponseBody, ErrorResponseBody } from "@shared/errors/types";
+import ErrorType from "@shared/errors/list";
 
 export default class Utils {
     private static instance?: Utils;
@@ -51,17 +52,12 @@ export default class Utils {
         };
     }
 
-    /**
-     *
-     * @returns Lambda response that rappresents a generic internal server error.
-     */
-    public getGeneralServerErrorResponse() {
-        return Utils.getInstance().getSuccessfulResponse(500, {
-            message: "Something went wrong",
-        });
-    }
+    public getErrorResponse(
+        errorType: ErrorType,
+        contentType: string = "application/json",
+    ) {
+        const error = new Error(errorType);
 
-    public getErrorResponse(error: Error, contentType: string = "application/json") {
         const body: ErrorResponseBody = {
             error: true,
             data: {
