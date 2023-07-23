@@ -14,6 +14,7 @@ import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
+import { SignUpResponse, SignUpResponseData } from "@requestInterfaces/auth/signUp";
 
 // Environment variables
 const USER_POOL_ID = process.env.USER_POOL_ID!;
@@ -90,7 +91,7 @@ export const handler: APIGatewayProxyHandler = async (
         }
         const createdUser = createDBUserResponse.val;
 
-        return Utils.getInstance().getSuccessfulResponse(201, {
+        return Utils.getInstance().getSuccessfulResponse<SignUpResponseData>(201, {
             createdUser,
         });
     } catch (err) {
