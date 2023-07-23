@@ -144,7 +144,9 @@ export default class TransactionsUtils {
         }
     }
 
-    public static async deleteTransaction(id: string): Promise<Result<boolean, Errors>> {
+    public static async deleteTransaction(
+        id: string,
+    ): Promise<Result<undefined, ErrorType>> {
         try {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
@@ -152,13 +154,13 @@ export default class TransactionsUtils {
                 .where(eq(transactions.id, id));
 
             if (result[0].affectedRows == 0) {
-                return Err("UNEXISTING_RESOURCE");
+                return Err(ErrorType.TRANSACTIONS__DELETE__NOT_PERFORMED);
             }
 
-            return Ok(true);
+            return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.TRANSACTIONS__DELETE__GENERAL);
         }
     }
 }

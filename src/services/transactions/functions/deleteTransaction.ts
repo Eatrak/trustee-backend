@@ -15,6 +15,8 @@ import {
     DeleteTransactionQueryParameters,
 } from "@APIs/input/transactions/deleteTransaction";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import ErrorType from "@shared/errors/list";
+import { DeleteTransactionResponseData } from "@APIs/output/transactions/deleteTransaction";
 
 Validator.setMessages("en", en);
 
@@ -29,26 +31,29 @@ export const handler: APIGatewayProxyHandler = async (
     // Validate data
     const validator = new Validator(input, deleteTransactionInputRules);
     if (validator.fails()) {
-        return Utils.getInstance().getSuccessfulResponse(404, {
-            errors: validator.errors,
-        });
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.TRANSACTIONS__DELETE__DATA_VALIDATION,
+        );
     }
 
     try {
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
         const deleteTransactionResponse = await TransactionsUtils.deleteTransaction(
             input.id,
         );
-
         if (deleteTransactionResponse.err) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+            return Utils.getInstance().getErrorResponse(deleteTransactionResponse.val);
         }
 
-        return Utils.getInstance().getSuccessfulResponse(200, {});
+        const response: DeleteTransactionResponseData = {};
+        return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
-
-    return Utils.getInstance().getGeneralServerErrorResponse();
 };
