@@ -12,6 +12,7 @@ import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import { SignInBody } from "@bodies/auth/signIn";
 import ErrorType from "@shared/errors/list";
+import { SignInResponseData } from "@requestInterfaces/auth/signIn";
 
 // Environment variables
 const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env;
@@ -53,15 +54,16 @@ export const handler: APIGatewayProxyHandler = async (
         }
         const { AuthenticationResult } = authenticateUserResponse.val;
 
-        if (!AuthenticationResult) {
+        if (!AuthenticationResult || !AuthenticationResult.IdToken) {
             return Utils.getInstance().getErrorResponse(
                 ErrorType.AUTH__SIGN_IN__READING_GENERATED_ID_TOKEN,
             );
         }
 
-        return Utils.getInstance().getSuccessfulResponse(200, {
+        const response: SignInResponseData = {
             authToken: AuthenticationResult.IdToken,
-        });
+        };
+        return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
 
