@@ -28,7 +28,7 @@ export const handler: APIGatewayProxyHandler = async (
         signUpEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
+        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__SIGN_UP__ENV);
     }
 
     // Data validation
