@@ -8,6 +8,7 @@
         "module": "CommonJS",
         "moduleResolution": "node",
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "strictPropertyInitialization": false,
@@ -20,7 +21,6 @@
             "@requestInterfaces/*": ["./src/shared/requestInterfaces/*"],
             "@ts-types/*": ["src/shared/ts-types/*"],
             "@utils/*": ["./src/shared/utils/*"],
-            "@env/*": ["./src/env/*"],
             "@services/*": ["./src/services/*"],
             "@shared/*": ["./src/shared/*"]
         }

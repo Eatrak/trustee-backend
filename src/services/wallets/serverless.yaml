@@ -22,6 +22,7 @@ provider:
         restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
         restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
     environment:
+        DB_URL: ${file(../../../env/env.${self:provider.stage}.json):DB_URL}
         REGION: !Ref AWS::Region
         STAGE: ${self:provider.stage}
     iamRoleStatements:

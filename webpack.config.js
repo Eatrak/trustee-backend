@@ -38,7 +38,6 @@ module.exports = {
             "@requestInterfaces": path.resolve(__dirname, "src/shared/requestInterfaces"),
             "@ts-types": path.resolve(__dirname, "src/shared/ts-types"),
             "@utils": path.resolve(__dirname, "src/shared/utils"),
-            "@env": path.resolve(__dirname, "src/env"),
             "@services": path.resolve(__dirname, "src/services"),
             "@shared": path.resolve(__dirname, "src/shared"),
         },
