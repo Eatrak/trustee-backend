@@ -16,9 +16,8 @@
         "experimentalDecorators": true,
         "baseUrl": "./",
         "paths": {
-            "@bodies/*": ["./src/shared/bodies/*"],
             "@crudValidators/*": ["./src/shared/crudValidators/*"],
-            "@requestInterfaces/*": ["./src/shared/requestInterfaces/*"],
+            "@APIs/*": ["./src/shared/APIs/*"],
             "@ts-types/*": ["src/shared/ts-types/*"],
             "@utils/*": ["./src/shared/utils/*"],
             "@services/*": ["./src/services/*"],

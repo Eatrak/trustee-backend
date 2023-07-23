@@ -9,12 +9,12 @@ import en from "validatorjs/src/lang/en";
 import { v4 as uuid } from "uuid";
 
 import { signUpEnvironmentValidator, signUpValidator } from "@crudValidators/auth";
-import { SignUpBody } from "@bodies/auth/signUp";
+import { SignUpBody } from "@shared/APIs/input/auth/signUp";
 import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
-import { SignUpResponseData } from "@requestInterfaces/auth/signUp";
+import { SignUpResponseData } from "@shared/APIs/output/auth/signUp";
 
 // Environment variables
 const USER_POOL_ID = process.env.USER_POOL_ID!;

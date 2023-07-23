@@ -12,9 +12,9 @@ import TransactionsUtils from "@utils/TransactionsUtils";
 import {
     GetTransactionsInputQueryParams,
     GetTransactionsInput,
-} from "@bodies/transactions/getTransactions";
+} from "@APIs/input/transactions/getTransactions";
 import { getTransactionsValidator } from "@crudValidators/transactions";
-import { GetTransactionsResponse } from "@requestInterfaces/transactions/getTransactions";
+import { GetTransactionsResponse } from "@APIs/output/transactions/getTransactions";
 import DatabaseUtils from "@utils/DatabaseUtils";
 
 Validator.setMessages("en", en);

@@ -9,7 +9,7 @@ import en from "validatorjs/src/lang/en";
 
 import Utils from "@utils/Utils";
 import CurrencyUtils from "@utils/CurrencyUtils";
-import { GetCurrenciesResponseData } from "@requestInterfaces/transactions/getCurrencies";
+import { GetCurrenciesResponseData } from "@APIs/output/transactions/getCurrencies";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
 

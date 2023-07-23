@@ -12,10 +12,10 @@ import Utils from "@utils/Utils";
 import {
     CreateTransactionBody,
     CreateTransactionInput,
-} from "@bodies/transactions/createTransaction";
+} from "@APIs/input/transactions/createTransaction";
 import TransactionsUtils from "@utils/TransactionsUtils";
 import { createTransactionInputRules } from "@crudValidators/transactions";
-import { CreateTransactionResponse } from "@requestInterfaces/transactions/createTransactionResponse";
+import { CreateTransactionResponse } from "@APIs/output/transactions/createTransactionResponse";
 import DatabaseUtils from "@utils/DatabaseUtils";
 
 Validator.setMessages("en", en);

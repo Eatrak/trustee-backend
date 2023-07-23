@@ -33,9 +33,8 @@ module.exports = {
     },
     resolve: {
         alias: {
-            "@bodies": path.resolve(__dirname, "src/shared/bodies"),
             "@crudValidators": path.resolve(__dirname, "src/shared/crudValidators"),
-            "@requestInterfaces": path.resolve(__dirname, "src/shared/requestInterfaces"),
+            "@APIs": path.resolve(__dirname, "src/shared/APIs"),
             "@ts-types": path.resolve(__dirname, "src/shared/ts-types"),
             "@utils": path.resolve(__dirname, "src/shared/utils"),
             "@services": path.resolve(__dirname, "src/services"),

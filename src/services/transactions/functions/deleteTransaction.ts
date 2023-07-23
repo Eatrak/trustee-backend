@@ -13,7 +13,7 @@ import { deleteTransactionInputRules } from "@crudValidators/transactions";
 import {
     DeleteTransactionInput,
     DeleteTransactionQueryParameters,
-} from "@bodies/transactions/deleteTransaction";
+} from "@APIs/input/transactions/deleteTransaction";
 import DatabaseUtils from "@utils/DatabaseUtils";
 
 Validator.setMessages("en", en);

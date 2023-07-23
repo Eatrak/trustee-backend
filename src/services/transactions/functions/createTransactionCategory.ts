@@ -10,8 +10,8 @@ import { v4 as uuid } from "uuid";
 
 import Utils from "@utils/Utils";
 import TransactionsUtils from "@utils/TransactionsUtils";
-import { CreateTransactionCategoryBody } from "@bodies/transactions/createTransactionCategory";
-import { CreateTransactionCategoryResponse } from "@requestInterfaces/transactions/createTransactionCategory";
+import { CreateTransactionCategoryBody } from "@APIs/input/transactions/createTransactionCategory";
+import { CreateTransactionCategoryResponse } from "@APIs/output/transactions/createTransactionCategory";
 import { createTransactionCategoryRules } from "@crudValidators/transactions";
 import DatabaseUtils from "@utils/DatabaseUtils";
 

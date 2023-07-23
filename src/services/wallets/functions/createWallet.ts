@@ -11,8 +11,8 @@ import { Err, Ok } from "ts-results";
 
 import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
-import { CreateWalletBody } from "@bodies/transactions/createWallet";
-import { CreateWalletResponse } from "@requestInterfaces/transactions/createWallet";
+import { CreateWalletBody } from "@APIs/input/transactions/createWallet";
+import { CreateWalletResponse } from "@APIs/output/transactions/createWallet";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import Error from "@shared/errors";
 import ErrorType from "@shared/errors/list";

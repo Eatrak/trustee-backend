@@ -10,9 +10,9 @@ import en from "validatorjs/src/lang/en";
 import { signInEnvironmentValidator, signInValidator } from "@crudValidators/auth";
 import Utils from "@utils/Utils";
 import UsersUtils from "@utils/UsersUtils";
-import { SignInBody } from "@bodies/auth/signIn";
+import { SignInBody } from "@shared/APIs/input/auth/signIn";
 import ErrorType from "@shared/errors/list";
-import { SignInResponseData } from "@requestInterfaces/auth/signIn";
+import { SignInResponseData } from "@shared/APIs/output/auth/signIn";
 
 // Environment variables
 const { USER_POOL_ID, USER_POOL_CLIENT_ID } = process.env;

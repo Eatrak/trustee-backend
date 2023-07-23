@@ -2,9 +2,9 @@ import dayjs from "dayjs";
 import { Ok, Err, Result } from "ts-results";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 
-import { CreateTransactionCategoryInput } from "@bodies/transactions/createTransactionCategory";
-import { CreateTransactionInput } from "@bodies/transactions/createTransaction";
-import { GetTransactionsByCurrencyAndCreationRangeInput } from "@bodies/transactions/getTransactionsByCurrency";
+import { CreateTransactionCategoryInput } from "@APIs/input/transactions/createTransactionCategory";
+import { CreateTransactionInput } from "@APIs/input/transactions/createTransaction";
+import { GetTransactionsByCurrencyAndCreationRangeInput } from "@APIs/input/transactions/getTransactionsByCurrency";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import {
     transactions,
