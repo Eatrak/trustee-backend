@@ -88,7 +88,7 @@ export default class TransactionsUtils {
     public static async createTransactionCategory(
         id: string,
         input: CreateTransactionCategoryInput,
-    ): Promise<Result<TransactionCategory, "GENERAL">> {
+    ): Promise<Result<TransactionCategory, ErrorType>> {
         try {
             const { userId, name } = input;
 
@@ -105,7 +105,7 @@ export default class TransactionsUtils {
             return Ok(transactionCategoryToCreate);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.TRANSACTION_CATEGORIES__CREATE__GENERAL);
         }
     }
 
