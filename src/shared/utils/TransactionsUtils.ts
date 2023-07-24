@@ -32,7 +32,7 @@ export default class TransactionsUtils {
         endCarriedOut,
         currencyId,
     }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
-        Result<Transaction[], "GENERAL">
+        Result<Transaction[], ErrorType>
     > {
         try {
             const result: Transaction[] = await DatabaseUtils.getInstance()
@@ -64,13 +64,13 @@ export default class TransactionsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.TRANSACTIONS__GET__GENERAL);
         }
     }
 
     public static async getTransactionCategories(
         userId: string,
-    ): Promise<Result<TransactionCategory[], "GENERAL">> {
+    ): Promise<Result<TransactionCategory[], ErrorType>> {
         try {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
@@ -81,7 +81,7 @@ export default class TransactionsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL);
         }
     }
 

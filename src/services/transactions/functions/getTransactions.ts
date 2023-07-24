@@ -14,8 +14,9 @@ import {
     GetTransactionsInput,
 } from "@APIs/input/transactions/getTransactions";
 import { getTransactionsValidator } from "@crudValidators/transactions";
-import { GetTransactionsResponse } from "@APIs/output/transactions/getTransactions";
+import { GetTransactionsResponseData } from "@APIs/output/transactions/getTransactions";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
 
@@ -38,13 +39,17 @@ export const handler: APIGatewayProxyHandler = async (
         getTransactionsValidator,
     );
     if (getTransactionsValidation.fails()) {
-        return Utils.getInstance().getSuccessfulResponse(400, {
-            errors: getTransactionsValidation.errors,
-        });
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.TRANSACTIONS__GET__DATA_VALIDATION,
+        );
     }
 
     try {
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
         // Get user transactions by both creation-range and currency
         const getTransactionsResponse =
@@ -52,16 +57,16 @@ export const handler: APIGatewayProxyHandler = async (
                 getTransactionsInput,
             );
         if (getTransactionsResponse.err) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+            return Utils.getInstance().getErrorResponse(getTransactionsResponse.val);
         }
         const transactions = getTransactionsResponse.val;
 
-        const response: GetTransactionsResponse = { transactions };
+        const response: GetTransactionsResponseData = { transactions };
 
         return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
     }
 
-    return Utils.getInstance().getGeneralServerErrorResponse();
+    return Utils.getInstance().getErrorResponse(ErrorType.TRANSACTIONS__GET__GENERAL);
 };
