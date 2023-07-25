@@ -5,8 +5,6 @@ import DatabaseUtils from "./DatabaseUtils";
 import { Wallet, wallets } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 
-export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
-
 export default class WalletsUtils {
     /**
      * Get user wallets.
@@ -14,7 +12,7 @@ export default class WalletsUtils {
      * @param userId ID of the user that owns the wallets.
      * @returns Result of the query used to get user wallets.
      */
-    public static async getWallets(userId: string): Promise<Result<Wallet[], "GENERAL">> {
+    public static async getWallets(userId: string): Promise<Result<Wallet[], ErrorType>> {
         try {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
@@ -25,7 +23,7 @@ export default class WalletsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err("GENERAL");
+            return Err(ErrorType.WALLETS__GET__GENERAL);
         }
     }
 

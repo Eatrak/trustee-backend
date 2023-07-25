@@ -11,6 +11,7 @@ import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
 import { GetWalletsResponse } from "@APIs/output/transactions/getWallets";
 import DatabaseUtils from "@utils/DatabaseUtils";
+import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
 
@@ -20,11 +21,15 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
         const getWalletsResponse = await WalletsUtils.getWallets(userId);
         if (getWalletsResponse.err) {
-            return Utils.getInstance().getGeneralServerErrorResponse();
+            return Utils.getInstance().getErrorResponse(getWalletsResponse.val);
         }
         const wallets = getWalletsResponse.val;
 
@@ -34,5 +39,5 @@ export const handler: APIGatewayProxyHandler = async (
         console.log(err);
     }
 
-    return Utils.getInstance().getGeneralServerErrorResponse();
+    return Utils.getInstance().getErrorResponse(ErrorType.WALLETS__GET__GENERAL);
 };

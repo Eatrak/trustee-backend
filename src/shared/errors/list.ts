@@ -26,6 +26,7 @@ enum ErrorType {
     TRANSACTION_CATEGORIES__DELETE__GENERAL = getErrorType(500, "00012"),
     TRANSACTION_CATEGORIES__GET__GENERAL = getErrorType(500, "00012"),
     WALLETS__CREATE__GENERAL = getErrorType(500, "00013"),
+    WALLETS__GET__GENERAL = getErrorType(500, "00013"),
     GENERAL__DB__INITIALIZATION = getErrorType(500, "00014"),
     GENERAL__SERVER = getErrorType(500, "00015"),
 }
