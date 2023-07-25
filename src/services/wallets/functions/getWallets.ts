@@ -9,7 +9,7 @@ import en from "validatorjs/src/lang/en";
 
 import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
-import { GetWalletsResponse } from "@APIs/output/transactions/getWallets";
+import { GetWalletsResponseData } from "@APIs/output/transactions/getWallets";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
 
@@ -33,7 +33,7 @@ export const handler: APIGatewayProxyHandler = async (
         }
         const wallets = getWalletsResponse.val;
 
-        const response: GetWalletsResponse = { wallets };
+        const response: GetWalletsResponseData = { wallets };
         return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
