@@ -22,6 +22,11 @@ provider:
         restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
         restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
     environment:
+        DB_HOST: ${file(../../../env/env.${self:provider.stage}.json):DB_HOST}
+        DB_USERNAME: ${file(../../../env/env.${self:provider.stage}.json):DB_USERNAME}
+        DB_PASSWORD: ${file(../../../env/env.${self:provider.stage}.json):DB_PASSWORD}
+        DB_NAME: ${file(../../../env/env.${self:provider.stage}.json):DB_NAME}
+        DB_PORT: ${file(../../../env/env.${self:provider.stage}.json):DB_PORT}
         USER_POOL_ID: !ImportValue TrusteeUserPool
         USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
         REGION: !Ref AWS::Region
