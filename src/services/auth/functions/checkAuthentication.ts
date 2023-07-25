@@ -41,7 +41,7 @@ async function getJsonWebKeyWithKID(kid: string) {
 function verifyJsonWebTokenSignature(token: string, jsonWebKey: any) {
     const pem = jwkToPem(jsonWebKey);
     const decodedToken = jwt.verify(token, pem, { algorithms: ["RS256"] });
-    return decodedToken;
+    return decodedToken as jwt.JwtPayload;
 }
 
 export const handler: APIGatewayProxyHandler = async (
