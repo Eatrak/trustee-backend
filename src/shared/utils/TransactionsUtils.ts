@@ -15,8 +15,6 @@ import {
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 
-export type Errors = "UNEXISTING_RESOURCE" | "GENERAL";
-
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
 
