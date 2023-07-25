@@ -8,6 +8,8 @@ import jwkToPem from "jwk-to-pem";
 
 import Utils from "@utils/Utils";
 import { JsonWebKey } from "src/shared/ts-types/auth";
+import ErrorType from "@shared/errors/list";
+import { CheckAuthenticationResponseData } from "@APIs/output/auth/signIn";
 
 // Environment variables
 const { USER_POOL_ID, REGION } = process.env;
@@ -49,16 +51,18 @@ export const handler: APIGatewayProxyHandler = async (
         const authToken = event.headers.Authorization!.split(" ")[1];
         const tokenHeader = decodeTokenHeader(authToken);
         const jsonWebKey = await getJsonWebKeyWithKID(tokenHeader.kid);
-        const decodedAuthToken = verifyJsonWebTokenSignature(authToken, jsonWebKey);
+        try {
+            const decodedAuthToken = verifyJsonWebTokenSignature(authToken, jsonWebKey);
 
-        return Utils.getInstance().getSuccessfulResponse(200, {
-            decodedAuthToken,
-        });
+            const responseData: CheckAuthenticationResponseData = { decodedAuthToken };
+            return Utils.getInstance().getSuccessfulResponse(200, responseData);
+        } catch (err) {
+            return Utils.getInstance().getErrorResponse(
+                ErrorType.AUTH__CHECK__UNAUTHORIZED,
+            );
+        }
     } catch (err) {
         console.log(err);
-
-        return Utils.getInstance().getSuccessfulResponse(401, {
-            message: "You are not authenticated. Please, perform the login",
-        });
+        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__CHECK__GENERAL);
     }
 };
