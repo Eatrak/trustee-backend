@@ -9,7 +9,7 @@ import jwkToPem from "jwk-to-pem";
 import Utils from "@utils/Utils";
 import { JsonWebKey } from "src/shared/ts-types/auth";
 import ErrorType from "@shared/errors/list";
-import { CheckAuthenticationResponseData } from "@APIs/output/auth/signIn";
+import { CheckAuthenticationResponseData } from "@APIs/output/auth/checkAuthentication";
 
 // Environment variables
 const { USER_POOL_ID, REGION } = process.env;

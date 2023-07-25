@@ -1,7 +1,7 @@
 import { Response } from "@shared/errors/types";
 
-export interface CheckAuthenticationResponseData {
-    decodedAuthToken: string | jwt.JwtPayload;
+export interface SignInResponseData {
+    authToken: string;
 }
 
-export type CheckAuthenticationResponse = Response<CheckAuthenticationResponseData>;
+export type SignInResponse = Response<SignInResponseData>;

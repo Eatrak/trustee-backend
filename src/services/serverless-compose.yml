@@ -1,4 +1,6 @@
 services:
+    auth:
+        path: auth
     currencies:
         path: currencies
     transactions:
