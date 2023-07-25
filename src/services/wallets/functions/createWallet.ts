@@ -7,14 +7,12 @@ import Validator from "validatorjs";
 //@ts-ignore
 import en from "validatorjs/src/lang/en";
 import { v4 as uuid } from "uuid";
-import { Err, Ok } from "ts-results";
 
 import Utils from "@utils/Utils";
 import WalletsUtils from "@utils/WalletsUtils";
 import { CreateWalletBody } from "@APIs/input/transactions/createWallet";
-import { CreateWalletResponse } from "@APIs/output/transactions/createWallet";
+import { CreateWalletResponseData } from "@APIs/output/transactions/createWallet";
 import DatabaseUtils from "@utils/DatabaseUtils";
-import Error from "@shared/errors";
 import ErrorType from "@shared/errors/list";
 
 Validator.setMessages("en", en);
@@ -28,7 +26,11 @@ export const handler: APIGatewayProxyHandler = async (
         : {};
 
     try {
-        await DatabaseUtils.getInstance().initConnection();
+        // Init DB connection
+        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
+        if (initConnectionResponse.err) {
+            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        }
 
         const walletId = uuid();
         const createWalletResponse = await WalletsUtils.createWallet(
@@ -38,16 +40,14 @@ export const handler: APIGatewayProxyHandler = async (
             currencyId,
         );
         if (createWalletResponse.err) {
-            const error = new Error(ErrorType.WALLETS__CREATE__GENERAL);
-            return Utils.getInstance().getErrorResponse(error);
+            return Utils.getInstance().getErrorResponse(createWalletResponse.val);
         }
         const createdWallet = createWalletResponse.val;
 
-        return Utils.getInstance().getSuccessfulResponse(201, { createdWallet });
+        const responseData: CreateWalletResponseData = { createdWallet };
+        return Utils.getInstance().getSuccessfulResponse(201, responseData);
     } catch (err) {
         console.log(err);
-
-        const error = new Error(ErrorType.WALLETS__CREATE__GENERAL);
-        return Utils.getInstance().getErrorResponse(error);
+        return Utils.getInstance().getErrorResponse(ErrorType.WALLETS__CREATE__GENERAL);
     }
 };
