@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 
-import { ErrorType } from "./list";
+import ErrorType from "./list";
 
 const ERROR_TYPE_ATTRIBUTES_SEPARATOR = "|";
 
