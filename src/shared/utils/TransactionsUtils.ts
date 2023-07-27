@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Ok, Err, Result } from "ts-results";
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 import { CreateTransactionCategoryInput } from "@APIs/input/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@APIs/input/transactions/createTransaction";
@@ -14,6 +14,7 @@ import {
     wallets,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
+import { CurrencyTotalBalance } from "@ts-types/transactions";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -63,6 +64,48 @@ export default class TransactionsUtils {
         } catch (err) {
             console.log(err);
             return Err(ErrorType.TRANSACTIONS__GET__GENERAL);
+        }
+    }
+
+    public static async getCurrencyTotalBalance({
+        userId,
+        currencyId,
+        startCarriedOut,
+        endCarriedOut,
+    }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
+        Result<CurrencyTotalBalance, ErrorType>
+    > {
+        try {
+            const result = await DatabaseUtils.getInstance()
+                .getDB()
+                .select({
+                    totalAmount: sql<number>`sum(${transactions.amount})`,
+                    isIncome: sql<boolean>`CASE WHEN ${transactions.amount} >= 0} THEN CAST(1 as BIT) ELSE CAST(0 as BIT) END`,
+                })
+                .from(transactions)
+                .where(
+                    and(
+                        eq(transactions.userId, userId),
+                        eq(wallets.currencyId, currencyId),
+                        gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
+                        lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
+                    ),
+                )
+                .groupBy(gte(transactions.amount, 0));
+
+            const currencyTotalBalance = {
+                totalIncome: result[0].isIncome
+                    ? result[0].totalAmount
+                    : result[1].totalAmount,
+                totalExpense: !result[0].isIncome
+                    ? result[0].totalAmount
+                    : result[1].totalAmount,
+            };
+
+            return Ok(currencyTotalBalance);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.TRANSACTIONS__GET__CURRENCY_TOTAL_BALANCE);
         }
     }
 
