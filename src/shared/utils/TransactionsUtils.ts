@@ -80,9 +80,10 @@ export default class TransactionsUtils {
                 .getDB()
                 .select({
                     totalAmount: sql<number>`sum(${transactions.amount})`,
-                    isIncome: sql<boolean>`CASE WHEN ${transactions.amount} >= 0} THEN CAST(1 as BIT) ELSE CAST(0 as BIT) END`,
+                    isIncome: transactions.isIncome,
                 })
                 .from(transactions)
+                .innerJoin(wallets, eq(wallets.id, transactions.walletId))
                 .where(
                     and(
                         eq(transactions.userId, userId),
@@ -91,7 +92,14 @@ export default class TransactionsUtils {
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
                 )
-                .groupBy(gte(transactions.amount, 0));
+                .groupBy(transactions.isIncome);
+
+            if (result.length == 0) {
+                return Ok({
+                    totalExpense: 0,
+                    totalIncome: 0,
+                });
+            }
 
             const currencyTotalBalance = {
                 totalIncome: result[0].isIncome
