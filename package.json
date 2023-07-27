@@ -27,6 +27,7 @@
         "node": ">=14.0.0"
     },
     "dependencies": {
+        "@aws-sdk/client-cognito-identity-provider": "^3.378.0",
         "@planetscale/database": "^1.8.0",
         "@types/aws-lambda": "^8.10.110",
         "@types/node": "^18.14.0",
