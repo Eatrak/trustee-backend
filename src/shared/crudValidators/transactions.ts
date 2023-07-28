@@ -4,6 +4,12 @@ export const getTransactionsValidator = {
     currencyId: "required|string",
 };
 
+export const getBalanceValidator = {
+    startCarriedOut: "required|integer",
+    endCarriedOut: "required|integer",
+    currencyId: "required|string",
+};
+
 export const createTransactionCategoryRules = {
     name: "required|string",
 };

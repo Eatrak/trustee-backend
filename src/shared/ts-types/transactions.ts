@@ -1,12 +1,4 @@
-export interface TotalIncomeByCurrency {
-    [currencyCode: string]: number;
-}
-
-export interface TotalExpenseByCurrency {
-    [currencyCode: string]: number;
-}
-
-export interface CurrencyTotalBalance {
+export interface TotalBalance {
     totalIncome: number;
     totalExpense: number;
 }

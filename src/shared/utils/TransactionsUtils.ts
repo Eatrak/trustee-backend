@@ -14,7 +14,8 @@ import {
     wallets,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
-import { CurrencyTotalBalance } from "@ts-types/transactions";
+import { TotalBalance } from "@ts-types/transactions";
+import { GetBalanceInput } from "@APIs/input/transactions/getBalance";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -67,14 +68,12 @@ export default class TransactionsUtils {
         }
     }
 
-    public static async getCurrencyTotalBalance({
+    public static async getBalance({
         userId,
         currencyId,
         startCarriedOut,
         endCarriedOut,
-    }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
-        Result<CurrencyTotalBalance, ErrorType>
-    > {
+    }: GetBalanceInput): Promise<Result<TotalBalance, ErrorType>> {
         try {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
@@ -106,7 +105,7 @@ export default class TransactionsUtils {
             return Ok(currencyTotalBalance);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__GET__CURRENCY_TOTAL_BALANCE);
+            return Err(ErrorType.TRANSACTIONS__GET_BALANCE__GENERAL);
         }
     }
 
