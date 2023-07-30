@@ -30,6 +30,9 @@ export const transactions = mysqlTable("Transaction", {
     categoryId: varchar("categoryId", { length: UUID_LENGTH })
         .notNull()
         .references(() => transactionCategories.id),
+    currencyId: varchar("currencyId", { length: UUID_LENGTH })
+        .notNull()
+        .references(() => currencies.id),
     carriedOut: int("carriedOut").notNull(),
     amount: float("amount").notNull(),
     isIncome: boolean("isIncome").notNull(),
@@ -44,22 +47,13 @@ export const transactionCategories = mysqlTable("TransactionCategory", {
         .references(() => users.id),
 });
 
-export const wallets = mysqlTable(
-    "Wallet",
-    {
-        id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
-        name: varchar("name", { length: 256 }).notNull(),
-        userId: varchar("userId", { length: UUID_LENGTH })
-            .notNull()
-            .references(() => users.id),
-        currencyId: varchar("currencyId", { length: UUID_LENGTH })
-            .notNull()
-            .references(() => currencies.id),
-    },
-    (t) => ({
-        unq: unique().on(t.name, t.currencyId),
-    }),
-);
+export const wallets = mysqlTable("Wallet", {
+    id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
+    name: varchar("name", { length: 256 }).notNull(),
+    userId: varchar("userId", { length: UUID_LENGTH })
+        .notNull()
+        .references(() => users.id),
+});
 
 // Type definitions
 export type User = InferModel<typeof users, "select">;

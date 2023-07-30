@@ -21,9 +21,7 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const { name, currencyId }: CreateWalletBody = event.body
-        ? JSON.parse(event.body)
-        : {};
+    const { name }: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
 
     try {
         // Init DB connection
@@ -37,7 +35,6 @@ export const handler: APIGatewayProxyHandler = async (
             walletId,
             userId,
             name,
-            currencyId,
         );
         if (createWalletResponse.err) {
             return Utils.getInstance().getErrorResponse(createWalletResponse.val);
