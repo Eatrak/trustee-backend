@@ -61,18 +61,8 @@ export const handler: APIGatewayProxyHandler = async (
         }
         const transactions = getTransactionsResponse.val;
 
-        const getCurrencyTotalBalance = await TransactionsUtils.getBalance(
-            getTransactionsInput,
-        );
-        if (getCurrencyTotalBalance.err) {
-            return Utils.getInstance().getErrorResponse(getCurrencyTotalBalance.val);
-        }
-        const { totalIncome, totalExpense } = getCurrencyTotalBalance.val;
-
         const response: GetTransactionsResponseData = {
             transactions,
-            totalIncome,
-            totalExpense,
         };
 
         return Utils.getInstance().getSuccessfulResponse(200, response);

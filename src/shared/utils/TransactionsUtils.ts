@@ -91,11 +91,18 @@ export default class TransactionsUtils {
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
                 )
-                .groupBy(transactions.isIncome)
-                .orderBy(desc(transactions.isIncome));
+                .groupBy(transactions.isIncome);
 
-            const totalIncome = result[0] ? result[0].totalAmount : 0;
-            const totalExpense = result[1] ? result[1].totalAmount : 0;
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            result.forEach((resultPart) => {
+                if (resultPart.isIncome) {
+                    totalIncome = resultPart.totalAmount;
+                } else {
+                    totalExpense = resultPart.totalAmount;
+                }
+            });
 
             const currencyTotalBalance = {
                 totalIncome,
