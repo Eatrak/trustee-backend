@@ -1,5 +1,5 @@
 import { InferModel } from "drizzle-orm";
-import { mysqlTable, varchar, boolean, float, int, unique } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, boolean, float, int } from "drizzle-orm/mysql-core";
 
 const UUID_LENGTH = 36;
 
@@ -49,7 +49,7 @@ export const transactionCategories = mysqlTable("TransactionCategory", {
 
 export const wallets = mysqlTable("Wallet", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
-    name: varchar("name", { length: 256 }).notNull(),
+    name: varchar("name", { length: 256 }).notNull().unique(),
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .references(() => users.id),
