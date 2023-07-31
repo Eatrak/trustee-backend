@@ -54,6 +54,7 @@ export default class TransactionsUtils {
                     and(
                         eq(transactions.userId, userId),
                         eq(transactions.currencyId, currencyId),
+                        eq(wallets.isDeleted, false),
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),

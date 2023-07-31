@@ -1,5 +1,5 @@
 import { Ok, Err, Result } from "ts-results";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import DatabaseUtils from "./DatabaseUtils";
 import { Wallet, wallets } from "@shared/schema";
@@ -18,7 +18,7 @@ export default class WalletsUtils {
                 .getDB()
                 .select()
                 .from(wallets)
-                .where(eq(wallets.userId, userId));
+                .where(and(eq(wallets.userId, userId), eq(wallets.isDeleted, false)));
 
             return Ok(result);
         } catch (err) {
@@ -37,6 +37,7 @@ export default class WalletsUtils {
                 id,
                 name,
                 userId,
+                isDeleted: false,
             };
             await DatabaseUtils.getInstance()
                 .getDB()
@@ -47,6 +48,26 @@ export default class WalletsUtils {
         } catch (err) {
             console.log(err);
             return Err(ErrorType.WALLETS__CREATE__GENERAL);
+        }
+    }
+
+    /**
+     * Permanently delete a wallet.
+     *
+     * @param id ID of the wallet to delete.
+     * @returns A Result.
+     */
+    public static async deleteWallet(id: string): Promise<Result<undefined, ErrorType>> {
+        try {
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .delete(wallets)
+                .where(eq(wallets.id, id));
+
+            return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.WALLETS__DELETE__GENERAL);
         }
     }
 }

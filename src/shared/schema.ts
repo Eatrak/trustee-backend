@@ -26,10 +26,11 @@ export const transactions = mysqlTable("Transaction", {
         .references(() => users.id),
     walletId: varchar("walletId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => wallets.id),
-    categoryId: varchar("categoryId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => transactionCategories.id),
+        .references(() => wallets.id, { onDelete: "cascade" }),
+    categoryId: varchar("categoryId", { length: UUID_LENGTH }).references(
+        () => transactionCategories.id,
+        { onDelete: "set null" },
+    ),
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
         .references(() => currencies.id),
@@ -53,6 +54,7 @@ export const wallets = mysqlTable("Wallet", {
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .references(() => users.id),
+    isDeleted: boolean("isDeleted").notNull().default(false),
 });
 
 // Type definitions

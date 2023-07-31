@@ -36,6 +36,20 @@
       "when": 1690715165554,
       "tag": "0004_workable_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1690778428525,
+      "tag": "0005_safe_natasha_romanoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1690783555911,
+      "tag": "0006_reflective_sabretooth",
+      "breakpoints": true
     }
   ]
 }
