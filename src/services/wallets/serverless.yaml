@@ -81,3 +81,15 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
+    UpdateWallet:
+        handler: functions/updateWallet.handler
+        events:
+            - http:
+                  method: PUT
+                  path: /wallets/{id}
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email

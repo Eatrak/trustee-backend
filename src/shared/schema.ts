@@ -54,7 +54,6 @@ export const wallets = mysqlTable("Wallet", {
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .references(() => users.id),
-    isDeleted: boolean("isDeleted").notNull().default(false),
 });
 
 // Type definitions

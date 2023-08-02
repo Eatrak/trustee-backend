@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import DatabaseUtils from "./DatabaseUtils";
 import { Wallet, wallets } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
+import { UpdateWalletUpdateInfo } from "@APIs/input/transactions/updateWallet";
 
 export default class WalletsUtils {
     /**
@@ -18,7 +19,7 @@ export default class WalletsUtils {
                 .getDB()
                 .select()
                 .from(wallets)
-                .where(and(eq(wallets.userId, userId), eq(wallets.isDeleted, false)));
+                .where(eq(wallets.userId, userId));
 
             return Ok(result);
         } catch (err) {
@@ -37,7 +38,6 @@ export default class WalletsUtils {
                 id,
                 name,
                 userId,
-                isDeleted: false,
             };
             await DatabaseUtils.getInstance()
                 .getDB()
@@ -68,6 +68,29 @@ export default class WalletsUtils {
         } catch (err) {
             console.log(err);
             return Err(ErrorType.WALLETS__DELETE__GENERAL);
+        }
+    }
+
+    public static async updateWallet(
+        id: string,
+        userId: string,
+        updateInfo: UpdateWalletUpdateInfo,
+    ): Promise<Result<undefined, ErrorType>> {
+        try {
+            const { name } = updateInfo;
+
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .update(wallets)
+                .set({
+                    name,
+                })
+                .where(and(eq(wallets.id, id), eq(wallets.userId, userId)));
+
+            return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.WALLETS__UPDATE__GENERAL);
         }
     }
 }

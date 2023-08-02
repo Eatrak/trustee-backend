@@ -32,8 +32,10 @@ enum ErrorType {
     WALLETS__GET__GENERAL = getErrorType(500, "00029"),
     WALLETS__DELETE__DATA_VALIDATION = getErrorType(400, "00030"),
     WALLETS__DELETE__GENERAL = getErrorType(500, "00031"),
-    GENERAL__DB__INITIALIZATION = getErrorType(500, "00032"),
-    GENERAL__SERVER = getErrorType(500, "00033"),
+    WALLETS__UPDATE__DATA_VALIDATION = getErrorType(400, "00032"),
+    WALLETS__UPDATE__GENERAL = getErrorType(500, "00033"),
+    GENERAL__DB__INITIALIZATION = getErrorType(500, "00034"),
+    GENERAL__SERVER = getErrorType(500, "00035"),
 }
 
 export default ErrorType;
