@@ -31,9 +31,6 @@ export const transactions = mysqlTable("Transaction", {
         () => transactionCategories.id,
         { onDelete: "set null" },
     ),
-    currencyId: varchar("currencyId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => currencies.id),
     carriedOut: int("carriedOut").notNull(),
     amount: double("amount").notNull(),
     isIncome: boolean("isIncome").notNull(),
@@ -54,6 +51,9 @@ export const wallets = mysqlTable("Wallet", {
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .references(() => users.id),
+    currencyId: varchar("currencyId", { length: UUID_LENGTH })
+        .notNull()
+        .references(() => currencies.id),
 });
 
 // Type definitions

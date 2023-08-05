@@ -32,11 +32,13 @@ export default class WalletsUtils {
         id: string,
         userId: string,
         name: string,
+        currencyId: string,
     ): Promise<Result<Wallet, ErrorType>> {
         try {
             const walletToCreate: Wallet = {
                 id,
                 name,
+                currencyId,
                 userId,
             };
             await DatabaseUtils.getInstance()

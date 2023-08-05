@@ -43,7 +43,6 @@ export default class TransactionsUtils {
                     name: transactions.name,
                     walletId: transactions.walletId,
                     categoryId: transactions.categoryId,
-                    currencyId: transactions.currencyId,
                     carriedOut: transactions.carriedOut,
                     amount: transactions.amount,
                     isIncome: transactions.isIncome,
@@ -53,8 +52,7 @@ export default class TransactionsUtils {
                 .where(
                     and(
                         eq(transactions.userId, userId),
-                        eq(transactions.currencyId, currencyId),
-                        eq(wallets.isDeleted, false),
+                        eq(wallets.currencyId, currencyId),
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
@@ -88,7 +86,7 @@ export default class TransactionsUtils {
                 .where(
                     and(
                         eq(transactions.userId, userId),
-                        eq(transactions.currencyId, currencyId),
+                        eq(wallets.currencyId, currencyId),
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
@@ -164,16 +162,8 @@ export default class TransactionsUtils {
         input: CreateTransactionInput,
     ): Promise<Result<Transaction, ErrorType>> {
         try {
-            const {
-                userId,
-                categoryId,
-                isIncome,
-                amount,
-                carriedOut,
-                name,
-                walletId,
-                currencyId,
-            } = input;
+            const { userId, categoryId, isIncome, amount, carriedOut, name, walletId } =
+                input;
 
             const transactionToCreate: Transaction = {
                 id,
@@ -182,7 +172,6 @@ export default class TransactionsUtils {
                 amount,
                 carriedOut,
                 categoryId,
-                currencyId,
                 createdAt: dayjs().unix(),
                 isIncome,
                 walletId,
