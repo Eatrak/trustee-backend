@@ -1,10 +1,11 @@
 import { Ok, Err, Result } from "ts-results";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import DatabaseUtils from "./DatabaseUtils";
-import { Wallet, wallets } from "@shared/schema";
+import { Wallet, currencies, transactions, wallets } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { UpdateWalletUpdateInfo } from "@APIs/input/transactions/updateWallet";
+import { WalletTableRow } from "@ts-types/DTOs/wallets";
 
 export default class WalletsUtils {
     /**
@@ -13,13 +14,51 @@ export default class WalletsUtils {
      * @param userId ID of the user that owns the wallets.
      * @returns Result of the query used to get user wallets.
      */
-    public static async getWallets(userId: string): Promise<Result<Wallet[], ErrorType>> {
+    public static async getWalletsSummary(
+        userId: string,
+    ): Promise<Result<Wallet[], ErrorType>> {
         try {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .select()
                 .from(wallets)
                 .where(eq(wallets.userId, userId));
+
+            return Ok(result);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.WALLETS__GET__GENERAL);
+        }
+    }
+
+    /**
+     * Get user wallets to show in table.
+     *
+     * @param userId ID of the user that owns the wallets.
+     * @returns Result of the query used to get user wallets.
+     */
+    public static async getWalletTableRows(
+        userId: string,
+    ): Promise<Result<WalletTableRow[], ErrorType>> {
+        try {
+            const result: WalletTableRow[] = await DatabaseUtils.getInstance()
+                .getDB()
+                .select({
+                    id: wallets.id,
+                    name: wallets.name,
+                    userId: wallets.userId,
+                    currencyId: wallets.currencyId,
+                    net: sql<number>`(sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END) - sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END))`,
+                    income: sql<number>`sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END)`,
+                    expense: sql<number>`sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
+                    transactionsCount: sql<number>`count(${transactions.id})`,
+                    currencyCode: currencies.code,
+                })
+                .from(wallets)
+                .where(eq(wallets.userId, userId))
+                .innerJoin(transactions, eq(wallets.id, transactions.walletId))
+                .innerJoin(currencies, eq(wallets.currencyId, currencies.id))
+                .groupBy(wallets.id);
 
             return Ok(result);
         } catch (err) {

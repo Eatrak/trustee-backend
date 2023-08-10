@@ -12,6 +12,8 @@ import WalletsUtils from "@utils/WalletsUtils";
 import { GetWalletsResponseData } from "@APIs/output/transactions/getWallets";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
+import { GetWalletsInputQueryParams } from "@APIs/input/transactions/getWallets";
+import { WalletViews } from "@ts-types/DTOs/wallets";
 
 Validator.setMessages("en", en);
 
@@ -27,13 +29,38 @@ export const handler: APIGatewayProxyHandler = async (
             return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
         }
 
-        const getWalletsResponse = await WalletsUtils.getWallets(userId);
-        if (getWalletsResponse.err) {
-            return Utils.getInstance().getErrorResponse(getWalletsResponse.val);
-        }
-        const wallets = getWalletsResponse.val;
+        const queryParams: GetWalletsInputQueryParams | null =
+            event.queryStringParameters;
+        const view = (queryParams && queryParams.view) || WalletViews.SUMMARY;
 
-        const response: GetWalletsResponseData = { wallets };
+        let response: GetWalletsResponseData;
+
+        switch (view) {
+            // Get wallet table rows
+            case WalletViews.TABLE_ROW:
+                const getWalletTableRowsResponse = await WalletsUtils.getWalletTableRows(
+                    userId,
+                );
+                if (getWalletTableRowsResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        getWalletTableRowsResponse.val,
+                    );
+                }
+                response = { view, wallets: getWalletTableRowsResponse.val };
+                break;
+            // Get wallet with few details
+            case WalletViews.SUMMARY:
+                const getWalletsSummaryResponse = await WalletsUtils.getWalletsSummary(
+                    userId,
+                );
+                if (getWalletsSummaryResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        getWalletsSummaryResponse.val,
+                    );
+                }
+                response = { view, wallets: getWalletsSummaryResponse.val };
+        }
+
         return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
