@@ -8,9 +8,10 @@ import { Err, Ok, Result } from "ts-results";
 
 import Utils from "@utils/Utils";
 import DatabaseUtils from "@utils/DatabaseUtils";
-import { User, users } from "@shared/schema";
+import { User, currencies, userSettings, users } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { CognitoException } from "@ts-types/auth";
+import { eq } from "drizzle-orm";
 
 export default class UsersUtils {
     /**
@@ -162,5 +163,38 @@ export default class UsersUtils {
                     return Err(ErrorType.AUTH__SIGN_IN__AUTHENTICATION);
             }
         }
+    }
+
+    public static async getPersonalInfo(userId: string) {
+        const { id, name, surname, email, currencyId, currencyCode, currencySymbol } = (
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .select({
+                    id: users.id,
+                    name: users.name,
+                    surname: users.surname,
+                    email: users.email,
+                    currencyId: currencies.id,
+                    currencySymbol: currencies.symbol,
+                    currencyCode: currencies.code,
+                })
+                .from(users)
+                .where(eq(users.id, userId))
+                .innerJoin(userSettings, eq(userSettings.userId, users.id))
+                .innerJoin(currencies, eq(currencies.id, userSettings.currencyId))
+        )[0];
+
+        return {
+            name,
+            surname,
+            email,
+            settings: {
+                currency: {
+                    id: currencyId,
+                    code: currencyCode,
+                    symbol: currencySymbol,
+                },
+            },
+        };
     }
 }

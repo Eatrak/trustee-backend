@@ -1,9 +1,8 @@
-import jwt from "jsonwebtoken";
-
 import { Response } from "@shared/errors/types";
+import { PersonalInfo } from "@ts-types/DTOs/auth";
 
 export interface CheckAuthenticationResponseData {
-    decodedAuthToken: jwt.JwtPayload;
+    personalInfo: PersonalInfo;
 }
 
 export type CheckAuthenticationResponse = Response<CheckAuthenticationResponseData>;

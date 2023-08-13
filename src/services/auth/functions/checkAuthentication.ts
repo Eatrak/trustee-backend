@@ -10,6 +10,8 @@ import Utils from "@utils/Utils";
 import { JsonWebKey } from "src/shared/ts-types/auth";
 import ErrorType from "@shared/errors/list";
 import { CheckAuthenticationResponseData } from "@APIs/output/auth/checkAuthentication";
+import DatabaseUtils from "@utils/DatabaseUtils";
+import UsersUtils from "@utils/UsersUtils";
 
 // Environment variables
 const { USER_POOL_ID, REGION } = process.env;
@@ -52,9 +54,21 @@ export const handler: APIGatewayProxyHandler = async (
         const tokenHeader = decodeTokenHeader(authToken);
         const jsonWebKey = await getJsonWebKeyWithKID(tokenHeader.kid);
         try {
-            const decodedAuthToken = verifyJsonWebTokenSignature(authToken, jsonWebKey);
+            const { "custom:id": userId } = verifyJsonWebTokenSignature(
+                authToken,
+                jsonWebKey,
+            );
 
-            const responseData: CheckAuthenticationResponseData = { decodedAuthToken };
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
+
+            const personalInfo = await UsersUtils.getPersonalInfo(userId);
+
+            const responseData: CheckAuthenticationResponseData = { personalInfo };
             return Utils.getInstance().getSuccessfulResponse(200, responseData);
         } catch (err) {
             return Utils.getInstance().getErrorResponse(
