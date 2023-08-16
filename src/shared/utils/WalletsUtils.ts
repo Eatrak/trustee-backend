@@ -48,7 +48,8 @@ export default class WalletsUtils {
                     name: wallets.name,
                     userId: wallets.userId,
                     currencyId: wallets.currencyId,
-                    net: sql<number>`(sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END) - sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END))`,
+                    untrackedBalance: wallets.untrackedBalance,
+                    net: sql<number>`${wallets.untrackedBalance} + (sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END) - sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END))`,
                     income: sql<number>`sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END)`,
                     expense: sql<number>`sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
                     transactionsCount: sql<number>`count(${transactions.id})`,
@@ -71,6 +72,7 @@ export default class WalletsUtils {
         id: string,
         userId: string,
         name: string,
+        untrackedBalance: number,
         currencyId: string,
     ): Promise<Result<Wallet, ErrorType>> {
         try {
@@ -79,6 +81,7 @@ export default class WalletsUtils {
                 name,
                 currencyId,
                 userId,
+                untrackedBalance,
             };
             await DatabaseUtils.getInstance()
                 .getDB()
@@ -118,14 +121,10 @@ export default class WalletsUtils {
         updateInfo: UpdateWalletUpdateInfo,
     ): Promise<Result<undefined, ErrorType>> {
         try {
-            const { name } = updateInfo;
-
             await DatabaseUtils.getInstance()
                 .getDB()
                 .update(wallets)
-                .set({
-                    name,
-                })
+                .set(updateInfo)
                 .where(and(eq(wallets.id, id), eq(wallets.userId, userId)));
 
             return Ok(undefined);

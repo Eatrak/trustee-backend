@@ -14,6 +14,7 @@ import { CreateWalletBody } from "@APIs/input/transactions/createWallet";
 import { CreateWalletResponseData } from "@APIs/output/transactions/createWallet";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
+import { createWalletInputRules } from "@crudValidators/wallets";
 
 Validator.setMessages("en", en);
 
@@ -21,11 +22,19 @@ export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
-    const { name, currencyId }: CreateWalletBody = event.body
-        ? JSON.parse(event.body)
-        : {};
+    const input: CreateWalletBody = event.body ? JSON.parse(event.body) : {};
 
     try {
+        // Validate data
+        const validation = new Validator({ ...input, userId }, createWalletInputRules);
+        if (validation.fails()) {
+            return Utils.getInstance().getErrorResponse(
+                ErrorType.WALLETS__CREATE__GENERAL,
+            );
+        }
+
+        const { name, untrackedBalance, currencyId } = input;
+
         // Init DB connection
         const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
         if (initConnectionResponse.err) {
@@ -37,6 +46,7 @@ export const handler: APIGatewayProxyHandler = async (
             walletId,
             userId,
             name,
+            untrackedBalance,
             currencyId,
         );
         if (createWalletResponse.err) {
@@ -48,6 +58,6 @@ export const handler: APIGatewayProxyHandler = async (
         return Utils.getInstance().getSuccessfulResponse(201, responseData);
     } catch (err) {
         console.log(err);
-        return Utils.getInstance().getErrorResponse(ErrorType.WALLETS__CREATE__GENERAL);
+        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
     }
 };

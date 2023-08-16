@@ -65,6 +65,7 @@ export const wallets = mysqlTable("Wallet", {
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
         .references(() => currencies.id),
+    untrackedBalance: double("untrackedBalance").notNull(),
 });
 
 // Type definitions

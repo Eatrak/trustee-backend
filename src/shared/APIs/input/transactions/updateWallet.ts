@@ -4,6 +4,7 @@ export interface UpdateWalletPathParameters {
 
 export interface UpdateWalletUpdateInfo {
     name?: string;
+    untrackedBalance?: number;
 }
 
 export interface UpdateWalletBody {
