@@ -35,6 +35,7 @@ export const updateTransactionInputRules = {
         amount: "numeric|min:0.01",
         isIncome: "boolean",
     },
+    // TODO: find a better way to achive the same validation
     atLeastOneUpdateInfo: "at_least_one:updateInfo",
 };
 
