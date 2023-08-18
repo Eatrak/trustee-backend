@@ -16,6 +16,7 @@ import {
 import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
 import { GetBalanceInput } from "@APIs/input/transactions/getBalance";
+import { UpdateTransactionInput } from "@APIs/input/transactions/updateTransaction";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -189,6 +190,25 @@ export default class TransactionsUtils {
         } catch (err) {
             console.log(err);
             return Err(ErrorType.TRANSACTIONS__CREATE__GENERAL);
+        }
+    }
+
+    public static async updateTransaction({
+        id,
+        userId,
+        updateInfo,
+    }: UpdateTransactionInput): Promise<Result<undefined, ErrorType>> {
+        try {
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .update(transactions)
+                .set(updateInfo)
+                .where(and(eq(transactions.id, id), eq(transactions.userId, userId)));
+
+            return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.TRANSACTIONS__UPDATE__GENERAL);
         }
     }
 

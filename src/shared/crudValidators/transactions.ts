@@ -24,6 +24,20 @@ export const createTransactionInputRules = {
     userId: "required|string",
 };
 
+export const updateTransactionInputRules = {
+    id: "required|string",
+    userId: "required|string",
+    updateInfo: {
+        name: "string",
+        walletId: "string",
+        categoryId: "string",
+        carriedOut: "integer",
+        amount: "numeric|min:0.01",
+        isIncome: "boolean",
+    },
+    atLeastOneUpdateInfo: "at_least_one:updateInfo",
+};
+
 export const deleteTransactionInputRules = {
     userId: "required|string",
     id: "required|string",
