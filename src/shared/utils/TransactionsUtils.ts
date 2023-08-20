@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Ok, Err, Result } from "ts-results";
-import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { SQL, and, desc, eq, gte, lte, or, sql } from "drizzle-orm";
 
 import { CreateTransactionCategoryInput } from "@APIs/input/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@APIs/input/transactions/createTransaction";
@@ -17,6 +17,8 @@ import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
 import { GetBalanceInput } from "@APIs/input/transactions/getBalance";
 import { UpdateTransactionInput } from "@APIs/input/transactions/updateTransaction";
+import { GetTransactionCategoryBalancesInput } from "@APIs/input/transactions/getTransactionCategories";
+import { TransactionCategoryBalance } from "@ts-types/DTOs/transactions";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -126,6 +128,54 @@ export default class TransactionsUtils {
                 .select()
                 .from(transactionCategories)
                 .where(eq(transactionCategories.userId, userId));
+
+            return Ok(result);
+        } catch (err) {
+            console.log(err);
+            return Err(ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL);
+        }
+    }
+
+    public static async getTransactionCategoryBalances({
+        userId,
+        startDate,
+        endDate,
+        wallets: walletsToFilter,
+    }: GetTransactionCategoryBalancesInput): Promise<
+        Result<TransactionCategoryBalance[], ErrorType>
+    > {
+        try {
+            let walletQueryConditions: SQL[] = walletsToFilter.map((wallet) =>
+                eq(wallets.id, wallet),
+            );
+
+            let result = await DatabaseUtils.getInstance()
+                .getDB()
+                .select({
+                    id: transactionCategories.id,
+                    name: transactionCategories.name,
+                    userId: transactionCategories.userId,
+                    income: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END)`,
+                    expense: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
+                })
+                .from(transactionCategories)
+                .leftJoin(
+                    transactions,
+                    eq(transactions.categoryId, transactionCategories.id),
+                )
+                .innerJoin(wallets, or(...walletQueryConditions))
+                .where(
+                    and(
+                        eq(transactionCategories.userId, userId),
+                        gte(transactions.carriedOut, startDate),
+                        lte(transactions.carriedOut, endDate),
+                    ),
+                )
+                .groupBy(
+                    transactionCategories.id,
+                    transactionCategories.name,
+                    transactionCategories.userId,
+                );
 
             return Ok(result);
         } catch (err) {

@@ -3,12 +3,27 @@ import {
     APIGatewayProxyHandler,
     APIGatewayProxyResult,
 } from "aws-lambda";
+import Validator from "validatorjs";
 
 import Utils from "@utils/Utils";
 import TransactionsUtils from "@utils/TransactionsUtils";
-import { GetTransactionCategoriesResponseData } from "@APIs/output/transactions/getTransactionCategories";
+import {
+    GetNormalTransactionCategoriesResponseData,
+    GetTransactionCategoryBalancesResponseData,
+} from "@APIs/output/transactions/getTransactionCategories";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
+import {
+    GetTransactionCategoryBalancesInputMultiQueryParams,
+    GetTransactionCategoryBalancesInputQueryParams,
+    GetTransactionCategoriesNormalInput,
+    GetTransactionCategoryBalancesInput,
+} from "@APIs/input/transactions/getTransactionCategories";
+import {
+    getTransactionCategoriesInputRules,
+    getTransactionCategoryBalancesInputRules,
+} from "@crudValidators/transactions";
+import { TransactionCategoriesViews } from "@ts-types/DTOs/transactions";
 
 export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent,
@@ -16,29 +31,92 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
-        }
+        const queryParams =
+            event.queryStringParameters as unknown as GetTransactionCategoryBalancesInputQueryParams;
+        const multiQueryParams =
+            event.multiValueQueryStringParameters as unknown as GetTransactionCategoryBalancesInputMultiQueryParams;
 
-        const getTransactionCategoriesResponse =
-            await TransactionsUtils.getTransactionCategories(userId);
-        if (getTransactionCategoriesResponse.err) {
-            return Utils.getInstance().getErrorResponse(
-                getTransactionCategoriesResponse.val,
+        if (queryParams && multiQueryParams) {
+            const input: GetTransactionCategoryBalancesInput = {
+                startDate: queryParams.startDate,
+                endDate: queryParams.endDate,
+                wallets: multiQueryParams.wallets,
+                userId,
+            };
+
+            // Validate data
+            const getTransactionCategoryBalanceValidation = new Validator(
+                input,
+                getTransactionCategoryBalancesInputRules,
             );
-        }
-        const transactionCategories = getTransactionCategoriesResponse.val;
+            if (getTransactionCategoryBalanceValidation.passes()) {
+                // Init DB connection
+                const initConnectionResponse =
+                    await DatabaseUtils.getInstance().initConnection();
+                if (initConnectionResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        initConnectionResponse.val,
+                    );
+                }
 
-        const responseData: GetTransactionCategoriesResponseData = {
-            transactionCategories,
+                const getTransactionCategoryBalancesResponse =
+                    await TransactionsUtils.getTransactionCategoryBalances(input);
+                if (getTransactionCategoryBalancesResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        getTransactionCategoryBalancesResponse.val,
+                    );
+                }
+                const transactionCategoryBalances =
+                    getTransactionCategoryBalancesResponse.val;
+
+                const response: GetTransactionCategoryBalancesResponseData = {
+                    view: TransactionCategoriesViews.WITH_BALANCE,
+                    transactionCategories: transactionCategoryBalances,
+                };
+
+                return Utils.getInstance().getSuccessfulResponse(200, response);
+            }
+        }
+
+        const input: GetTransactionCategoriesNormalInput = {
+            userId,
         };
-        return Utils.getInstance().getSuccessfulResponse(200, responseData);
+        // Validate data
+        const getTransactionCategoriesValidation = new Validator(
+            input,
+            getTransactionCategoriesInputRules,
+        );
+        if (getTransactionCategoriesValidation.passes()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
+
+            const getTransactionCategoriesResponse =
+                await TransactionsUtils.getTransactionCategories(userId);
+            if (getTransactionCategoriesResponse.err) {
+                return Utils.getInstance().getErrorResponse(
+                    getTransactionCategoriesResponse.val,
+                );
+            }
+            const transactionCategories = getTransactionCategoriesResponse.val;
+
+            const responseData: GetNormalTransactionCategoriesResponseData = {
+                view: TransactionCategoriesViews.NORMAL,
+                transactionCategories,
+            };
+            return Utils.getInstance().getSuccessfulResponse(200, responseData);
+        }
+
+        return Utils.getInstance().getErrorResponse(
+            ErrorType.TRANSACTION_CATEGORIES__GET__DATA_VALIDATION,
+        );
     } catch (err) {
         console.log(err);
         return Utils.getInstance().getErrorResponse(
-            ErrorType.TRANSACTION_CATEGORIES__CREATE__GENERAL,
+            ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL,
         );
     }
 };
