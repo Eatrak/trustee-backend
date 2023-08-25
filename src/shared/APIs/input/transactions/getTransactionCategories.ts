@@ -1,6 +1,4 @@
-export interface GetTransactionCategoriesNormalInput {
-    userId: string;
-}
+export interface GetTransactionCategoriesNormalInput {}
 
 export interface GetTransactionCategoryBalancesInputQueryParams {
     startDate: number;
