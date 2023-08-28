@@ -166,7 +166,7 @@ export default class UsersUtils {
     }
 
     public static async getPersonalInfo(userId: string) {
-        const { id, name, surname, email, currencyId, currencyCode, currencySymbol } = (
+        const { name, surname, email, currencyId, currencyCode, currencySymbol } = (
             await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
