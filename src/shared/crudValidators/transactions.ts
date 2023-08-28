@@ -54,3 +54,8 @@ export const getTransactionCategoryBalancesInputRules = {
 export const getTransactionCategoriesInputRules = {
     userId: "required|string",
 };
+
+export const getCategoriesOfTransactionInputRules = {
+    id: "required|string",
+    userId: "required|string",
+};

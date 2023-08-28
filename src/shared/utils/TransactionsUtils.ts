@@ -14,6 +14,7 @@ import {
     transactionCategories,
     wallets,
     transactionCategoryRelation,
+    CategoryOfTransaction,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
@@ -21,6 +22,7 @@ import { GetBalanceInput } from "@APIs/input/transactions/getBalance";
 import { UpdateTransactionInput } from "@APIs/input/transactions/updateTransaction";
 import { GetTransactionCategoryBalancesInput } from "@APIs/input/transactions/getTransactionCategories";
 import { TransactionCategoryBalance } from "@ts-types/DTOs/transactions";
+import { GetCategoriesOfTransactionInput } from "@APIs/input/transactions/getCategoriesOfTransaction";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -202,6 +204,38 @@ export default class TransactionsUtils {
         } catch (err) {
             console.log(err);
             return Err(ErrorType.TRANSACTION_CATEGORIES__CREATE__GENERAL);
+        }
+    }
+
+    public static async getCategoriesOfTransaction({
+        id: transactionId,
+        userId,
+    }: GetCategoriesOfTransactionInput): Promise<
+        Result<CategoryOfTransaction[], ErrorType>
+    > {
+        try {
+            const categoriesOfTransaction = await DatabaseUtils.getInstance()
+                .getDB()
+                .select({
+                    id: transactionCategoryRelation.id,
+                    transactionId: transactionCategoryRelation.transactionId,
+                    categoryId: transactionCategoryRelation.categoryId,
+                })
+                .from(transactionCategoryRelation)
+                .where(
+                    and(
+                        eq(transactionCategoryRelation.transactionId, transactionId),
+                        eq(transactions.userId, userId),
+                    ),
+                )
+                .innerJoin(
+                    transactions,
+                    eq(transactions.id, transactionCategoryRelation.transactionId),
+                );
+
+            return Ok(categoriesOfTransaction);
+        } catch (err) {
+            return Err(ErrorType.CATEGORIES_OF_TRANSACTION__GET__GENERAL);
         }
     }
 
