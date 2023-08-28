@@ -17,7 +17,7 @@ export const createTransactionCategoryRules = {
 export const createTransactionInputRules = {
     name: "required|string",
     walletId: "required|string",
-    categoryId: "required|string",
+    categories: "required|array",
     carriedOut: "required|integer",
     amount: "required|numeric|min:0.01",
     isIncome: "required|boolean",
@@ -30,7 +30,7 @@ export const updateTransactionInputRules = {
     updateInfo: {
         name: "string",
         walletId: "string",
-        categoryId: "string",
+        categories: "array",
         carriedOut: "integer",
         amount: "numeric|min:0.01",
         isIncome: "boolean",

@@ -1,7 +1,7 @@
 export interface CreateTransactionBody {
     name: string;
     walletId: string;
-    categoryId: string;
+    categories: string[];
     carriedOut: number;
     amount: number;
     isIncome: boolean;
@@ -10,7 +10,7 @@ export interface CreateTransactionBody {
 export interface CreateTransactionInput {
     name: string;
     walletId: string;
-    categoryId: string;
+    categories: string[];
     carriedOut: number;
     amount: number;
     isIncome: boolean;

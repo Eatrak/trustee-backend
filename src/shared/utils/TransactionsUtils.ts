@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { Ok, Err, Result } from "ts-results";
 import { SQL, and, desc, eq, gte, lte, or, sql } from "drizzle-orm";
+import { v4 as uuid } from "uuid";
 
 import { CreateTransactionCategoryInput } from "@APIs/input/transactions/createTransactionCategory";
 import { CreateTransactionInput } from "@APIs/input/transactions/createTransaction";
@@ -12,6 +13,7 @@ import {
     TransactionCategory,
     transactionCategories,
     wallets,
+    transactionCategoryRelation,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
@@ -45,7 +47,6 @@ export default class TransactionsUtils {
                     id: transactions.id,
                     name: transactions.name,
                     walletId: transactions.walletId,
-                    categoryId: transactions.categoryId,
                     carriedOut: transactions.carriedOut,
                     amount: transactions.amount,
                     isIncome: transactions.isIncome,
@@ -159,10 +160,6 @@ export default class TransactionsUtils {
                     expense: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
                 })
                 .from(transactionCategories)
-                .leftJoin(
-                    transactions,
-                    eq(transactions.categoryId, transactionCategories.id),
-                )
                 .innerJoin(wallets, or(...walletQueryConditions))
                 .where(
                     and(
@@ -213,7 +210,7 @@ export default class TransactionsUtils {
         input: CreateTransactionInput,
     ): Promise<Result<Transaction, ErrorType>> {
         try {
-            const { userId, categoryId, isIncome, amount, carriedOut, name, walletId } =
+            const { userId, categories, isIncome, amount, carriedOut, name, walletId } =
                 input;
 
             const transactionToCreate: Transaction = {
@@ -222,19 +219,29 @@ export default class TransactionsUtils {
                 name,
                 amount,
                 carriedOut,
-                categoryId,
                 createdAt: dayjs().unix(),
                 isIncome,
                 walletId,
             };
-            const result = await DatabaseUtils.getInstance()
-                .getDB()
-                .insert(transactions)
-                .values(transactionToCreate);
 
-            if (result[0].affectedRows == 0) {
-                return Err(ErrorType.TRANSACTIONS__CREATE__NOT_PERFORMED);
-            }
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .transaction(async (tx) => {
+                    // Create transaction
+                    await tx.insert(transactions).values(transactionToCreate);
+
+                    // Create in parallel relationship items between the created transaction
+                    // and its associated categories
+                    await Promise.all(
+                        categories.map((category) => {
+                            return tx.insert(transactionCategoryRelation).values({
+                                id: uuid(),
+                                transactionId: id,
+                                categoryId: category,
+                            });
+                        }),
+                    );
+                });
 
             return Ok(transactionToCreate);
         } catch (err) {
