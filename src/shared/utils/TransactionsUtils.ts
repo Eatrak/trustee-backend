@@ -161,14 +161,21 @@ export default class TransactionsUtils {
                     income: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END)`,
                     expense: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
                 })
-                .from(transactionCategories)
+                .from(transactionCategoryRelation)
                 .innerJoin(wallets, or(...walletQueryConditions))
-                .where(
+                .innerJoin(
+                    transactions,
                     and(
-                        eq(transactionCategories.userId, userId),
+                        eq(transactionCategoryRelation.transactionId, transactions.id),
+                        eq(transactions.userId, userId),
+                        eq(wallets.id, transactions.walletId),
                         gte(transactions.carriedOut, startDate),
                         lte(transactions.carriedOut, endDate),
                     ),
+                )
+                .innerJoin(
+                    transactionCategories,
+                    eq(transactionCategoryRelation.categoryId, transactionCategories.id),
                 )
                 .groupBy(
                     transactionCategories.id,
