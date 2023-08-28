@@ -142,3 +142,15 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
+    GetCategoriesOfTransaction:
+        handler: functions/getCategoriesOfTransaction.handler
+        events:
+            - http:
+                  method: GET
+                  path: /transactions/{id}/categories
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
