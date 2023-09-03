@@ -14,6 +14,7 @@ import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
 import {
     GetBalanceInput,
+    GetBalanceInputMultiQueryParams,
     GetBalanceInputQueryParams,
 } from "@APIs/input/transactions/getBalance";
 import { GetBalanceResponseData } from "@APIs/output/transactions/getBalance";
@@ -26,11 +27,14 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
     const { startCarriedOut, endCarriedOut, currencyId } =
         event.queryStringParameters as unknown as GetBalanceInputQueryParams;
+    const { wallets } =
+        event.multiValueQueryStringParameters as unknown as GetBalanceInputMultiQueryParams;
     const input: GetBalanceInput = {
         startCarriedOut,
         endCarriedOut,
         currencyId,
         userId,
+        wallets,
     };
 
     // Validate data

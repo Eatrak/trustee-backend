@@ -8,6 +8,7 @@ export const getBalanceValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
     currencyId: "required|string",
+    wallets: "required|array",
 };
 
 export const createTransactionCategoryRules = {

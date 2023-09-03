@@ -4,9 +4,12 @@ export interface GetBalanceInputQueryParams {
     currencyId: string;
 }
 
-export interface GetBalanceInput {
-    startCarriedOut: string;
-    endCarriedOut: string;
+export interface GetBalanceInputMultiQueryParams {
+    wallets: string[];
+}
+
+export interface GetBalanceInput
+    extends GetBalanceInputQueryParams,
+        GetBalanceInputMultiQueryParams {
     userId: string;
-    currencyId: string;
 }

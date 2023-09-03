@@ -79,8 +79,13 @@ export default class TransactionsUtils {
         currencyId,
         startCarriedOut,
         endCarriedOut,
+        wallets: walletsToFilter,
     }: GetBalanceInput): Promise<Result<TotalBalance, ErrorType>> {
         try {
+            const walletsConditions = walletsToFilter.map((walletId) =>
+                eq(wallets.id, walletId),
+            );
+
             const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
@@ -88,7 +93,10 @@ export default class TransactionsUtils {
                     isIncome: transactions.isIncome,
                 })
                 .from(transactions)
-                .innerJoin(wallets, eq(wallets.id, transactions.walletId))
+                .innerJoin(
+                    wallets,
+                    and(eq(wallets.id, transactions.walletId), ...walletsConditions),
+                )
                 .where(
                     and(
                         eq(transactions.userId, userId),
