@@ -17,10 +17,10 @@ export const userSettings = mysqlTable("UserSettings", {
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .unique()
-        .references(() => users.id),
+        .references(() => users.id, { onDelete: "cascade" }),
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => currencies.id),
+        .references(() => currencies.id, { onDelete: "no action" }),
 });
 
 export const currencies = mysqlTable("Currency", {
@@ -34,7 +34,7 @@ export const transactions = mysqlTable("Transaction", {
     name: varchar("name", { length: 256 }).notNull(),
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => users.id),
+        .references(() => users.id, { onDelete: "cascade" }),
     walletId: varchar("walletId", { length: UUID_LENGTH })
         .notNull()
         .references(() => wallets.id, { onDelete: "cascade" }),
@@ -49,17 +49,17 @@ export const transactionCategories = mysqlTable("TransactionCategory", {
     name: varchar("name", { length: 256 }).notNull().unique(),
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => users.id),
+        .references(() => users.id, { onDelete: "cascade" }),
 });
 
 export const transactionCategoryRelation = mysqlTable("TransactionCategoryRelation", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
     transactionId: varchar("transactionId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => transactions.id),
+        .references(() => transactions.id, { onDelete: "cascade" }),
     categoryId: varchar("categoryId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => transactionCategories.id),
+        .references(() => transactionCategories.id, { onDelete: "cascade" }),
 });
 
 export const wallets = mysqlTable("Wallet", {
@@ -67,10 +67,10 @@ export const wallets = mysqlTable("Wallet", {
     name: varchar("name", { length: 256 }).notNull().unique(),
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => users.id),
+        .references(() => users.id, { onDelete: "cascade" }),
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
-        .references(() => currencies.id),
+        .references(() => currencies.id, { onDelete: "no action" }),
     untrackedBalance: double("untrackedBalance").notNull(),
 });
 
