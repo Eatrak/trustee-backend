@@ -33,10 +33,13 @@ export const handler: APIGatewayProxyHandler = async (
             );
         }
 
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        if (!DatabaseUtils.getInstance().getDB()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
         }
 
         const deleteWalletResponse = await WalletsUtils.deleteWallet(input.id);

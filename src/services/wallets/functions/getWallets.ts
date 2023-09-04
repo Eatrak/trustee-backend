@@ -23,10 +23,13 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
 
     try {
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        if (!DatabaseUtils.getInstance().getDB()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
         }
 
         const queryParams: GetWalletsInputQueryParams | null =

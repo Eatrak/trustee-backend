@@ -50,13 +50,15 @@ export const handler: APIGatewayProxyHandler = async (
                 getTransactionCategoryBalancesInputRules,
             );
             if (getTransactionCategoryBalanceValidation.passes()) {
-                // Init DB connection
-                const initConnectionResponse =
-                    await DatabaseUtils.getInstance().initConnection();
-                if (initConnectionResponse.err) {
-                    return Utils.getInstance().getErrorResponse(
-                        initConnectionResponse.val,
-                    );
+                if (!DatabaseUtils.getInstance().getDB()) {
+                    // Init DB connection
+                    const initConnectionResponse =
+                        await DatabaseUtils.getInstance().initConnection();
+                    if (initConnectionResponse.err) {
+                        return Utils.getInstance().getErrorResponse(
+                            initConnectionResponse.val,
+                        );
+                    }
                 }
 
                 const getTransactionCategoryBalancesResponse =
@@ -87,11 +89,15 @@ export const handler: APIGatewayProxyHandler = async (
             getTransactionCategoriesInputRules,
         );
         if (getTransactionCategoriesValidation.passes()) {
-            // Init DB connection
-            const initConnectionResponse =
-                await DatabaseUtils.getInstance().initConnection();
-            if (initConnectionResponse.err) {
-                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            if (!DatabaseUtils.getInstance().getDB()) {
+                // Init DB connection
+                const initConnectionResponse =
+                    await DatabaseUtils.getInstance().initConnection();
+                if (initConnectionResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        initConnectionResponse.val,
+                    );
+                }
             }
 
             const getTransactionCategoriesResponse =

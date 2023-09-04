@@ -18,11 +18,15 @@ Validator.setMessages("en", en);
 export const handler: APIGatewayProxyHandler =
     async (): Promise<APIGatewayProxyResult> => {
         try {
-            // Init DB connection
-            const initConnectionResponse =
-                await DatabaseUtils.getInstance().initConnection();
-            if (initConnectionResponse.err) {
-                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            if (!DatabaseUtils.getInstance().getDB()) {
+                // Init DB connection
+                const initConnectionResponse =
+                    await DatabaseUtils.getInstance().initConnection();
+                if (initConnectionResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        initConnectionResponse.val,
+                    );
+                }
             }
 
             const getCurrenciesResponse = await CurrencyUtils.getCurrencies();

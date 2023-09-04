@@ -59,11 +59,15 @@ export const handler: APIGatewayProxyHandler = async (
                 jsonWebKey,
             );
 
-            // Init DB connection
-            const initConnectionResponse =
-                await DatabaseUtils.getInstance().initConnection();
-            if (initConnectionResponse.err) {
-                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            if (!DatabaseUtils.getInstance().getDB()) {
+                // Init DB connection
+                const initConnectionResponse =
+                    await DatabaseUtils.getInstance().initConnection();
+                if (initConnectionResponse.err) {
+                    return Utils.getInstance().getErrorResponse(
+                        initConnectionResponse.val,
+                    );
+                }
             }
 
             const personalInfo = await UsersUtils.getPersonalInfo(userId);

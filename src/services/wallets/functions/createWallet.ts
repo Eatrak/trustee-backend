@@ -35,10 +35,13 @@ export const handler: APIGatewayProxyHandler = async (
 
         const { name, untrackedBalance, currencyId } = input;
 
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        if (!DatabaseUtils.getInstance().getDB()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
         }
 
         const walletId = uuid();

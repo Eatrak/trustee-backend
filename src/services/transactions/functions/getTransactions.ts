@@ -45,10 +45,13 @@ export const handler: APIGatewayProxyHandler = async (
     }
 
     try {
-        // Init DB connection
-        const initConnectionResponse = await DatabaseUtils.getInstance().initConnection();
-        if (initConnectionResponse.err) {
-            return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+        if (!DatabaseUtils.getInstance().getDB()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
         }
 
         // Get user transactions by both creation-range and currency
