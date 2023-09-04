@@ -156,9 +156,11 @@ export default class TransactionsUtils {
         Result<TransactionCategoryBalance[], ErrorType>
     > {
         try {
-            let walletQueryConditions: SQL[] = walletsToFilter.map((wallet) =>
-                eq(wallets.id, wallet),
-            );
+            // Get balances based on the given wallets;
+            // if no wallets are passed, all the category balances will be 0
+            const walletQueryConditions: SQL[] = walletsToFilter
+                ? walletsToFilter.map((wallet) => eq(wallets.id, wallet))
+                : [eq(wallets.id, "")];
 
             let result = await DatabaseUtils.getInstance()
                 .getDB()
@@ -166,12 +168,16 @@ export default class TransactionsUtils {
                     id: transactionCategories.id,
                     name: transactionCategories.name,
                     userId: transactionCategories.userId,
-                    income: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END)`,
-                    expense: sql<number>`SUM (CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END)`,
+                    income: sql<number>`COALESCE(SUM (CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END), 0)`,
+                    expense: sql<number>`COALESCE(SUM (CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END), 0)`,
                 })
-                .from(transactionCategoryRelation)
-                .innerJoin(wallets, or(...walletQueryConditions))
-                .innerJoin(
+                .from(transactionCategories)
+                .leftJoin(
+                    transactionCategoryRelation,
+                    eq(transactionCategoryRelation.categoryId, transactionCategories.id),
+                )
+                .leftJoin(wallets, or(...walletQueryConditions))
+                .leftJoin(
                     transactions,
                     and(
                         eq(transactionCategoryRelation.transactionId, transactions.id),
@@ -180,10 +186,6 @@ export default class TransactionsUtils {
                         gte(transactions.carriedOut, startDate),
                         lte(transactions.carriedOut, endDate),
                     ),
-                )
-                .innerJoin(
-                    transactionCategories,
-                    eq(transactionCategoryRelation.categoryId, transactionCategories.id),
                 )
                 .groupBy(
                     transactionCategories.id,

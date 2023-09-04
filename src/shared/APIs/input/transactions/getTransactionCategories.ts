@@ -6,7 +6,7 @@ export interface GetTransactionCategoryBalancesInputQueryParams {
 }
 
 export interface GetTransactionCategoryBalancesInputMultiQueryParams {
-    wallets: string[];
+    wallets?: string[];
 }
 
 export interface GetTransactionCategoryBalancesInput

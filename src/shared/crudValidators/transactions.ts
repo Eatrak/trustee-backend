@@ -48,7 +48,6 @@ export const deleteTransactionInputRules = {
 export const getTransactionCategoryBalancesInputRules = {
     startDate: "required_with:endDate,wallets,userId|integer",
     endDate: "required_with:startDate,wallets,userId|integer",
-    wallets: "required_with:endDate,startDate,userId|array",
     userId: "required_with:endDate,wallets,startDate|string",
 };
 
