@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (
         signUpEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__SIGN_UP__ENV);
+        return Utils.getInstance().getErrorResponse(ErrorType.ENV);
     }
 
     // Data validation
@@ -41,15 +41,34 @@ export const handler: APIGatewayProxyHandler = async (
     if (validation.fails()) {
         console.log(validation.errors);
 
-        return Utils.getInstance().getErrorResponse(
-            ErrorType.AUTH__SIGN_UP__DATA_VALIDATION,
-        );
+        return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
     }
 
     // User creation
     try {
         // Generate user ID
         const userId = uuid();
+
+        if (!DatabaseUtils.getInstance().getDB()) {
+            // Init DB connection
+            const initConnectionResponse =
+                await DatabaseUtils.getInstance().initConnection();
+            if (initConnectionResponse.err) {
+                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
+            }
+        }
+
+        // Create user in the DB
+        const createDBUserResponse = await UsersUtils.createDBUser(
+            userId,
+            email,
+            name,
+            surname,
+        );
+        if (createDBUserResponse.err) {
+            return Utils.getInstance().getErrorResponse(createDBUserResponse.val);
+        }
+        const createdUser = createDBUserResponse.val;
 
         // Create the user in Cognito
         const createCognitoUserResponse = await UsersUtils.createCognitoUser(
@@ -73,33 +92,12 @@ export const handler: APIGatewayProxyHandler = async (
             return Utils.getInstance().getErrorResponse(setUserPasswordResponse.val);
         }
 
-        if (!DatabaseUtils.getInstance().getDB()) {
-            // Init DB connection
-            const initConnectionResponse =
-                await DatabaseUtils.getInstance().initConnection();
-            if (initConnectionResponse.err) {
-                return Utils.getInstance().getErrorResponse(initConnectionResponse.val);
-            }
-        }
-
-        // Create user in the DB
-        const createDBUserResponse = await UsersUtils.createDBUser(
-            userId,
-            email,
-            name,
-            surname,
-        );
-        if (createDBUserResponse.err) {
-            return Utils.getInstance().getErrorResponse(createDBUserResponse.val);
-        }
-        const createdUser = createDBUserResponse.val;
-
         return Utils.getInstance().getSuccessfulResponse<SignUpResponseData>(201, {
             createdUser,
         });
     } catch (err) {
         console.log(err);
 
-        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

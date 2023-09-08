@@ -38,7 +38,11 @@ export default class UsersUtils {
             return Ok(userToCreate);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.AUTH__SIGN_UP__DB_USER_CREATION);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -87,7 +91,7 @@ export default class UsersUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.AUTH__SIGN_UP__COGNITO_USER_CREATION);
+            return Err(ErrorType.COGNITO_USER_CREATION);
         }
     }
 
@@ -118,7 +122,7 @@ export default class UsersUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.AUTH__SIGN_UP__COGNITO_USER_PASSWORD_SETTING);
+            return Err(ErrorType.COGNITO_USER_PASSWORD_SETTING);
         }
     }
 
@@ -156,11 +160,11 @@ export default class UsersUtils {
 
             switch (errorType) {
                 case "UserNotFoundException":
-                    return Err(ErrorType.AUTH__SIGN_IN__USER_NOT_FOUND);
+                    return Err(ErrorType.NOT_FOUND);
                 case "NotAuthorizedException":
-                    return Err(ErrorType.AUTH__SIGN_IN__USER_NOT_FOUND);
+                    return Err(ErrorType.NOT_FOUND);
                 default:
-                    return Err(ErrorType.AUTH__SIGN_IN__AUTHENTICATION);
+                    return Err(ErrorType.UNKNOWN);
             }
         }
     }

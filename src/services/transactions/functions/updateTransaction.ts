@@ -70,9 +70,7 @@ export const handler: APIGatewayProxyHandler = async (
         );
         if (validator.fails()) {
             console.log(validator.errors);
-            return Utils.getInstance().getErrorResponse(
-                ErrorType.TRANSACTIONS__UPDATE__DATA_VALIDATION,
-            );
+            return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
         }
         if (!DatabaseUtils.getInstance().getDB()) {
             // Init DB connection
@@ -94,6 +92,6 @@ export const handler: APIGatewayProxyHandler = async (
         return Utils.getInstance().getSuccessfulResponse(200, response);
     } catch (err) {
         console.log(err);
-        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

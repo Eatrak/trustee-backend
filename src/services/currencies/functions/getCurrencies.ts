@@ -41,5 +41,5 @@ export const handler: APIGatewayProxyHandler =
             console.log(err);
         }
 
-        return Utils.getInstance().getErrorResponse(ErrorType.CURRENCIES__GET__GENERAL);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     };

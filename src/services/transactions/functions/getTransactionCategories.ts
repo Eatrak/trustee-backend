@@ -116,13 +116,9 @@ export const handler: APIGatewayProxyHandler = async (
             return Utils.getInstance().getSuccessfulResponse(200, responseData);
         }
 
-        return Utils.getInstance().getErrorResponse(
-            ErrorType.TRANSACTION_CATEGORIES__GET__DATA_VALIDATION,
-        );
+        return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
     } catch (err) {
         console.log(err);
-        return Utils.getInstance().getErrorResponse(
-            ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL,
-        );
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

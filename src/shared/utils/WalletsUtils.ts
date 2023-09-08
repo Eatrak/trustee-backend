@@ -27,7 +27,11 @@ export default class WalletsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.WALLETS__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -64,7 +68,11 @@ export default class WalletsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.WALLETS__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -91,7 +99,11 @@ export default class WalletsUtils {
             return Ok(walletToCreate);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.WALLETS__CREATE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -111,7 +123,11 @@ export default class WalletsUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.WALLETS__DELETE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -130,7 +146,11 @@ export default class WalletsUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.WALLETS__UPDATE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 }

@@ -75,12 +75,11 @@ export const handler: APIGatewayProxyHandler = async (
             const responseData: CheckAuthenticationResponseData = { personalInfo };
             return Utils.getInstance().getSuccessfulResponse(200, responseData);
         } catch (err) {
-            return Utils.getInstance().getErrorResponse(
-                ErrorType.AUTH__CHECK__UNAUTHORIZED,
-            );
+            console.log(err);
+            return Utils.getInstance().getErrorResponse(ErrorType.UNAUTHORIZED);
         }
     } catch (err) {
         console.log(err);
-        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__CHECK__GENERAL);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

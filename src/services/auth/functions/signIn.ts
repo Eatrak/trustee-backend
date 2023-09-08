@@ -27,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (
         signInEnvironmentValidator,
     );
     if (!environmentError) {
-        return Utils.getInstance().getErrorResponse(ErrorType.AUTH__SIGN_IN__ENV);
+        return Utils.getInstance().getErrorResponse(ErrorType.ENV);
     }
 
     const body: SignInBody = event.body ? JSON.parse(event.body) : {};
@@ -35,9 +35,7 @@ export const handler: APIGatewayProxyHandler = async (
     // Data validation
     const validation = new Validator(body.userInfo, signInValidator);
     if (validation.fails()) {
-        return Utils.getInstance().getErrorResponse(
-            ErrorType.AUTH__SIGN_IN__DATA_VALIDATION,
-        );
+        return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
     }
 
     try {
@@ -56,7 +54,7 @@ export const handler: APIGatewayProxyHandler = async (
 
         if (!AuthenticationResult || !AuthenticationResult.IdToken) {
             return Utils.getInstance().getErrorResponse(
-                ErrorType.AUTH__SIGN_IN__READING_GENERATED_ID_TOKEN,
+                ErrorType.READING_GENERATED_ID_TOKEN,
             );
         }
 
@@ -67,6 +65,6 @@ export const handler: APIGatewayProxyHandler = async (
     } catch (err) {
         console.log(err);
 
-        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

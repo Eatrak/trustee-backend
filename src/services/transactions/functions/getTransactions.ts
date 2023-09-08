@@ -39,9 +39,7 @@ export const handler: APIGatewayProxyHandler = async (
         getTransactionsValidator,
     );
     if (getTransactionsValidation.fails()) {
-        return Utils.getInstance().getErrorResponse(
-            ErrorType.TRANSACTIONS__GET__DATA_VALIDATION,
-        );
+        return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
     }
 
     try {
@@ -73,5 +71,5 @@ export const handler: APIGatewayProxyHandler = async (
         console.log(err);
     }
 
-    return Utils.getInstance().getErrorResponse(ErrorType.TRANSACTIONS__GET__GENERAL);
+    return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
 };

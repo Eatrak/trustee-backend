@@ -33,9 +33,7 @@ export const handler: APIGatewayProxyHandler = async (
         // Validate data
         const validator = new Validator(input, updateWalletInputRules);
         if (validator.fails()) {
-            return Utils.getInstance().getErrorResponse(
-                ErrorType.WALLETS__UPDATE__DATA_VALIDATION,
-            );
+            return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
         }
 
         const { id, updateInfo } = input;
@@ -62,6 +60,6 @@ export const handler: APIGatewayProxyHandler = async (
         return Utils.getInstance().getSuccessfulResponse(200, responseData);
     } catch (err) {
         console.log(err);
-        return Utils.getInstance().getErrorResponse(ErrorType.GENERAL__SERVER);
+        return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
     }
 };

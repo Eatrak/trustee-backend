@@ -69,5 +69,5 @@ export const handler: APIGatewayProxyHandler = async (
         console.log(err);
     }
 
-    return Utils.getInstance().getErrorResponse(ErrorType.WALLETS__GET__GENERAL);
+    return Utils.getInstance().getErrorResponse(ErrorType.UNKNOWN);
 };

@@ -2,6 +2,7 @@ import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { Err, Ok, Result } from "ts-results";
 import Validator from "validatorjs";
+import { MysqlErrorCodes as sqlErrors } from "@shared/ts-types/mySqlErrorCodes";
 
 import { EnvironmentConfiguration } from "@ts-types/environment";
 import ErrorType from "@shared/errors/list";
@@ -41,7 +42,7 @@ export default class DatabaseUtils {
             if (validation.fails()) {
                 console.log(validation.errors);
 
-                return Err(ErrorType.GENERAL__DB__INITIALIZATION);
+                return Err(ErrorType.DB_INITIALIZATION);
             }
 
             const connection = await mysql.createConnection({
@@ -56,11 +57,25 @@ export default class DatabaseUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.GENERAL__SERVER);
+            return Err(ErrorType.UNKNOWN);
         }
     }
 
     public getDB(): MySql2Database {
         return this.db;
+    }
+
+    public getErrorCodeFromSQLError(sqlErrorNumber: number): ErrorType {
+        try {
+            switch (sqlErrorNumber) {
+                case sqlErrors.ER_DUP_ENTRY:
+                    return ErrorType.DUPLICATE_ENTRY;
+                default:
+                    return ErrorType.UNKNOWN;
+            }
+        } catch (err) {
+            console.log(err);
+            return ErrorType.UNKNOWN;
+        }
     }
 }

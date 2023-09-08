@@ -70,7 +70,11 @@ export default class TransactionsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -126,7 +130,11 @@ export default class TransactionsUtils {
             return Ok(currencyTotalBalance);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__GET_BALANCE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -143,7 +151,11 @@ export default class TransactionsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -196,7 +208,11 @@ export default class TransactionsUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTION_CATEGORIES__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -220,7 +236,11 @@ export default class TransactionsUtils {
             return Ok(transactionCategoryToCreate);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTION_CATEGORIES__CREATE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -252,7 +272,11 @@ export default class TransactionsUtils {
 
             return Ok(categoriesOfTransaction);
         } catch (err) {
-            return Err(ErrorType.CATEGORIES_OF_TRANSACTION__GET__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -297,7 +321,11 @@ export default class TransactionsUtils {
             return Ok(transactionToCreate);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__CREATE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -316,7 +344,11 @@ export default class TransactionsUtils {
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__UPDATE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 
@@ -324,19 +356,19 @@ export default class TransactionsUtils {
         id: string,
     ): Promise<Result<undefined, ErrorType>> {
         try {
-            const result = await DatabaseUtils.getInstance()
+            await DatabaseUtils.getInstance()
                 .getDB()
                 .delete(transactions)
                 .where(eq(transactions.id, id));
 
-            if (result[0].affectedRows == 0) {
-                return Err(ErrorType.TRANSACTIONS__DELETE__NOT_PERFORMED);
-            }
-
             return Ok(undefined);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.TRANSACTIONS__DELETE__GENERAL);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 }

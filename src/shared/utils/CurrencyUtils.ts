@@ -20,7 +20,11 @@ export default class CurrencyUtils {
             return Ok(result);
         } catch (err) {
             console.log(err);
-            return Err(ErrorType.CURRENCIES__GET__GET_CURRENCIES);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
         }
     }
 }
