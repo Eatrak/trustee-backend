@@ -5,6 +5,7 @@ import {
     AdminInitiateAuthCommandOutput,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { Err, Ok, Result } from "ts-results";
+import { v4 as uuid } from "uuid";
 
 import Utils from "@utils/Utils";
 import DatabaseUtils from "@utils/DatabaseUtils";
@@ -12,6 +13,7 @@ import { User, currencies, userSettings, users } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { CognitoException } from "@ts-types/auth";
 import { eq } from "drizzle-orm";
+import CurrencyUtils from "./CurrencyUtils";
 
 export default class UsersUtils {
     /**
@@ -33,7 +35,21 @@ export default class UsersUtils {
                 name,
                 surname,
             };
-            await DatabaseUtils.getInstance().getDB().insert(users).values(userToCreate);
+            await DatabaseUtils.getInstance()
+                .getDB()
+                .transaction(async (tx) => {
+                    await tx.insert(users).values(userToCreate);
+
+                    const currencies = await CurrencyUtils.getCurrencies();
+
+                    if (currencies.err) throw new Error("No currencies found");
+
+                    await tx.insert(userSettings).values({
+                        id: uuid(),
+                        userId: id,
+                        currencyId: currencies.val[0].id,
+                    });
+                });
 
             return Ok(userToCreate);
         } catch (err) {
