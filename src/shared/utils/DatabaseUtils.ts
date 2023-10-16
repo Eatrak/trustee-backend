@@ -70,6 +70,8 @@ export default class DatabaseUtils {
             switch (sqlErrorNumber) {
                 case sqlErrors.ER_DUP_ENTRY:
                     return ErrorType.DUPLICATE_ENTRY;
+                case sqlErrors.ER_NO_REFERENCED_ROW_2:
+                    return ErrorType.UNEXISTING_RESOURCE_TO_REFERENCE;
                 default:
                     return ErrorType.UNKNOWN;
             }

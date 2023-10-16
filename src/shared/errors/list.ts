@@ -11,6 +11,7 @@ enum ErrorType {
     UNAUTHORIZED = getErrorType(401, "00008"),
     DB_INITIALIZATION = getErrorType(500, "00009"),
     UNKNOWN = getErrorType(500, "00010"),
+    UNEXISTING_RESOURCE_TO_REFERENCE = getErrorType(404, "00011"),
 }
 
 export default ErrorType;

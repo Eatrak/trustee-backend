@@ -1,0 +1,47 @@
+service: trustee-user
+frameworkVersion: "3"
+
+plugins:
+    - serverless-webpack
+
+package:
+    individually: true
+
+custom:
+    webpack:
+        webpackConfig: ../../../webpack.config.js
+        packager: "npm"
+
+provider:
+    name: aws
+    runtime: nodejs18.x
+    region: eu-central-1
+    versionFunctions: false
+    stage: ${opt:stage, 'dev'}
+    apiGateway:
+        restApiId: !ImportValue TrusteeRestApiGatewayId-${self:provider.stage}
+        restApiRootResourceId: !ImportValue TrusteeRestApiGatewayRootResourceId-${self:provider.stage}
+    environment:
+        DB_HOST: ${file(../../../env/env.${self:provider.stage}.json):DB_HOST}
+        DB_USERNAME: ${file(../../../env/env.${self:provider.stage}.json):DB_USERNAME}
+        DB_PASSWORD: ${file(../../../env/env.${self:provider.stage}.json):DB_PASSWORD}
+        DB_NAME: ${file(../../../env/env.${self:provider.stage}.json):DB_NAME}
+        DB_PORT: ${file(../../../env/env.${self:provider.stage}.json):DB_PORT}
+        USER_POOL_ID: !ImportValue TrusteeUserPool
+        USER_POOL_CLIENT_ID: !ImportValue TrusteeUserPoolClient
+        REGION: !Ref AWS::Region
+        STAGE: ${self:provider.stage}
+
+functions:
+    UpdateUserSettings:
+        handler: functions/updateUserSettings.handler
+        events:
+            - http:
+                  method: PUT
+                  path: /user/settings
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
