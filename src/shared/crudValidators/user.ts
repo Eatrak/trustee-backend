@@ -1,7 +1,6 @@
 export const updateUserSettingsInputRules = {
-    userId: "required|string",
     updateInfo: {
-        // Required since there are no other info that can be updated
-        currencyId: "required|string",
+        currencyId: ["string", { required_if: ["updateInfo.language", undefined] }],
+        language: ["string", { required_if: ["updateInfo.currencyId", undefined] }],
     },
 };

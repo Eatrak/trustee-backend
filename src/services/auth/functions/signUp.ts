@@ -36,7 +36,7 @@ export const handler: APIGatewayProxyHandler = async (
     const body: SignUpBody = event.body ? JSON.parse(event.body) : {};
 
     const validation = new Validator(body.userInfo, signUpValidator);
-    const { name, email, password, surname } = body.userInfo;
+    const { name, email, password, surname, language } = body.userInfo;
 
     if (validation.fails()) {
         console.log(validation.errors);
@@ -64,6 +64,7 @@ export const handler: APIGatewayProxyHandler = async (
             email,
             name,
             surname,
+            language,
         );
         if (createDBUserResponse.err) {
             return Utils.getInstance().getErrorResponse(createDBUserResponse.val);

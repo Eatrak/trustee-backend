@@ -14,6 +14,7 @@ import ErrorType from "@shared/errors/list";
 import { CognitoException } from "@ts-types/auth";
 import { eq } from "drizzle-orm";
 import CurrencyUtils from "./CurrencyUtils";
+import { TranslationLanguage } from "@ts-types/generic/translations";
 
 export default class UsersUtils {
     /**
@@ -27,6 +28,7 @@ export default class UsersUtils {
         email: string,
         name: string,
         surname: string,
+        language: TranslationLanguage,
     ): Promise<Result<User, ErrorType>> {
         try {
             const userToCreate: User = {
@@ -48,6 +50,7 @@ export default class UsersUtils {
                         id: uuid(),
                         userId: id,
                         currencyId: currencies.val[0].id,
+                        language,
                     });
                 });
 
@@ -186,7 +189,15 @@ export default class UsersUtils {
     }
 
     public static async getPersonalInfo(userId: string) {
-        const { name, surname, email, currencyId, currencyCode, currencySymbol } = (
+        const {
+            name,
+            surname,
+            email,
+            currencyId,
+            currencyCode,
+            currencySymbol,
+            language,
+        } = (
             await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
@@ -197,6 +208,7 @@ export default class UsersUtils {
                     currencyId: currencies.id,
                     currencySymbol: currencies.symbol,
                     currencyCode: currencies.code,
+                    language: userSettings.language,
                 })
                 .from(users)
                 .where(eq(users.id, userId))
@@ -214,6 +226,7 @@ export default class UsersUtils {
                     code: currencyCode,
                     symbol: currencySymbol,
                 },
+                language,
             },
         };
     }

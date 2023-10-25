@@ -15,10 +15,12 @@ export default class UserUtils {
         updateInfo,
     }: UpdateUserSettingsInput): Promise<Result<undefined, ErrorType>> {
         try {
+            const { currencyId, language } = updateInfo;
+
             await DatabaseUtils.getInstance()
                 .getDB()
                 .update(userSettings)
-                .set({ currencyId: updateInfo.currencyId })
+                .set({ currencyId, language })
                 .where(eq(userSettings.userId, userId));
 
             return Ok(undefined);

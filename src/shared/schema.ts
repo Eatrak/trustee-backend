@@ -21,6 +21,7 @@ export const userSettings = mysqlTable("UserSettings", {
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
         .references(() => currencies.id, { onDelete: "no action" }),
+    language: varchar("language", { length: 10 }).notNull(),
 });
 
 export const currencies = mysqlTable("Currency", {

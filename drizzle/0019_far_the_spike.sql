@@ -1,0 +1,1 @@
+ALTER TABLE `UserSettings` ADD `language` varchar(10) NOT NULL;
