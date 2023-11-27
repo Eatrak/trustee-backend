@@ -43,8 +43,15 @@ export default class WalletsUtils {
      */
     public static async getWalletTableRows(
         userId: string,
+        currencyId?: string,
     ): Promise<Result<WalletTableRow[], ErrorType>> {
         try {
+            const whereConditions = [eq(wallets.userId, userId)];
+
+            // If the currencyId is given, get only the wallets with the given currencyId;
+            // otherwise, get all the wallets
+            currencyId && whereConditions.push(eq(wallets.currencyId, currencyId));
+
             const result: WalletTableRow[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
@@ -60,7 +67,7 @@ export default class WalletsUtils {
                     currencyCode: currencies.code,
                 })
                 .from(wallets)
-                .where(eq(wallets.userId, userId))
+                .where(and(...whereConditions))
                 .leftJoin(transactions, eq(wallets.id, transactions.walletId))
                 .innerJoin(currencies, eq(wallets.currencyId, currencies.id))
                 .groupBy(wallets.id);

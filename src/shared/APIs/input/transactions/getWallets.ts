@@ -2,6 +2,7 @@ import { WalletViews } from "@ts-types/DTOs/wallets";
 
 export interface GetWalletsInputQueryParams {
     view?: WalletViews;
+    currencyId?: string;
 }
 
 export interface GetWalletsInput {

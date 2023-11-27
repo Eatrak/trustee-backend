@@ -43,6 +43,7 @@ export const handler: APIGatewayProxyHandler = async (
             case WalletViews.TABLE_ROW:
                 const getWalletTableRowsResponse = await WalletsUtils.getWalletTableRows(
                     userId,
+                    queryParams?.currencyId,
                 );
                 if (getWalletTableRowsResponse.err) {
                     return Utils.getInstance().getErrorResponse(
