@@ -81,6 +81,18 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
+    GetWallet:
+        handler: functions/getWallet.handler
+        events:
+            - http:
+                  method: GET
+                  path: /wallets/{id}
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
     UpdateWallet:
         handler: functions/updateWallet.handler
         events:

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const deleteWalletValidator = {
     id: "required|string",
     userId: "required|string",
@@ -18,3 +20,8 @@ export const updateWalletInputRules = {
         untrackedBalance: ["numeric", { required_if: ["updateInfo.name", undefined] }],
     },
 };
+
+export const getWalletInputSchema = z.object({
+    id: z.string(),
+    userId: z.string(),
+});

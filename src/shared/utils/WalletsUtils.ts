@@ -115,6 +115,31 @@ export default class WalletsUtils {
     }
 
     /**
+     * Get a wallet.
+     *
+     * @param id ID of the wallet to get.
+     * @returns A Result.
+     */
+    public static async getWallet(id: string): Promise<Result<Wallet, ErrorType>> {
+        try {
+            const wallet = await DatabaseUtils.getInstance()
+                .getDB()
+                .select()
+                .from(wallets)
+                .where(eq(wallets.id, id));
+
+            return Ok(wallet[0]);
+        } catch (err) {
+            console.log(err);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
+        }
+    }
+
+    /**
      * Permanently delete a wallet.
      *
      * @param id ID of the wallet to delete.
