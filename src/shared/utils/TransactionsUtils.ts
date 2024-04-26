@@ -47,7 +47,7 @@ export default class TransactionsUtils {
             const result: Transaction[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
-                    userId: users.id,
+                    userId: wallets.userId,
                     id: transactions.id,
                     name: transactions.name,
                     walletId: transactions.walletId,
