@@ -3,4 +3,5 @@ export interface GetTransactionsByCurrencyAndCreationRangeInput {
     endCarriedOut: string;
     currencyId: string;
     userId: string;
+    wallets: string[];
 }

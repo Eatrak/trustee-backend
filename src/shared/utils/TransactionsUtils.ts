@@ -40,10 +40,15 @@ export default class TransactionsUtils {
         startCarriedOut,
         endCarriedOut,
         currencyId,
+        wallets: walletsToFilter,
     }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
         Result<Transaction[], ErrorType>
     > {
         try {
+            const walletsConditions = walletsToFilter.map((walletId) =>
+                eq(wallets.id, walletId),
+            );
+
             const result: Transaction[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
@@ -65,7 +70,10 @@ export default class TransactionsUtils {
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
                 )
-                .innerJoin(wallets, eq(wallets.id, transactions.walletId))
+                .innerJoin(
+                    wallets,
+                    and(eq(wallets.id, transactions.walletId), or(...walletsConditions)),
+                )
                 .orderBy(desc(transactions.carriedOut))
                 .limit(this.MAX_TRANSACTIONS_TO_GET);
 

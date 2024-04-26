@@ -12,6 +12,7 @@ import TransactionsUtils from "@utils/TransactionsUtils";
 import {
     GetTransactionsInputQueryParams,
     GetTransactionsInput,
+    GetTransactionsInputMultiQueryParams,
 } from "@APIs/input/transactions/getTransactions";
 import { getTransactionsValidator } from "@crudValidators/transactions";
 import { GetTransactionsResponseData } from "@APIs/output/transactions/getTransactions";
@@ -26,11 +27,14 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
     const { startCarriedOut, endCarriedOut, currencyId } =
         event.queryStringParameters as unknown as GetTransactionsInputQueryParams;
+    const { wallets } =
+        event.multiValueQueryStringParameters as unknown as GetTransactionsInputMultiQueryParams;
     const getTransactionsInput: GetTransactionsInput = {
         startCarriedOut,
         endCarriedOut,
         currencyId,
         userId,
+        wallets,
     };
 
     // Validate data
