@@ -6,6 +6,7 @@ import { Wallet, currencies, transactions, wallets } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { UpdateWalletUpdateInfo } from "@APIs/input/transactions/updateWallet";
 import { WalletTableRow } from "@ts-types/DTOs/wallets";
+import { MySql2Database } from "drizzle-orm/mysql2";
 
 export default class WalletsUtils {
     /**
@@ -153,6 +154,35 @@ export default class WalletsUtils {
                 .where(eq(wallets.id, id));
 
             return Ok(undefined);
+        } catch (err) {
+            console.log(err);
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
+        }
+    }
+
+    public static async isTheWalletOwnedByTheUser(
+        db: MySql2Database,
+        walletId: string,
+        userId: string,
+    ): Promise<Result<boolean, ErrorType>> {
+        try {
+            const wallet = await db
+                .select()
+                .from(wallets)
+                .where(
+                    and(
+                        // Check if the wallet exists
+                        eq(wallets.id, walletId),
+                        // Check if the wallet belongs to the user
+                        eq(wallets.userId, userId),
+                    ),
+                );
+
+            return Ok(Boolean(wallet[0]));
         } catch (err) {
             console.log(err);
             return Err(

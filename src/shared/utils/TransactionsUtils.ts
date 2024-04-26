@@ -15,6 +15,7 @@ import {
     wallets,
     transactionCategoryRelation,
     CategoryOfTransaction,
+    users,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
@@ -23,6 +24,7 @@ import { UpdateTransactionInput } from "@APIs/input/transactions/updateTransacti
 import { GetTransactionCategoryBalancesInput } from "@APIs/input/transactions/getTransactionCategories";
 import { TransactionCategoryBalance } from "@ts-types/DTOs/transactions";
 import { GetCategoriesOfTransactionInput } from "@APIs/input/transactions/getCategoriesOfTransaction";
+import WalletsUtils from "./WalletsUtils";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -45,7 +47,7 @@ export default class TransactionsUtils {
             const result: Transaction[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
-                    userId: transactions.userId,
+                    userId: users.id,
                     id: transactions.id,
                     name: transactions.name,
                     walletId: transactions.walletId,
@@ -57,7 +59,7 @@ export default class TransactionsUtils {
                 .from(transactions)
                 .where(
                     and(
-                        eq(transactions.userId, userId),
+                        eq(wallets.userId, userId),
                         eq(wallets.currencyId, currencyId),
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
@@ -99,35 +101,32 @@ export default class TransactionsUtils {
                 .from(transactions)
                 .innerJoin(
                     wallets,
-                    and(eq(wallets.id, transactions.walletId), ...walletsConditions),
+                    and(
+                        eq(wallets.id, transactions.walletId),
+                        eq(wallets.currencyId, currencyId),
+                        eq(wallets.userId, userId),
+                        or(...walletsConditions),
+                    ),
                 )
                 .where(
                     and(
-                        eq(transactions.userId, userId),
-                        eq(wallets.currencyId, currencyId),
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
                     ),
                 )
                 .groupBy(transactions.isIncome);
 
-            let totalIncome = 0;
-            let totalExpense = 0;
+            if (result[0].isIncome) {
+                return Ok({
+                    totalIncome: result[0].totalAmount,
+                    totalExpense: result[1].totalAmount,
+                });
+            }
 
-            result.forEach((resultPart) => {
-                if (resultPart.isIncome) {
-                    totalIncome = resultPart.totalAmount;
-                } else {
-                    totalExpense = resultPart.totalAmount;
-                }
+            return Ok({
+                totalIncome: result[1].totalAmount,
+                totalExpense: result[0].totalAmount,
             });
-
-            const currencyTotalBalance = {
-                totalIncome,
-                totalExpense,
-            };
-
-            return Ok(currencyTotalBalance);
         } catch (err) {
             console.log(err);
             return Err(
@@ -193,7 +192,7 @@ export default class TransactionsUtils {
                     transactions,
                     and(
                         eq(transactionCategoryRelation.transactionId, transactions.id),
-                        eq(transactions.userId, userId),
+                        eq(wallets.userId, userId),
                         eq(wallets.id, transactions.walletId),
                         gte(transactions.carriedOut, startDate),
                         lte(transactions.carriedOut, endDate),
@@ -259,16 +258,13 @@ export default class TransactionsUtils {
                     categoryId: transactionCategoryRelation.categoryId,
                 })
                 .from(transactionCategoryRelation)
-                .where(
-                    and(
-                        eq(transactionCategoryRelation.transactionId, transactionId),
-                        eq(transactions.userId, userId),
-                    ),
-                )
+                .where(eq(transactionCategoryRelation.transactionId, transactionId))
                 .innerJoin(
                     transactions,
-                    eq(transactions.id, transactionCategoryRelation.transactionId),
-                );
+                    eq(transactionCategoryRelation.transactionId, transactions.id),
+                )
+                .innerJoin(wallets, eq(wallets.id, transactions.walletId))
+                .where(eq(wallets.userId, userId));
 
             return Ok(categoriesOfTransaction);
         } catch (err) {
@@ -290,7 +286,6 @@ export default class TransactionsUtils {
 
             const transactionToCreate: Transaction = {
                 id,
-                userId,
                 name,
                 amount,
                 carriedOut,
@@ -302,6 +297,17 @@ export default class TransactionsUtils {
             await DatabaseUtils.getInstance()
                 .getDB()
                 .transaction(async (tx) => {
+                    const isTheWalletOwnedByTheUser =
+                        await WalletsUtils.isTheWalletOwnedByTheUser(
+                            tx,
+                            walletId,
+                            userId,
+                        );
+
+                    // If the user doesn't own the wallet involved, the operation will be cancelled
+                    if (isTheWalletOwnedByTheUser.err || !isTheWalletOwnedByTheUser.val)
+                        return tx.rollback();
+
                     // Create transaction
                     await tx.insert(transactions).values(transactionToCreate);
 
@@ -337,9 +343,30 @@ export default class TransactionsUtils {
         try {
             await DatabaseUtils.getInstance()
                 .getDB()
-                .update(transactions)
-                .set(updateInfo)
-                .where(and(eq(transactions.id, id), eq(transactions.userId, userId)));
+                .transaction(async (tx) => {
+                    const results = await Promise.all([
+                        async () => {
+                            const isTheWalletOwnedByTheUser =
+                                await WalletsUtils.isTheWalletOwnedByTheUser(
+                                    tx,
+                                    updateInfo.walletId,
+                                    userId,
+                                );
+
+                            if (isTheWalletOwnedByTheUser.ok) {
+                                return isTheWalletOwnedByTheUser.val;
+                            }
+                        },
+                        async () => {
+                            await tx
+                                .update(transactions)
+                                .set(updateInfo)
+                                .where(and(eq(transactions.id, id)));
+                        },
+                    ]);
+
+                    if (!results[0]) return tx.rollback();
+                });
 
             return Ok(undefined);
         } catch (err) {
