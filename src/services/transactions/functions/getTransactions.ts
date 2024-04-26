@@ -27,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (
     const { userId } = Utils.getInstance().getAuthorizerClaims(event);
     const { startCarriedOut, endCarriedOut, currencyId } =
         event.queryStringParameters as unknown as GetTransactionsInputQueryParams;
-    const { wallets } =
+    const { wallets = [] } =
         event.multiValueQueryStringParameters as unknown as GetTransactionsInputMultiQueryParams;
     const getTransactionsInput: GetTransactionsInput = {
         startCarriedOut,

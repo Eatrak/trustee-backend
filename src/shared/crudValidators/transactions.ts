@@ -2,13 +2,14 @@ export const getTransactionsValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
     currencyId: "required|string",
+    wallets: "present|array",
 };
 
 export const getBalanceValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
     currencyId: "required|string",
-    wallets: "required|array",
+    wallets: "present|array",
 };
 
 export const createTransactionCategoryRules = {
