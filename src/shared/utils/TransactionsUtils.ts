@@ -16,13 +16,17 @@ import {
     transactionCategoryRelation,
     CategoryOfTransaction,
     users,
+    currencies,
 } from "@shared/schema";
 import ErrorType from "@shared/errors/list";
 import { TotalBalance } from "@ts-types/transactions";
 import { GetBalanceInput } from "@APIs/input/transactions/getBalance";
 import { UpdateTransactionInput } from "@APIs/input/transactions/updateTransaction";
 import { GetTransactionCategoryBalancesInput } from "@APIs/input/transactions/getTransactionCategories";
-import { TransactionCategoryBalance } from "@ts-types/DTOs/transactions";
+import {
+    TransactionCategoryBalance,
+    TransactionTableRow,
+} from "@ts-types/DTOs/transactions";
 import { GetCategoriesOfTransactionInput } from "@APIs/input/transactions/getCategoriesOfTransaction";
 import WalletsUtils from "./WalletsUtils";
 
@@ -42,14 +46,14 @@ export default class TransactionsUtils {
         currencyId,
         wallets: walletsToFilter,
     }: GetTransactionsByCurrencyAndCreationRangeInput): Promise<
-        Result<Transaction[], ErrorType>
+        Result<TransactionTableRow[], ErrorType>
     > {
         try {
             const walletsConditions = walletsToFilter.map((walletId) =>
                 eq(wallets.id, walletId),
             );
 
-            const result: Transaction[] = await DatabaseUtils.getInstance()
+            const result: TransactionTableRow[] = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
                     userId: wallets.userId,
@@ -60,6 +64,10 @@ export default class TransactionsUtils {
                     amount: transactions.amount,
                     isIncome: transactions.isIncome,
                     createdAt: transactions.createdAt,
+                    currencyId: wallets.currencyId,
+                    walletName: wallets.name,
+                    currencyCode: currencies.code,
+                    currencySymbol: currencies.symbol,
                 })
                 .from(transactions)
                 .where(
@@ -74,6 +82,7 @@ export default class TransactionsUtils {
                     wallets,
                     and(eq(wallets.id, transactions.walletId), or(...walletsConditions)),
                 )
+                .innerJoin(currencies, eq(wallets.currencyId, currencies.id))
                 .orderBy(desc(transactions.carriedOut))
                 .limit(this.MAX_TRANSACTIONS_TO_GET);
 
