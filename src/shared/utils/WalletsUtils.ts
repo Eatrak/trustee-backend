@@ -61,9 +61,9 @@ export default class WalletsUtils {
                     userId: wallets.userId,
                     currencyId: wallets.currencyId,
                     untrackedBalance: wallets.untrackedBalance,
-                    net: sql<number>`${wallets.untrackedBalance} + COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END), 0) - COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END), 0)`,
-                    income: sql<number>`COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN ${transactions.amount} ELSE 0 END), 0)`,
-                    expense: sql<number>`COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE ${transactions.amount} END), 0)`,
+                    net: sql<number>`${wallets.untrackedBalance} + COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN cast(${transactions.amount} as float) ELSE 0 END), 0) - COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE cast(${transactions.amount} as float) END), 0)`,
+                    income: sql<number>`COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN cast(${transactions.amount} as float) ELSE 0 END), 0)`,
+                    expense: sql<number>`COALESCE(sum(CASE WHEN ${transactions.isIncome} THEN 0 ELSE cast(${transactions.amount} as float) END), 0)`,
                     transactionsCount: sql<number>`count(${transactions.id})`,
                     currencyCode: currencies.code,
                 })

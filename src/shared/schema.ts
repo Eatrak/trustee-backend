@@ -4,13 +4,20 @@ import {
     varchar,
     boolean,
     int,
-    double,
-    decimal,
     unique,
-    MySqlDoubleBuilderInitial,
+    customType,
 } from "drizzle-orm/mysql-core";
 
 const UUID_LENGTH = 36;
+
+export const moneyDecimal = customType<{ data: number }>({
+    dataType() {
+        return "decimal(19, 2)";
+    },
+    fromDriver(value) {
+        return Number(value);
+    },
+});
 
 // Table definitions
 
@@ -46,10 +53,7 @@ export const transactions = mysqlTable("Transaction", {
         .notNull()
         .references(() => wallets.id, { onDelete: "cascade" }),
     carriedOut: int("carriedOut").notNull(),
-    amount: decimal("amount", {
-        precision: 19,
-        scale: 2,
-    }).notNull() as unknown as MySqlDoubleBuilderInitial<"amount">,
+    amount: moneyDecimal("amount"),
     isIncome: boolean("isIncome").notNull(),
     createdAt: int("createdAt").notNull(),
 });
@@ -87,10 +91,7 @@ export const wallets = mysqlTable("Wallet", {
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
         .references(() => currencies.id, { onDelete: "no action" }),
-    untrackedBalance: decimal("untrackedBalance", {
-        precision: 19,
-        scale: 2,
-    }).notNull() as unknown as MySqlDoubleBuilderInitial<"untrackedBalance">,
+    untrackedBalance: moneyDecimal("untrackedBalance").notNull(),
 });
 
 // Type definitions

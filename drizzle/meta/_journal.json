@@ -8,6 +8,13 @@
       "when": 1714120515701,
       "tag": "0000_gigantic_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1714137495862,
+      "tag": "0001_equal_doorman",
+      "breakpoints": true
     }
   ]
 }

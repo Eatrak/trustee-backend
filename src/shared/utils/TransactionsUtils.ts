@@ -103,7 +103,7 @@ export default class TransactionsUtils {
             const result = await DatabaseUtils.getInstance()
                 .getDB()
                 .select({
-                    totalAmount: sql<number>`sum(${transactions.amount})`,
+                    totalAmount: sql<number>`cast(sum(${transactions.amount}) as float)`,
                     isIncome: transactions.isIncome,
                 })
                 .from(transactions)
@@ -124,16 +124,17 @@ export default class TransactionsUtils {
                 )
                 .groupBy(transactions.isIncome);
 
-            if (result[0].isIncome) {
-                return Ok({
-                    totalIncome: result[0].totalAmount,
-                    totalExpense: result[1].totalAmount,
-                });
+            let totalIncome = 0,
+                totalExpense = 0;
+
+            for (const total of result) {
+                if (total.isIncome) totalIncome = total.totalAmount;
+                else totalExpense = total.totalAmount;
             }
 
             return Ok({
-                totalIncome: result[1].totalAmount,
-                totalExpense: result[0].totalAmount,
+                totalIncome,
+                totalExpense,
             });
         } catch (err) {
             console.log(err);
