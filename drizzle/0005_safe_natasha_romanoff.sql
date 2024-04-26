@@ -1,1 +1,0 @@
-ALTER TABLE `Wallet` ADD `isDeleted` boolean DEFAULT false NOT NULL;

@@ -1,1 +1,0 @@
-ALTER TABLE `Wallet` MODIFY COLUMN `untrackedBalance` double NOT NULL;

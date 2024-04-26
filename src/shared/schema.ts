@@ -1,5 +1,13 @@
 import { InferModel } from "drizzle-orm";
-import { mysqlTable, varchar, boolean, int, double } from "drizzle-orm/mysql-core";
+import {
+    mysqlTable,
+    varchar,
+    boolean,
+    int,
+    double,
+    decimal,
+    unique,
+} from "drizzle-orm/mysql-core";
 
 const UUID_LENGTH = 36;
 
@@ -33,25 +41,28 @@ export const currencies = mysqlTable("Currency", {
 export const transactions = mysqlTable("Transaction", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
     name: varchar("name", { length: 256 }).notNull(),
-    userId: varchar("userId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => users.id, { onDelete: "cascade" }),
     walletId: varchar("walletId", { length: UUID_LENGTH })
         .notNull()
         .references(() => wallets.id, { onDelete: "cascade" }),
     carriedOut: int("carriedOut").notNull(),
-    amount: double("amount").notNull(),
+    amount: decimal("amount", { precision: 19, scale: 2 }).notNull(),
     isIncome: boolean("isIncome").notNull(),
     createdAt: int("createdAt").notNull(),
 });
 
-export const transactionCategories = mysqlTable("TransactionCategory", {
-    id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
-    name: varchar("name", { length: 256 }).notNull().unique(),
-    userId: varchar("userId", { length: UUID_LENGTH })
-        .notNull()
-        .references(() => users.id, { onDelete: "cascade" }),
-});
+export const transactionCategories = mysqlTable(
+    "TransactionCategory",
+    {
+        id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
+        name: varchar("name", { length: 256 }).notNull(),
+        userId: varchar("userId", { length: UUID_LENGTH })
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
+    },
+    (t) => ({
+        nameAndUser: unique().on(t.name, t.userId),
+    }),
+);
 
 export const transactionCategoryRelation = mysqlTable("TransactionCategoryRelation", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
@@ -65,14 +76,14 @@ export const transactionCategoryRelation = mysqlTable("TransactionCategoryRelati
 
 export const wallets = mysqlTable("Wallet", {
     id: varchar("id", { length: UUID_LENGTH }).primaryKey(),
-    name: varchar("name", { length: 256 }).notNull().unique(),
+    name: varchar("name", { length: 256 }).notNull(),
     userId: varchar("userId", { length: UUID_LENGTH })
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     currencyId: varchar("currencyId", { length: UUID_LENGTH })
         .notNull()
         .references(() => currencies.id, { onDelete: "no action" }),
-    untrackedBalance: double("untrackedBalance").notNull(),
+    untrackedBalance: decimal("untrackedBalance", { precision: 19, scale: 2 }).notNull(),
 });
 
 // Type definitions

@@ -1,1 +1,0 @@
-ALTER TABLE `Transaction` MODIFY COLUMN `amount` double NOT NULL;

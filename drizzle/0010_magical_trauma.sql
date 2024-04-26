@@ -1,1 +1,0 @@
-ALTER TABLE `Wallet` ADD `untrackedBalance` double NOT NULL;

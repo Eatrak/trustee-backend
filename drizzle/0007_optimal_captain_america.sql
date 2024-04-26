@@ -1,1 +1,0 @@
-ALTER TABLE `Wallet` DROP COLUMN `isDeleted`;
