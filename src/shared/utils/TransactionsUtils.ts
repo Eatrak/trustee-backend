@@ -74,8 +74,8 @@ export default class TransactionsUtils {
                     and(
                         eq(wallets.userId, userId),
                         eq(wallets.currencyId, currencyId),
-                        gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
-                        lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
+                        gte(transactions.carriedOut, Number(startCarriedOut)),
+                        lte(transactions.carriedOut, Number(endCarriedOut)),
                     ),
                 )
                 .innerJoin(
