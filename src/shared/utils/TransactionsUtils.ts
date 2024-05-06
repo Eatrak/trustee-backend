@@ -131,6 +131,7 @@ export default class TransactionsUtils {
                     and(
                         gte(transactions.carriedOut, Number.parseInt(startCarriedOut)),
                         lte(transactions.carriedOut, Number.parseInt(endCarriedOut)),
+                        eq(transactions.isDeleted, false),
                     ),
                 )
                 .groupBy(transactions.isIncome);
