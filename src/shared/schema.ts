@@ -56,6 +56,7 @@ export const transactions = mysqlTable("Transaction", {
     amount: moneyDecimal("amount"),
     isIncome: boolean("isIncome").notNull(),
     createdAt: int("createdAt").notNull(),
+    isDeleted: boolean("isDeleted").notNull(),
 });
 
 export const transactionCategories = mysqlTable(

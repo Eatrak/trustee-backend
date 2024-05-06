@@ -1,0 +1,1 @@
+ALTER TABLE `Transaction` ADD `isDeleted` boolean NOT NULL;

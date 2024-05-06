@@ -68,6 +68,7 @@ export default class TransactionsUtils {
                     walletName: wallets.name,
                     currencyCode: currencies.code,
                     currencySymbol: currencies.symbol,
+                    isDeleted: transactions.isDeleted,
                 })
                 .from(transactions)
                 .where(
@@ -76,6 +77,7 @@ export default class TransactionsUtils {
                         eq(wallets.currencyId, currencyId),
                         gte(transactions.carriedOut, Number(startCarriedOut)),
                         lte(transactions.carriedOut, Number(endCarriedOut)),
+                        eq(transactions.isDeleted, false),
                     ),
                 )
                 .innerJoin(
@@ -310,6 +312,7 @@ export default class TransactionsUtils {
                 createdAt: dayjs().unix(),
                 isIncome,
                 walletId,
+                isDeleted: false,
             };
 
             await DatabaseUtils.getInstance()
@@ -403,7 +406,8 @@ export default class TransactionsUtils {
         try {
             await DatabaseUtils.getInstance()
                 .getDB()
-                .delete(transactions)
+                .update(transactions)
+                .set({ isDeleted: true })
                 .where(eq(transactions.id, id));
 
             return Ok(undefined);
