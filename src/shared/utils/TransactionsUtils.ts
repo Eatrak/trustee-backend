@@ -217,6 +217,7 @@ export default class TransactionsUtils {
                         eq(wallets.id, transactions.walletId),
                         gte(transactions.carriedOut, startDate),
                         lte(transactions.carriedOut, endDate),
+                        eq(transactions.isDeleted, false),
                     ),
                 )
                 .groupBy(
