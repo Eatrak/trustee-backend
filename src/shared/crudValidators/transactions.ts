@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const getTransactionsValidator = {
     startCarriedOut: "required|integer",
     endCarriedOut: "required|integer",
@@ -60,3 +62,12 @@ export const getCategoriesOfTransactionInputRules = {
     id: "required|string",
     userId: "required|string",
 };
+
+export const getTransactionPathParametersSchema = z.object({
+    id: z.string().min(1),
+});
+
+export const getTransactionInputSchema = z.object({
+    pathParameters: getTransactionPathParametersSchema,
+    userId: z.string().min(1),
+});

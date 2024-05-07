@@ -29,6 +29,7 @@ import {
 } from "@ts-types/DTOs/transactions";
 import { GetCategoriesOfTransactionInput } from "@APIs/input/transactions/getCategoriesOfTransaction";
 import WalletsUtils from "./WalletsUtils";
+import { GetTransactionInput } from "@APIs/input/transactions/getTransaction";
 
 export default class TransactionsUtils {
     static MAX_TRANSACTIONS_TO_GET = 30;
@@ -290,6 +291,27 @@ export default class TransactionsUtils {
 
             return Ok(categoriesOfTransaction);
         } catch (err) {
+            return Err(
+                DatabaseUtils.getInstance().getErrorCodeFromSQLError(
+                    (err as { errno: number }).errno,
+                ),
+            );
+        }
+    }
+
+    public static async getTransaction(
+        input: GetTransactionInput,
+    ): Promise<Result<Transaction, ErrorType>> {
+        try {
+            const transactionsResult = await DatabaseUtils.getInstance()
+                .getDB()
+                .select()
+                .from(transactions)
+                .where(eq(transactions.id, input.pathParameters.id));
+
+            return Ok(transactionsResult[0]);
+        } catch (err) {
+            console.log(err);
             return Err(
                 DatabaseUtils.getInstance().getErrorCodeFromSQLError(
                     (err as { errno: number }).errno,

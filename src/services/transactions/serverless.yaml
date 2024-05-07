@@ -70,6 +70,18 @@ functions:
                       authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
                       claims:
                           - email
+    GetTransaction:
+        handler: functions/getTransaction.handler
+        events:
+            - http:
+                  method: GET
+                  path: /transactions/{id}
+                  cors: true
+                  authorizer:
+                      type: COGNITO_USER_POOLS
+                      authorizerId: !ImportValue TrusteeAuthorizerId-${self:provider.stage}
+                      claims:
+                          - email
     GetBalance:
         handler: functions/getBalance.handler
         events:
