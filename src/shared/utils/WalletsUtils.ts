@@ -69,7 +69,13 @@ export default class WalletsUtils {
                 })
                 .from(wallets)
                 .where(and(...whereConditions))
-                .leftJoin(transactions, eq(wallets.id, transactions.walletId))
+                .leftJoin(
+                    transactions,
+                    and(
+                        eq(wallets.id, transactions.walletId),
+                        eq(transactions.isDeleted, false),
+                    ),
+                )
                 .innerJoin(currencies, eq(wallets.currencyId, currencies.id))
                 .groupBy(wallets.id);
 
