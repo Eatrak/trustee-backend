@@ -385,33 +385,50 @@ export default class TransactionsUtils {
     }
 
     public static async updateTransaction({
-        id,
+        body,
         userId,
-        updateInfo,
+        pathParameters,
     }: UpdateTransactionInput): Promise<Result<undefined, ErrorType>> {
         try {
             await DatabaseUtils.getInstance()
                 .getDB()
                 .transaction(async (tx) => {
                     const results = await Promise.all([
-                        async () => {
+                        (async () => {
+                            // If the wallet must not be updated, than it's sure that
+                            // the wallet is owned by the user
+                            if (body.updateInfo.walletId == undefined) return true;
+
                             const isTheWalletOwnedByTheUser =
                                 await WalletsUtils.isTheWalletOwnedByTheUser(
                                     tx,
-                                    updateInfo.walletId,
+                                    body.updateInfo.walletId,
                                     userId,
                                 );
 
                             if (isTheWalletOwnedByTheUser.ok) {
                                 return isTheWalletOwnedByTheUser.val;
                             }
-                        },
-                        async () => {
+                        })(),
+                        (async () => {
+                            if (!body.updateInfo.categories) return;
+
+                            for (const category of body.updateInfo.categories) {
+                                tx.insert(transactionCategoryRelation)
+                                    .values({
+                                        categoryId: category,
+                                        id: uuid(),
+                                        transactionId: pathParameters.id,
+                                    })
+                                    .onDuplicateKeyUpdate({ set: {} });
+                            }
+                        })(),
+                        (async () => {
                             await tx
                                 .update(transactions)
-                                .set(updateInfo)
-                                .where(and(eq(transactions.id, id)));
-                        },
+                                .set(body.updateInfo)
+                                .where(and(eq(transactions.id, pathParameters.id)));
+                        })(),
                     ]);
 
                     if (!results[0]) return tx.rollback();
