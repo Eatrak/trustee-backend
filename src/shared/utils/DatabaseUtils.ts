@@ -1,4 +1,4 @@
-import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
+import { drizzle, MySql2Client, MySql2Database } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { Err, Ok, Result } from "ts-results";
 import Validator from "validatorjs";
@@ -11,6 +11,7 @@ import { initDBConnectionRules } from "@crudValidators/database";
 export default class DatabaseUtils {
     private static instance?: DatabaseUtils;
     private db: MySql2Database;
+    private dbConnection: MySql2Client;
 
     /**
      *
@@ -52,6 +53,7 @@ export default class DatabaseUtils {
                 database: DB_NAME,
                 port: DB_PORT,
             });
+            this.dbConnection = connection;
             this.db = drizzle(connection);
 
             return Ok(undefined);
@@ -63,6 +65,10 @@ export default class DatabaseUtils {
 
     public getDB(): MySql2Database {
         return this.db;
+    }
+
+    public getDBConnection(): MySql2Client {
+        return this.dbConnection;
     }
 
     public getErrorCodeFromSQLError(sqlErrorNumber: number): ErrorType {

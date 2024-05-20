@@ -52,6 +52,9 @@ export default class Utils {
         };
     }
 
+    public atLeastOneIsDefined = (obj: Record<string | number | symbol, unknown>) =>
+        Object.values(obj).some((v) => v !== undefined);
+
     public getErrorResponse(
         errorType: ErrorType,
         contentType: string = "application/json",

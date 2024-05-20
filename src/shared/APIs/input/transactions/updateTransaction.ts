@@ -1,20 +1,13 @@
-export interface UpdateTransactionPathParameters {
-    id: string;
-}
+import { z } from "zod";
 
-export interface UpdateTransactionBody {
-    updateInfo: {
-        name: string;
-        walletId: string;
-        categoryId: string;
-        amount: number;
-        isIncome: boolean;
-        carriedOut: number;
-    };
-}
+import {
+    updateTransactionBodySchema,
+    updateTransactionInputSchema,
+    updateTransactionPathParametersSchema,
+} from "@crudValidators/transactions";
 
-export interface UpdateTransactionInput
-    extends UpdateTransactionBody,
-        UpdateTransactionPathParameters {
-    userId: string;
-}
+export type UpdateTransactionPathParameters = z.infer<
+    typeof updateTransactionPathParametersSchema
+>;
+export type UpdateTransactionBody = z.infer<typeof updateTransactionBodySchema>;
+export type UpdateTransactionInput = z.infer<typeof updateTransactionInputSchema>;

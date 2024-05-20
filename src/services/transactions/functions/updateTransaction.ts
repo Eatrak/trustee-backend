@@ -3,34 +3,19 @@ import {
     APIGatewayProxyHandler,
     APIGatewayProxyResult,
 } from "aws-lambda";
-import Validator, { Validator as ValidatorType } from "validatorjs";
-//@ts-ignore
-import en from "validatorjs/src/lang/en";
 
 import Utils from "@utils/Utils";
 import TransactionsUtils from "@utils/TransactionsUtils";
-import { updateTransactionInputRules } from "@crudValidators/transactions";
 import DatabaseUtils from "@utils/DatabaseUtils";
 import ErrorType from "@shared/errors/list";
+import { UpdateTransactionResponseData } from "@APIs/output/transactions/updateTransaction";
 import {
     UpdateTransactionBody,
     UpdateTransactionInput,
     UpdateTransactionPathParameters,
 } from "@APIs/input/transactions/updateTransaction";
-import { UpdateTransactionResponseData } from "@APIs/output/transactions/updateTransaction";
+import { updateTransactionInputSchema } from "@crudValidators/transactions";
 
-Validator.setMessages("en", en);
-function getValue(obj: any, key: string) {
-    const keys = key.split(".");
-    let current = obj;
-    for (const k of keys) {
-        if (current[k] === undefined) {
-            return undefined;
-        }
-        current = current[k];
-    }
-    return current;
-}
 export const handler: APIGatewayProxyHandler = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
@@ -40,38 +25,17 @@ export const handler: APIGatewayProxyHandler = async (
             event.pathParameters as unknown as UpdateTransactionPathParameters;
         const body: UpdateTransactionBody = event.body ? JSON.parse(event.body) : {};
         const input: UpdateTransactionInput = {
-            ...body,
-            ...pathParameters,
+            body,
+            pathParameters,
             userId,
         };
 
-        Validator.register(
-            "at_least_one",
-            function (
-                this: { validator: ValidatorType<any> },
-                value,
-                requirement,
-                attribute,
-            ) {
-                const fieldToValidate = this.validator.input[requirement];
-                if (typeof fieldToValidate !== "object") return false;
-                return Object.keys(fieldToValidate).length > 0;
-            },
-        );
-
-        // Validate data
-        const validator = new Validator(
-            { ...input, atLeastOneUpdateInfo: true },
-            updateTransactionInputRules,
-            {
-                "at_least_one.atLeastOneUpdateInfo":
-                    "At least one update info must be given.",
-            },
-        );
-        if (validator.fails()) {
-            console.log(validator.errors);
+        const validation = updateTransactionInputSchema.safeParse(input);
+        if (!validation.success) {
+            console.log("Validation failed:", validation.error);
             return Utils.getInstance().getErrorResponse(ErrorType.DATA_VALIDATION);
         }
+
         if (!DatabaseUtils.getInstance().getDB()) {
             // Init DB connection
             const initConnectionResponse =

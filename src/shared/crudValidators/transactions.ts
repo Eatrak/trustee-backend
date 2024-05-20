@@ -1,3 +1,4 @@
+import Utils from "@utils/Utils";
 import { z } from "zod";
 
 export const getTransactionsValidator = {
@@ -28,20 +29,30 @@ export const createTransactionInputRules = {
     userId: "required|string",
 };
 
-export const updateTransactionInputRules = {
-    id: "required|string",
-    userId: "required|string",
-    updateInfo: {
-        name: "string",
-        walletId: "string",
-        categories: "array",
-        carriedOut: "integer",
-        amount: "numeric|min:0.01",
-        isIncome: "boolean",
-    },
-    // TODO: find a better way to achive the same validation
-    atLeastOneUpdateInfo: "at_least_one:updateInfo",
-};
+export const updateTransactionPathParametersSchema = z.object({
+    id: z.string().min(1),
+});
+
+export const updateTransactionBodySchema = z.object({
+    updateInfo: z
+        .object({
+            name: z.string().min(1),
+            walletId: z.string().min(1),
+            categories: z.array(z.string().min(1)),
+            carriedOut: z.number().min(0).int(),
+            amount: z.number().min(0.01),
+            isIncome: z.boolean(),
+        })
+        .partial()
+        // At least one attribute is defined
+        .refine(Utils.getInstance().atLeastOneIsDefined),
+});
+
+export const updateTransactionInputSchema = z.object({
+    pathParameters: updateTransactionPathParametersSchema,
+    body: updateTransactionBodySchema,
+    userId: z.string().min(1),
+});
 
 export const deleteTransactionInputRules = {
     userId: "required|string",
