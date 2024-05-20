@@ -270,21 +270,25 @@ export default class TransactionsUtils {
         id: transactionId,
         userId,
     }: GetCategoriesOfTransactionInput): Promise<
-        Result<CategoryOfTransaction[], ErrorType>
+        Result<TransactionCategory[], ErrorType>
     > {
         try {
             const categoriesOfTransaction = await DatabaseUtils.getInstance()
                 .getDB()
-                .select({
-                    id: transactionCategoryRelation.id,
-                    transactionId: transactionCategoryRelation.transactionId,
-                    categoryId: transactionCategoryRelation.categoryId,
+                .selectDistinct({
+                    id: transactionCategories.id,
+                    name: transactionCategories.name,
+                    userId: transactionCategories.userId,
                 })
                 .from(transactionCategoryRelation)
                 .where(eq(transactionCategoryRelation.transactionId, transactionId))
                 .innerJoin(
                     transactions,
                     eq(transactionCategoryRelation.transactionId, transactions.id),
+                )
+                .innerJoin(
+                    transactionCategories,
+                    eq(transactionCategoryRelation.categoryId, transactionCategories.id),
                 )
                 .innerJoin(wallets, eq(wallets.id, transactions.walletId))
                 .where(eq(wallets.userId, userId));

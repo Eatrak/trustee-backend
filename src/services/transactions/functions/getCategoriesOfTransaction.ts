@@ -55,10 +55,10 @@ export const handler: APIGatewayProxyHandler = async (
         if (queryResponse.err) {
             return Utils.getInstance().getErrorResponse(queryResponse.val);
         }
-        const categoriesOfTransaction = queryResponse.val;
+        const transactionCategories = queryResponse.val;
 
         const response: GetCategoriesOfTransactionResponseData = {
-            categoriesOfTransaction,
+            transactionCategories,
         };
 
         return Utils.getInstance().getSuccessfulResponse(200, response);
